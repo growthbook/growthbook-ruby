@@ -13,7 +13,7 @@ module Growthbook
       @variations = variations
       @coverage = options[:coverage] || 1
       @weights = options[:weights] || getEqualWeights()
-      @anon = options[:anon] || false
+      @anon = options.key?(:anon) ? options[:anon] : false
       @targeting = options[:targeting] || []
       @data = options[:data] || []
     end

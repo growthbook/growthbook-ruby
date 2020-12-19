@@ -17,7 +17,7 @@ module Growthbook
 
     def experiment(experiment)
       # If experiments are disabled globally
-      return Growthbook::Result.new unless @client.config.enabled
+      return Growthbook::Result.new unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
       id = ""
@@ -35,7 +35,9 @@ module Growthbook
 
       # User missing required user id type
       userId = experiment.anon ? @anonId : @id
-      return Growthbook::Result.new(experiment) unless userId
+      if !userId
+        return Growthbook::Result.new(experiment, -1)
+      end
 
       # Experiment has targeting rules, check if user passes
       if experiment.targeting

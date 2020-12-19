@@ -1,10 +1,10 @@
 module Growthbook
   class Client
-    attr_accessor :config
+    attr_accessor :enabled
     attr_accessor :experiments
 
-    def initialize(config = nil)
-      @config = config || Growthbook::Config.new
+    def initialize(config = {})
+      @enabled = config.key?('enabled') ? config[:enabled] : true
       @experiments = []
     end
 
@@ -20,8 +20,8 @@ module Growthbook
 
     def user(params = {})
       Growthbook::User.new(
-        params[:anonId] || "",
-        params[:id] || "",
+        params[:anonId] || nil,
+        params[:id] || nil,
         params[:attributes] || [],
         self
       )

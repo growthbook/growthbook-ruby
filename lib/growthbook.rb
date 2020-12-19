@@ -1,7 +1,6 @@
 module Growthbook
 end
 
-require 'growthbook/config'
 require 'growthbook/client'
 require 'growthbook/experiment'
 require 'growthbook/util'

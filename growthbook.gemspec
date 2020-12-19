@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.files         = [
     "lib/growthbook.rb",
     "lib/growthbook/client.rb",
-    "lib/growthbook/config.rb",
     "lib/growthbook/experiment.rb",
     "lib/growthbook/lookup_result.rb",
     "lib/growthbook/result.rb",
@@ -19,6 +18,8 @@ Gem::Specification.new do |s|
   s.license       = 'MIT'
   s.require_paths = ['lib']
 
-  s.add_runtime_dependency "json", "~> 2.3.1"
+  s.add_development_dependency "rspec", "~> 3.2"
+
+  #s.add_runtime_dependency "json", "~> 2.3.1"
   s.add_runtime_dependency "fnv", "~> 0.2.0"
 end
