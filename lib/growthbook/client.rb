@@ -1,27 +1,30 @@
-require 'growthbook/config'
-require 'growthbook/user'
+module Growthbook
+  class Client
+    attr_accessor :config
+    attr_accessor :experiments
 
-class Growthbook::Client
-  attr_accessor :config
-  attr_accessor :experiments
-
-  def initialize(config)
-    @config = config || Growthbook::Config.new
-    @experiments = []
-  end
-
-  def getExperiment(id)
-    @experiments.each do |exp|
-      return exp if exp.id == id
+    def initialize(config = nil)
+      @config = config || Growthbook::Config.new
+      @experiments = []
     end
-  end
 
-  def user(params = {})
-    Growthbook::User.new(
-      params.anonId || "",
-      params.id || "",
-      params.attributes || [],
-      self
-    )
+    def getExperiment(id)
+      match = nil;
+      @experiments.each do |exp|
+        if exp.id == id
+          match = exp
+        end
+      end
+      return match
+    end
+
+    def user(params = {})
+      Growthbook::User.new(
+        params[:anonId] || "",
+        params[:id] || "",
+        params[:attributes] || [],
+        self
+      )
+    end
   end
 end

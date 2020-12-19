@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.email         = 'jeremy@growthbook.io'
   s.homepage      = 'https://github.com/growthbook/growthbook-ruby'
   s.files         = [
+    "lib/growthbook.rb",
     "lib/growthbook/client.rb",
     "lib/growthbook/config.rb",
     "lib/growthbook/experiment.rb",

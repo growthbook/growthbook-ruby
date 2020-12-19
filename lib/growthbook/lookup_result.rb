@@ -1,14 +1,14 @@
-require 'growthbook/result'
+module Growthbook
+  class LookupResult < Growthbook::Result
+    attr_accessor :key
+    attr_accessor :value
 
-class LookupResult < Growthbook::Result
-  attr_accessor :key
-  attr_accessor :value
+    def self.fromResult(result, key)
+      obj = self.new(result.experiment, result.variation)
+      obj.key= key
+      obj.value=obj.getData(key)
 
-  def self.fromResult(result, key)
-    obj = self.new(result.experiment, result.variation)
-    obj.key= key
-    obj.value=obj.getData(key)
-
-    return obj
+      return obj
+    end
   end
 end

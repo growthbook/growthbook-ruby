@@ -1,7 +1,9 @@
-class Config
-  attr_accessor :enabled
+module Growthbook
+  class Config
+    attr_accessor :enabled
 
-  def initialize(options = {})
-    @enabled = options['enabled'] || true
+    def initialize(options = {})
+      @enabled = options[:enabled] || true
+    end
   end
 end

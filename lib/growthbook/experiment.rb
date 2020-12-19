@@ -1,35 +1,40 @@
-class Experiment
-  attr_accessor :id
-  attr_accessor :variations
-  attr_accessor :coverage
-  attr_accessor :weights
-  attr_accessor :anon
-  attr_accessor :targeting
-  attr_accessor :data
+module Growthbook
+  class Experiment
+    attr_accessor :id
+    attr_accessor :variations
+    attr_accessor :coverage
+    attr_accessor :weights
+    attr_accessor :anon
+    attr_accessor :targeting
+    attr_accessor :data
 
-  def initialize(id, variations, options = {})
-    @id = id
-    @variations = variations
-    @coverage = options['coverage'] || 1
-    @weights = options['weights'] || getEqualWeights()
-    @anon = options['anon'] || false
-    @targeting = options['targeting'] || []
-    @data = options['data'] || []
-  end
-
-  def getScaledWeights
-    @weights.map do [n]
-      n*@coverage
+    def initialize(id, variations, options = {})
+      @id = id
+      @variations = variations
+      @coverage = options[:coverage] || 1
+      @weights = options[:weights] || getEqualWeights()
+      @anon = options[:anon] || false
+      @targeting = options[:targeting] || []
+      @data = options[:data] || []
     end
-  end
 
-  private
+    def getScaledWeights
+      scaled = @weights.map do |n|
+        n*@coverage
+      end
 
-  def getEqualWeights
-    weights = []
-    for i in 0..@variations
-      weights << 1 / @variations
+      return scaled
     end
-    return weights
+
+    private
+
+    def getEqualWeights
+      weights = []
+      n = @variations
+      for i in 1..n
+        weights << (1.0 / n)
+      end
+      return weights
+    end
   end
 end
