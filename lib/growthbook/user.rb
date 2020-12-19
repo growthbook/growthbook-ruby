@@ -15,9 +15,14 @@ module Growthbook
       updateAttributeMap
     end
 
+    def attributes=(attributes)
+      @attributes = attributes
+      updateAttributeMap
+    end
+
     def experiment(experiment)
       # If experiments are disabled globally
-      return Growthbook::Result.new unless @client.enabled
+      return getResult unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
       id = ""
@@ -31,57 +36,71 @@ module Growthbook
       end
 
       # No experiment found
-      return Growthbook::Result.new(Growthbook::Experiment.new(id, 2), -1) unless experiment
+      return getResult(Growthbook::Experiment.new(id, 2)) unless experiment
 
       # User missing required user id type
       userId = experiment.anon ? @anonId : @id
       if !userId
-        return Growthbook::Result.new(experiment, -1)
+        return getResult(experiment)
       end
 
       # Experiment has targeting rules, check if user passes
       if experiment.targeting
-        return Growthbook::Result.new(experiment) unless isTargeted(experiment.targeting)
+        return getResult(experiment) unless isTargeted(experiment.targeting)
       end
 
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(userId, experiment)
-      return Growthbook::Result.new(experiment, variation)
+      return getResult(experiment, variation)
     end
 
     def lookupByDataKey(key)
       @client.experiments.each do |exp|
         if exp.data && exp.data.key?(key)
           ret = experiment(exp)
-          if ret.variation >= 0
-            return Growthbook::LookupResult.fromResult(ret, key)
+          if ret[:variation] >= 0
+            return getLookupResult(ret, key)
           end
         end
       end
 
-      return Growthbook::LookupResult.new
+      return nil
     end
 
     private
 
+    def getResult(experiment=nil, variation=-1)
+      return {
+        :variation => variation,
+        :experiment => experiment
+      }
+    end
+    def getLookupResult(result, key)
+      return {
+        :variation => result[:variation],
+        :experiment => result[:experiment],
+        :value => ""
+      }
+    end
+
     def flattenUserValues(prefix, val)
       if val.is_a? Hash
         ret = []
-        val.each do |v, k|
-          ret.concat(flattenUserValues(prefix ? prefix + "." + k : k, v))
+        val.each do |k, v|
+          ret.concat(flattenUserValues(prefix.length>0 ? prefix.to_s + "." + k.to_s : k.to_s, v))
         end
         return ret
       end
 
       if val.is_a? Array
         val = val.join ","
-      elsif val.is_a? Boolean
+      elsif !!val == val
         val = val ? "true" : "false"
       end
 
       return [
         {
-          "k" => prefix,
+          "k" => prefix.to_s,
           "v" => val.to_s
         }
       ]
@@ -96,17 +115,20 @@ module Growthbook
     end
 
     def isTargeted(rules)
+      pass = true
       rules.each do |rule|
         parts = rule.split(" ", 3)
-        
-        if parts.len == 3
-          key = parts[0].trim
+        if parts.length == 3
+          key = parts[0].strip
           actual = @attributeMap[key] || ""
-          return false if Growthbook::Util.checkRule(actual, parts[1].trim, parts[2].trim)
+          if !Growthbook::Util.checkRule(actual, parts[1].strip, parts[2].strip)
+            pass = false
+            break
+          end
         end
       end
 
-      return true
+      return pass
     end
   end
 end

@@ -10,8 +10,6 @@ Gem::Specification.new do |s|
     "lib/growthbook.rb",
     "lib/growthbook/client.rb",
     "lib/growthbook/experiment.rb",
-    "lib/growthbook/lookup_result.rb",
-    "lib/growthbook/result.rb",
     "lib/growthbook/user.rb",
     "lib/growthbook/util.rb"
   ]

@@ -6,7 +6,7 @@ describe 'growthbook' do
     if user.is_a? String
       user = @client.user(id: user)
     end
-    return user.experiment(experiment).variation
+    return user.experiment(experiment)[:variation]
   end
 
   before(:all) do
@@ -108,7 +108,7 @@ describe 'growthbook' do
       user = @client.user(id: "1")
       result = user.experiment(experiment)
 
-      expect(result.experiment).to eq(override)
+      expect(result[:experiment]).to eq(override)
     end
 
     it "targeting" do
@@ -128,8 +128,47 @@ describe 'growthbook' do
         :email => 'test@example.com'
       }
 
+      # Matches all
       user = @client.user(id: "1", attributes: attributes)
       expect(chooseVariation(user, experiment)).to eq(1)
+
+      # Missing negative checks
+      user.attributes={
+        :member => true,
+        :age => 21,
+        :source => "yahoo"
+      }
+      expect(chooseVariation(user, experiment)).to eq(1)
+
+      # Fails boolean
+      user.attributes=attributes.merge({
+        :member => false
+      })
+      expect(chooseVariation(user, experiment)).to eq(-1)
+
+      # Fails number
+      user.attributes=attributes.merge({
+        :age => 17
+      })
+      expect(chooseVariation(user, experiment)).to eq(-1)
+
+      # Fails regex
+      user.attributes=attributes.merge({
+        :source => "goog"
+      })
+      expect(chooseVariation(user, experiment)).to eq(-1)
+
+      # Fails not equals
+      user.attributes=attributes.merge({
+        :name => "matt"
+      })
+      expect(chooseVariation(user, experiment)).to eq(-1)
+
+      # Fails not regex
+      user.attributes=attributes.merge({
+        :email => "test@exclude.com"
+      })
+      expect(chooseVariation(user, experiment)).to eq(-1)
     end
   end
 end

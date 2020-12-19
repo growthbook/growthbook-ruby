@@ -5,7 +5,7 @@ module Growthbook
     def self.checkRule(actual, op, desired)
       case op
       when "="
-        actual == desired
+        actual.eql?(desired)
       when "!="
         actual != desired
       when ">"
