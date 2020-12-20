@@ -20,70 +20,6 @@ describe 'growthbook' do
   end
 
   describe "experiments" do
-    it "assigns variations with default weights" do
-      experiment = Growthbook::Experiment.new("my-test", 2)
-
-      expect(chooseVariation('1', experiment)).to eq(1)
-      expect(chooseVariation('2', experiment)).to eq(0)
-      expect(chooseVariation('3', experiment)).to eq(0)
-      expect(chooseVariation('4', experiment)).to eq(1)
-      expect(chooseVariation('5', experiment)).to eq(1)
-      expect(chooseVariation('6', experiment)).to eq(1)
-      expect(chooseVariation('7', experiment)).to eq(0)
-      expect(chooseVariation('8', experiment)).to eq(1)
-      expect(chooseVariation('9', experiment)).to eq(0)
-    end
-
-    it "assigns variations with uneven weights" do
-      experiment = Growthbook::Experiment.new("my-test", 2, weights: [0.1, 0.9])
-
-      expect(chooseVariation('1', experiment)).to eq(1)
-      expect(chooseVariation('2', experiment)).to eq(1)
-      expect(chooseVariation('3', experiment)).to eq(0)
-      expect(chooseVariation('4', experiment)).to eq(1)
-      expect(chooseVariation('5', experiment)).to eq(1)
-      expect(chooseVariation('6', experiment)).to eq(1)
-      expect(chooseVariation('7', experiment)).to eq(0)
-      expect(chooseVariation('8', experiment)).to eq(1)
-      expect(chooseVariation('9', experiment)).to eq(1)
-    end
-
-    it "assigns variations with reduced coverage" do
-      experiment = Growthbook::Experiment.new("my-test", 2, coverage: 0.4)
-
-      expect(chooseVariation('1', experiment)).to eq(-1)
-      expect(chooseVariation('2', experiment)).to eq(0)
-      expect(chooseVariation('3', experiment)).to eq(0)
-      expect(chooseVariation('4', experiment)).to eq(-1)
-      expect(chooseVariation('5', experiment)).to eq(-1)
-      expect(chooseVariation('6', experiment)).to eq(-1)
-      expect(chooseVariation('7', experiment)).to eq(0)
-      expect(chooseVariation('8', experiment)).to eq(-1)
-      expect(chooseVariation('9', experiment)).to eq(1)
-    end
-
-    it "assigns variations with default 3 variations" do
-      experiment = Growthbook::Experiment.new("my-test", 3)
-
-      expect(chooseVariation('1', experiment)).to eq(2)
-      expect(chooseVariation('2', experiment)).to eq(0)
-      expect(chooseVariation('3', experiment)).to eq(0)
-      expect(chooseVariation('4', experiment)).to eq(2)
-      expect(chooseVariation('5', experiment)).to eq(1)
-      expect(chooseVariation('6', experiment)).to eq(2)
-      expect(chooseVariation('7', experiment)).to eq(0)
-      expect(chooseVariation('8', experiment)).to eq(1)
-      expect(chooseVariation('9', experiment)).to eq(0)
-    end
-
-    it "uses experiment name to choose a variation" do
-      experiment1 = Growthbook::Experiment.new("my-test", 2)
-      experiment2 = Growthbook::Experiment.new("my-test-3", 2)
-
-      expect(chooseVariation('1', experiment1)).to eq(1)
-      expect(chooseVariation('1', experiment2)).to eq(0)
-    end
-
     it "assigns properly with both user id and anonymous ids" do
       userOnly = @client.user(id: "1")
       anonOnly = @client.user(anonId: "2")
@@ -180,36 +116,6 @@ describe 'growthbook' do
       expect(color[:value]).to eq("blue")
       expect(color[:experiment].id).to eq("button-color-safari")
       expect(size).to eq(nil)
-    end
-
-    it "does not have a sample ratio mismatch" do
-      # Full coverage
-      experiment = Growthbook::Experiment.new("my-test", 2)
-      variations = [0, 0]
-      for i in 0..999
-        variations[chooseVariation(i.to_s, experiment)] += 1
-      end
-      expect(variations[0]).to eq(503)
-
-      # Reduced coverage
-      experiment.coverage = 0.4
-      var0 = 0
-      var1 = 0
-      varn = 0
-      for i in 0..999
-        result = chooseVariation(i.to_s, experiment)
-        case result
-        when -1
-          varn += 1
-        when 0
-          var0 += 1
-        else
-          var1 += 1
-        end
-      end
-      expect(var0).to eq(200)
-      expect(var1).to eq(204)
-      expect(varn).to eq(596)
     end
 
     it "can target an experiment given rules and attributes" do

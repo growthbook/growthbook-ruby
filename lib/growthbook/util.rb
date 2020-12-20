@@ -3,20 +3,23 @@ require "fnv"
 module Growthbook
   class Util
     def self.checkRule(actual, op, desired)
+      # Check if both strings are numeric so we can do natural ordering
+      # for greater than / less than operators
+      numeric = (Float(actual) != nil && Float(desired) != nil) rescue false
+
       case op
       when "="
-        actual.eql?(desired)
+        numeric ? Float(actual) == Float(desired) : actual == desired
       when "!="
-        actual != desired
+        numeric ? Float(actual) != Float(desired) : actual != desired
       when ">"
-        # TODO: natural order string comparison
-        actual > desired
+        numeric ? Float(actual) > Float(desired) : actual > desired
       when "<"
-        actual < desired
+        numeric ? Float(actual) < Float(desired) : actual < desired
       when "~"
-        !!(actual =~ Regexp.new(desired))
+        !!(actual =~ Regexp.new(desired)) rescue false
       when "!~"
-        !(actual =~ Regexp.new(desired))
+        !(actual =~ Regexp.new(desired)) rescue false
       else
         true
       end
