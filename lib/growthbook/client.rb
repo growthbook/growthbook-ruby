@@ -4,7 +4,7 @@ module Growthbook
     attr_accessor :experiments
 
     def initialize(config = {})
-      @enabled = config.key?('enabled') ? config[:enabled] : true
+      @enabled = config.key?(:enabled) ? config[:enabled] : true
       @experiments = []
     end
 
