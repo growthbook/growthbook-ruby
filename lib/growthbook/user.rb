@@ -70,16 +70,28 @@ module Growthbook
     private
 
     def getResult(experiment=nil, variation=-1)
+      data = {}
+      if experiment && experiment.data
+        var = variation <0 ? 0 : variation
+        experiment.data.each do |k, v|
+          data[k] = v[var] || v[0]
+        end
+      end
+      
       return {
         :variation => variation,
-        :experiment => experiment
+        :experiment => experiment,
+        :data => data
       }
     end
     def getLookupResult(result, key)
+      value = result[:data][key]
+
       return {
         :variation => result[:variation],
         :experiment => result[:experiment],
-        :value => ""
+        :data => result[:data],
+        :value => value
       }
     end
 
