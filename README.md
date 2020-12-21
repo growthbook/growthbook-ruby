@@ -25,7 +25,7 @@ exp = Growthbook::Experiment.new("experiment-id", 2)
 
 result = user.experiment(exp)
 
-case result[:variation]
+case result.variation
 when 0
   puts "Control"
 when 1
@@ -144,9 +144,9 @@ experiment = Growthbook::Experiment.new("my-experiment-id", 3,
   :targeting => ["source != google"],
 
   # Add arbitrary data to the variations (see below for more info)
-  :data => [
+  :data => {
     "color" => ["blue","green","red"]
-  ]
+  }
 )
 
 result = user.experiment(experiment)
@@ -167,11 +167,11 @@ This is the simplest to understand and implement. You add branching via if/else 
 ```ruby
 result = user.experiment("experiment-id")
 
-if result[:variation] == 1
+if result.variation == 1
     # Variation
     buttonColor = "green"
 else
-    # Control
+    # Control or Not in experiment
     buttonColor = "blue"
 end
 ```
@@ -183,17 +183,17 @@ With this approach, you parameterize the variations by associating them with dat
 ```ruby
 experiment = Growthbook::Experiment.new("experiment-id", 2, 
   :data => {
-    :color => ["blue", "green"]
+    "color" => ["blue", "green"]
   }
 )
 
 result = user.experiment(experiment)
 
 # Will be either "blue" or "green"
-buttonColor = result[:data][:color]
+buttonColor = result.data["color"]
 
 # If no data is defined for the key, `nil` is returned
-result[:data][:unknown] == nil # true
+result.data["unknown"] == nil # true
 ```
 
 ### Approach 3: Configuration System
@@ -210,7 +210,7 @@ def getConfig(key)
   # If found, choose a variation and return the value for the requested key
   result = user.lookupByDataKey(key)
   if result != nil
-    return result[:value]
+    return result.value
   end
 
   # Continue with your normal lookup process
@@ -243,18 +243,17 @@ The Growth Book library does not do any event tracking.  You must implement that
 
 When someone is put into an experiment (i.e. variation >= `0`), you'll typically want to log this event in your analytics system.
 
-The `user.experiment` method returns a hash with everything you need for tracking:
+The result from either a `user.experiment` or `user.lookupByDataKey` contains everything you need for tracking:
 ```ruby
 result = user.experiment("my-test")
 
-# Don't track if the chosen variation is "-1"
-if result[:variation] == -1
-  puts "not in experiment, don't track"
-else
+if result.variation >= 0
   trackingData = {
-    "variation_id" => result[:variation], # the chosen variation, an integer
-    "experiment_id" => result[:experiment].id # "my-test"
+    "variation_id" => result.variation, # the chosen variation, an integer
+    "experiment_id" => result.experiment.id # "my-test"
   }
+else
+  puts "not in experiment, don't track"
 end
 ```
 

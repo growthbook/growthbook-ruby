@@ -11,7 +11,7 @@ describe 'user' do
       user = client.user(id: "1")
       result = user.experiment(experiment)
 
-      expect(result[:experiment]).to eq(override)
+      expect(result.experiment).to eq(override)
     end
 
     it "assigns properly with both user id and anonymous ids" do
@@ -23,13 +23,13 @@ describe 'user' do
       experimentAnon = Growthbook::Experiment.new("my-test", 2, anon:true)
       experimentUser = Growthbook::Experiment.new("my-test", 2, anon:false)
 
-      expect(userOnly.experiment(experimentUser)[:variation]).to eq(1)
-      expect(both.experiment(experimentUser)[:variation]).to eq(1)
-      expect(anonOnly.experiment(experimentUser)[:variation]).to eq(-1)
+      expect(userOnly.experiment(experimentUser).variation).to eq(1)
+      expect(both.experiment(experimentUser).variation).to eq(1)
+      expect(anonOnly.experiment(experimentUser).variation).to eq(-1)
 
-      expect(userOnly.experiment(experimentAnon)[:variation]).to eq(-1)
-      expect(both.experiment(experimentAnon)[:variation]).to eq(0)
-      expect(anonOnly.experiment(experimentAnon)[:variation]).to eq(0)
+      expect(userOnly.experiment(experimentAnon).variation).to eq(-1)
+      expect(both.experiment(experimentAnon).variation).to eq(0)
+      expect(anonOnly.experiment(experimentAnon).variation).to eq(0)
     end
 
     it "returns variation config data" do
@@ -42,17 +42,17 @@ describe 'user' do
 
       # Get correct config data
       result = user.experiment(experiment)
-      expect(result[:data][:color]).to eq("green")
-      expect(result[:data][:size]).to eq("large")
+      expect(result.data[:color]).to eq("green")
+      expect(result.data[:size]).to eq("large")
 
       # Fallback to control config data if not in test
       experiment.coverage = 0.01
       result = user.experiment(experiment)
-      expect(result[:data][:color]).to eq("blue")
-      expect(result[:data][:size]).to eq("small")
+      expect(result.data[:color]).to eq("blue")
+      expect(result.data[:size]).to eq("small")
 
       # Null for undefined keys
-      expect(result[:data][:unknown]).to eq(nil)
+      expect(result.data[:unknown]).to eq(nil)
     end
 
     it "can target an experiment given rules and attributes" do
@@ -75,7 +75,7 @@ describe 'user' do
 
       # Matches all
       user = client.user(id: "1", attributes: attributes)
-      expect(user.experiment(experiment)[:variation]).to eq(1)
+      expect(user.experiment(experiment).variation).to eq(1)
 
       # Missing negative checks
       user.attributes={
@@ -83,13 +83,13 @@ describe 'user' do
         :age => 21,
         :source => "yahoo"
       }
-      expect(user.experiment(experiment)[:variation]).to eq(1)
+      expect(user.experiment(experiment).variation).to eq(1)
 
       # Fails boolean
       user.attributes=attributes.merge({
         :member => false
       })
-      expect(user.experiment(experiment)[:variation]).to eq(-1)
+      expect(user.experiment(experiment).variation).to eq(-1)
     end
   end
 
@@ -124,19 +124,19 @@ describe 'user' do
       user = @client.user(id: "1", attributes: {:browser => "chrome"})
 
       color = user.lookupByDataKey("button.color")
-      expect(color[:value]).to eq("blue")
-      expect(color[:experiment].id).to eq("button-color-size-chrome")
+      expect(color.value).to eq("blue")
+      expect(color.experiment.id).to eq("button-color-size-chrome")
 
       size = user.lookupByDataKey("button.size")
-      expect(size[:value]).to eq("small")
-      expect(size[:experiment].id).to eq("button-color-size-chrome")
+      expect(size.value).to eq("small")
+      expect(size.experiment.id).to eq("button-color-size-chrome")
     end
     it "skips experiments that fail targeting rules" do
       user = @client.user(id: "1", attributes: {:browser => "safari"})
 
       color = user.lookupByDataKey("button.color")
-      expect(color[:value]).to eq("blue")
-      expect(color[:experiment].id).to eq("button-color-safari")
+      expect(color.value).to eq("blue")
+      expect(color.experiment.id).to eq("button-color-safari")
 
       size = user.lookupByDataKey("button.size")
       expect(size).to eq(nil)

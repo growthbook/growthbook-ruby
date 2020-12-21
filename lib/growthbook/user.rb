@@ -1,9 +1,14 @@
 module Growthbook
   class User
+    # @returns [String, nil]
     attr_accessor :id
+
+    # @returns [String, nil]
     attr_accessor :anonId
+
+    # @returns [Hash, nil]
+    attr_reader :attributes
     
-    @attributes = []
     @client
     @attributeMap = {}
 
@@ -15,14 +20,21 @@ module Growthbook
       updateAttributeMap
     end
 
+    # Set the user attributes
+    # 
+    # @params attributes [Hash, nil] Any user attributes you want to use for experiment targeting
+    #    Values can be any type, even nested arrays and hashes
     def attributes=(attributes)
       @attributes = attributes
       updateAttributeMap
     end
 
+    # Run an experiment on this user
+    # @param experiment [Growthbook::Experiment, String] If string, will lookup the experiment by id in the client
+    # @return [Growthbook::ExperimentResult]
     def experiment(experiment)
       # If experiments are disabled globally
-      return getResult unless @client.enabled
+      return Growthbook::ExperimentResult.new unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
       id = ""
@@ -36,30 +48,33 @@ module Growthbook
       end
 
       # No experiment found
-      return getResult(Growthbook::Experiment.new(id, 2)) unless experiment
+      return Growthbook::ExperimentResult.new unless experiment
 
       # User missing required user id type
       userId = experiment.anon ? @anonId : @id
       if !userId
-        return getResult(experiment)
+        return Growthbook::ExperimentResult.new(experiment)
       end
 
       # Experiment has targeting rules, check if user passes
       if experiment.targeting
-        return getResult(experiment) unless isTargeted(experiment.targeting)
+        return Growthbook::ExperimentResult.new(experiment) unless isTargeted(experiment.targeting)
       end
 
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(userId, experiment)
-      return getResult(experiment, variation)
+      return Growthbook::ExperimentResult.new(experiment, variation)
     end
 
+    # Run the first matching experiment that defines variation data for the requested key
+    # @param key [String, Symbol] The key to look up
+    # @return [Growthbook::LookupResult, nil] If nil, no matching experiments found
     def lookupByDataKey(key)
       @client.experiments.each do |exp|
         if exp.data && exp.data.key?(key)
           ret = experiment(exp)
-          if ret[:variation] >= 0
-            return getLookupResult(ret, key)
+          if ret.variation >= 0
+            return Growthbook::LookupResult.new(exp, key, ret.variation)
           end
         end
       end
@@ -69,33 +84,11 @@ module Growthbook
 
     private
 
-    def getResult(experiment=nil, variation=-1)
-      data = {}
-      if experiment && experiment.data
-        var = variation <0 ? 0 : variation
-        experiment.data.each do |k, v|
-          data[k] = v[var] || v[0]
-        end
+    def flattenUserValues(prefix, val)
+      if val.nil? 
+        return []
       end
       
-      return {
-        :variation => variation,
-        :experiment => experiment,
-        :data => data
-      }
-    end
-    def getLookupResult(result, key)
-      value = result[:data][key]
-
-      return {
-        :variation => result[:variation],
-        :experiment => result[:experiment],
-        :data => result[:data],
-        :value => value
-      }
-    end
-
-    def flattenUserValues(prefix, val)
       if val.is_a? Hash
         ret = []
         val.each do |k, v|

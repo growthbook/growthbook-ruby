@@ -11,7 +11,9 @@ Gem::Specification.new do |s|
     "lib/growthbook/client.rb",
     "lib/growthbook/experiment.rb",
     "lib/growthbook/user.rb",
-    "lib/growthbook/util.rb"
+    "lib/growthbook/util.rb",
+    "lib/growthbook/experiment_result.rb",
+    "lib/growthbook/lookup_result.rb"
   ]
   s.license       = 'MIT'
   s.require_paths = ['lib']
