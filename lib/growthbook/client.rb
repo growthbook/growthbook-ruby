@@ -12,6 +12,7 @@ module Growthbook
     def initialize(config = {})
       @enabled = config.has_key?(:enabled) ? config[:enabled] : true
       @experiments = config[:experiments] || []
+      @resultsToTrack = []
     end
 
     # Look up a pre-configured experiment by id

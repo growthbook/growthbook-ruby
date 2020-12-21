@@ -265,32 +265,19 @@ Your code now no longer cares where the value comes from. It could be a hard-cod
 
 ## Tracking
 
-The Growth Book library does not do any event tracking.  You must implement that yourself.
-
 When someone is put into an experiment, you'll typically want to log this event in your analytics system.
 
-The result from either a `user.experiment` or `user.lookupByDataKey` contains everything you need for tracking:
-```ruby
-# Also works for user.lookupByDataKey
-result = user.experiment("my-test")
+The user object has a property `resultsToTrack` that keeps track of all experiments that were run that should be tracked.
 
-if result.shouldTrack?
-  trackingData = {
-    "variation_id" => result.variation, # the chosen variation, an integer
-    "experiment_id" => result.experiment.id # "my-test"
-  }
-else
-  puts "not in experiment, don't track"
-end
-```
+For example, to track in Segment on the front-end, you can add something like this to the bottom of your HTML:
 
-For example, if you use Segment, you can pass the chosen experiments to the front-end and fire a tracking event in javascript like this for each one:
-
-```html
-<script>
-analytics.track("Experiment Viewed", {
-  experiment_id: "my-test",
-  variation_id: 0
-})
-</script>
+```erb
+  <% user.resultsToTrack.each do |result| %>
+    <script>
+    analytics.track("Experiment Viewed", {
+      experiment_id: "<%= result.experiment.id %>",
+      variation_id: <%= result.variation_id %>
+    })
+    </script>
+  <% end %>
 ```

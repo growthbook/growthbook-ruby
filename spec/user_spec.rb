@@ -140,6 +140,27 @@ describe 'user' do
     end
   end
 
+  describe "resultsToTrack" do
+    it "queues up results" do
+      client = Growthbook::Client.new
+      user = client.user(id: "1")
+
+      user.experiment(Growthbook::Experiment.new("my-test", 2))
+      user.experiment(Growthbook::Experiment.new("my-test2", 2))
+      user.experiment(Growthbook::Experiment.new("my-test3", 2))
+
+      expect(user.resultsToTrack.length).to eq(3)
+    end
+    it "ignores duplicates" do
+      client = Growthbook::Client.new
+      user = client.user(id: "1")
+      user.experiment(Growthbook::Experiment.new("my-test", 2))
+      user.experiment(Growthbook::Experiment.new("my-test", 2))
+
+      expect(user.resultsToTrack.length).to eq(1)
+    end
+  end
+
   describe ".lookupByDataKey" do
     before(:all) do
       @client = Growthbook::Client.new

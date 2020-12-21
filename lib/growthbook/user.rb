@@ -1,3 +1,5 @@
+require 'set'
+
 module Growthbook
   class User
     # @returns [String, nil]
@@ -8,9 +10,13 @@ module Growthbook
 
     # @returns [Hash, nil]
     attr_reader :attributes
+
+    # @returns [Array<Growthbook::ExperimentResult>]
+    attr_reader :resultsToTrack
     
     @client
     @attributeMap = {}
+    @experimentsTracked
 
     def initialize(anonId, id, attributes, client)
       @anonId = anonId
@@ -18,6 +24,9 @@ module Growthbook
       @attributes = attributes
       @client = client
       updateAttributeMap
+
+      @resultsToTrack = []
+      @experimentsTracked = Set[]
     end
 
     # Set the user attributes
@@ -34,7 +43,7 @@ module Growthbook
     # @return [Growthbook::ExperimentResult]
     def experiment(experiment)
       # If experiments are disabled globally
-      return Growthbook::ExperimentResult.new unless @client.enabled
+      return getExperimentResult unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
       id = ""
@@ -48,27 +57,35 @@ module Growthbook
       end
 
       # No experiment found
-      return Growthbook::ExperimentResult.new unless experiment
+      return getExperimentResult unless experiment
 
       # User missing required user id type
       userId = experiment.anon ? @anonId : @id
       if !userId
-        return Growthbook::ExperimentResult.new(experiment)
+        return getExperimentResult(experiment)
       end
 
       # Experiment has targeting rules, check if user passes
       if experiment.targeting
-        return Growthbook::ExperimentResult.new(experiment) unless isTargeted(experiment.targeting)
+        return getExperimentResult(experiment) unless isTargeted(experiment.targeting)
       end
 
       # Experiment has a specific variation forced
       if experiment.force != nil
-        return Growthbook::ExperimentResult.new(experiment, experiment.force, true)
+        return getExperimentResult(experiment, experiment.force, true)
       end
 
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(userId, experiment)
-      return Growthbook::ExperimentResult.new(experiment, variation)
+      result = getExperimentResult(experiment, variation)
+
+      # Add to the list of experiments that should be tracked in analytics
+      if result.shouldTrack? && !@experimentsTracked.include?(experiment.id)
+        @experimentsTracked << experiment.id
+        @resultsToTrack << result
+      end
+
+      return result
     end
 
     # Run the first matching experiment that defines variation data for the requested key
@@ -88,6 +105,10 @@ module Growthbook
     end
 
     private
+
+    def getExperimentResult(experiment = nil, variation = -1, forced = false)
+      Growthbook::ExperimentResult.new(self, experiment, variation, forced)
+    end
 
     def flattenUserValues(prefix, val)
       if val.nil? 
