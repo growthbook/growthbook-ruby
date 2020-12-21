@@ -120,6 +120,29 @@ client.experiments=[
 result = user.experiment("my-test")
 ```
 
+There is a helper method that can import a hash of multiple experiments at once. The expected format follows the GrowthBook API response.
+
+```ruby
+require 'json'
+
+# Example response from the GrowthBook API
+json = '{
+  "status": 200,
+  "experiments": {
+    "my-test": {
+      "variations": 2
+    },
+    "my-other-test": {
+      "variations": 3,
+      "weights": [0.5, 0.25, 0.25]
+    }
+  }
+}'
+parsed = JSON.parse(json)
+
+client.importExperimentsHash(parsed["experiments"])
+```
+
 ### Option 2: Inline Experiment Configuration
 
 As shown in the quick start above, you can use a `Growthbook::Experiment` object directly to run an experiment.

@@ -45,5 +45,22 @@ module Growthbook
         self
       )
     end
+
+    def importExperimentsHash(experimentsHash = {})
+      @experiments = []
+      experimentsHash.each do |id, data|
+        variations = data["variations"]
+
+        options = {}
+        options[:coverage] = data["coverage"] if data.has_key?("coverage")
+        options[:weights] = data["weights"] if data.has_key?("weights")
+        options[:force] = data["force"] if data.has_key?("force")
+        options[:anon] = data["anon"] if data.has_key?("anon")
+        options[:targeting] = data["targeting"] if data.has_key?("targeting")
+        options[:data] = data["data"] if data.has_key?("data")
+
+        @experiments << Growthbook::Experiment.new(id, variations, options)
+      end
+    end
   end
 end
