@@ -18,6 +18,9 @@ module Growthbook
     # @returns [Array<String>]
     attr_accessor :targeting
 
+    # @returns [Integer, nil]
+    attr_accessor :force
+
     # @returns [Hash]
     attr_accessor :data
 
@@ -34,12 +37,14 @@ module Growthbook
     #    If true, the experiment uses the anonymous id for bucketing
     # @option options [Array<String>] :targeting Array of targeting rules in the format "key op value"
     #    where op is one of: =, !=, <, >, ~, !~
+    # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
     def initialize(id, variations, options = {})
       @id = id
       @variations = variations
       @coverage = options[:coverage] || 1
       @weights = options[:weights] || getEqualWeights()
+      @force = options.has_key?(:force) ? options[:force] : nil
       @anon = options.has_key?(:anon) ? options[:anon] : false
       @targeting = options[:targeting] || []
       @data = options[:data] || {}

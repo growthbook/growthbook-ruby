@@ -55,6 +55,53 @@ describe 'user' do
       expect(result.data[:unknown]).to eq(nil)
     end
 
+    it "uses forced variations properly" do
+      client = Growthbook::Client.new
+      experiment = Growthbook::Experiment.new("my-test", 2, force: -1)
+      user = client.user(id: "1")
+
+      expect(user.experiment(experiment).variation).to eq(-1)
+      experiment.force = 0
+      expect(user.experiment(experiment).variation).to eq(0)
+      experiment.force = 1
+      expect(user.experiment(experiment).variation).to eq(1)
+    end
+
+    it "evaluates targeting before forced variation" do
+      client = Growthbook::Client.new
+      experiment = Growthbook::Experiment.new("my-test", 2, force: 1, targeting: ["age > 18"])
+      user = client.user(id: "1")
+
+      expect(user.experiment(experiment).variation).to eq(-1)
+    end
+
+    it "sets the shouldTrack flag on results" do
+      client = Growthbook::Client.new
+      experiment = Growthbook::Experiment.new("my-test", 2, data: {"color" => ["blue", "green"]})
+      client.experiments << experiment
+      user = client.user(id: "1")
+
+      # Normal
+      expect(user.experiment("my-test").shouldTrack?).to eq(true)
+      expect(user.experiment("my-test").forced?).to eq(false)
+      expect(user.lookupByDataKey("color").shouldTrack?).to eq(true)
+      expect(user.lookupByDataKey("color").forced?).to eq(false)
+
+      # Failed coverage
+      experiment.coverage = 0.01
+      expect(user.experiment("my-test").shouldTrack?).to eq(false)
+      expect(user.experiment("my-test").forced?).to eq(false)
+      expect(user.lookupByDataKey("color")).to eq(nil)
+
+      # Forced variation
+      experiment.coverage = 1.0
+      experiment.force = 1
+      expect(user.experiment("my-test").shouldTrack?).to eq(false)
+      expect(user.experiment("my-test").forced?).to eq(true)
+      expect(user.lookupByDataKey("color").shouldTrack?).to eq(false)
+      expect(user.lookupByDataKey("color").forced?).to eq(true)
+    end
+
     it "can target an experiment given rules and attributes" do
       client = Growthbook::Client.new
       experiment = Growthbook::Experiment.new("my-test", 2, targeting: [

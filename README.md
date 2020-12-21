@@ -139,6 +139,9 @@ experiment = Growthbook::Experiment.new("my-experiment-id", 3,
   # If true, use the anonymous id
   :anon => false,
 
+  # If set to an integer, force that variation for all users in the experiment
+  :force => 1,
+
   # Targeting rules
   # Evaluated against user attributes to determine who is included in the test
   :targeting => ["source != google"],
@@ -241,13 +244,14 @@ Your code now no longer cares where the value comes from. It could be a hard-cod
 
 The Growth Book library does not do any event tracking.  You must implement that yourself.
 
-When someone is put into an experiment (i.e. variation >= `0`), you'll typically want to log this event in your analytics system.
+When someone is put into an experiment, you'll typically want to log this event in your analytics system.
 
 The result from either a `user.experiment` or `user.lookupByDataKey` contains everything you need for tracking:
 ```ruby
+# Also works for user.lookupByDataKey
 result = user.experiment("my-test")
 
-if result.variation >= 0
+if result.shouldTrack?
   trackingData = {
     "variation_id" => result.variation, # the chosen variation, an integer
     "experiment_id" => result.experiment.id # "my-test"

@@ -61,6 +61,11 @@ module Growthbook
         return Growthbook::ExperimentResult.new(experiment) unless isTargeted(experiment.targeting)
       end
 
+      # Experiment has a specific variation forced
+      if experiment.force != nil
+        return Growthbook::ExperimentResult.new(experiment, experiment.force, true)
+      end
+
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(userId, experiment)
       return Growthbook::ExperimentResult.new(experiment, variation)
@@ -74,7 +79,7 @@ module Growthbook
         if exp.data && exp.data.key?(key)
           ret = experiment(exp)
           if ret.variation >= 0
-            return Growthbook::LookupResult.new(exp, key, ret.variation)
+            return Growthbook::LookupResult.new(ret, key)
           end
         end
       end
