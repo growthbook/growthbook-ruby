@@ -267,17 +267,17 @@ Your code now no longer cares where the value comes from. It could be a hard-cod
 
 When someone is put into an experiment, you'll typically want to log this event in your analytics system.
 
-The user object has a property `resultsToTrack` that keeps track of all experiments that were run that should be tracked.
+The user object has an array `resultsToTrack` that stores all experiment results that should be tracked.
 
-For example, to track in Segment on the front-end, you can add something like this to the bottom of your HTML:
+For example, if you are using Segment on the front-end, you can add something like this to the bottom of your HTML:
 
 ```erb
-  <% user.resultsToTrack.each do |result| %>
-    <script>
-    analytics.track("Experiment Viewed", {
-      experiment_id: "<%= result.experiment.id %>",
-      variation_id: <%= result.variation_id %>
-    })
-    </script>
-  <% end %>
+<% user.resultsToTrack.each do |result| %>
+  <script>
+  analytics.track("Experiment Viewed", {
+    experiment_id: "<%= result.experiment.id %>",
+    variation_id: <%= result.variation_id %>
+  })
+  </script>
+<% end %>
 ```
