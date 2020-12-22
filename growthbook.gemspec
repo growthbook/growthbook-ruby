@@ -20,6 +20,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec", "~> 3.2"
 
-  #s.add_runtime_dependency "json", "~> 2.3.1"
   s.add_runtime_dependency "fnv", "~> 0.2.0"
 end
