@@ -20,14 +20,7 @@ module Growthbook
     # @param id [String] The experiment id to look up
     # @return [Growthbook::Experiment, nil] the experiment object or nil if not found
     def getExperiment(id)
-      match = nil;
-      @experiments.each do |exp|
-        if exp.id == id
-          match = exp
-          break
-        end
-      end
-      return match
+      @experiments.detect{|exp| exp.id == id }
     end
 
     # Get a User object you can run experiments against
