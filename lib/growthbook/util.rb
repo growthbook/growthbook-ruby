@@ -61,84 +61,84 @@ module Growthbook
 
       match
     end
-  end
 
-  def self.hash(str)
-    (FNV.new.fnv1a_32(str) % 1000) / 1000.0
-  end
-
-  def self.inNamespace(userId, namespace)
-    n = hash("#{userId}__#{namespace[0]}")
-    n >= namespace[1] && n < namespace[2]
-  end
-
-  def self.getEqualWeights(numVariations)
-    weights = []
-    (1..numVariations).each do |_i|
-      weights << (1.0 / n)
-    end
-    weights
-  end
-
-  # Determine bucket ranges for experiment variations
-  def self.getBucketRanges(numVariations, coverage = 1, weights = [])
-    # Make sure coverage is within bounds
-    coverage = 0 if coverage.negative?
-    coverage = 1 if coverage > 1
-
-    # Default to equal weights
-    weights = getEqualWeights(numVariations) if weights.length != numVariations
-
-    # If weights don't add up to 1 (or close to it), default to equal weights
-    total = weights.sum
-    weights = getEqualWeights(numVariations) if total < 0.99 || total > 1.01
-
-    # Convert weights to ranges
-    cumulative = 0
-    ranges = []
-    weights.each do |w|
-      start = cumulative
-      cumulative += w
-      ranges << [start, start + coverage * w]
+    def self.hash(str)
+      (FNV.new.fnv1a_32(str) % 1000) / 1000.0
     end
 
-    ranges
-  end
-
-  # Chose a variation based on a hash and range
-  def self.chooseVariationNew(n, ranges)
-    (0..ranges.length).each do |i|
-      return i if n >= ranges[i][0] && n < ranges[i][1]
-    end
-    -1
-  end
-
-  # Get an override variation from a url querystring
-  # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
-  def self.getQueryStringOverride(id, url, numVariations)
-    # Skip if url is empty
-    return nil if url == ''
-
-    # Parse out the query string
-    parsed = URI(url)
-    qs = URI.decode_www_form(parsed.query)
-
-    # Look for `id` in the querystring and get the value
-    val = qs.assoc(id).last
-    return nil unless val
-
-    # Parse the value as an integer
-    n = begin
-      Integer(val)
-    rescue StandardError
-      nil
+    def self.inNamespace(userId, namespace)
+      n = hash("#{userId}__#{namespace[0]}")
+      n >= namespace[1] && n < namespace[2]
     end
 
-    # Make sure the integer is within range
-    return nil if n.nil?
-    return nil if n.negative?
-    return nil if n >= numVariations
+    def self.getEqualWeights(numVariations)
+      weights = []
+      (1..numVariations).each do |_i|
+        weights << (1.0 / numVariations)
+      end
+      weights
+    end
 
-    n
+    # Determine bucket ranges for experiment variations
+    def self.getBucketRanges(numVariations, coverage = 1, weights = [])
+      # Make sure coverage is within bounds
+      coverage = 0 if coverage.negative?
+      coverage = 1 if coverage > 1
+
+      # Default to equal weights
+      weights = getEqualWeights(numVariations) if !weights || weights.length != numVariations
+
+      # If weights don't add up to 1 (or close to it), default to equal weights
+      total = weights.sum
+      weights = getEqualWeights(numVariations) if total < 0.99 || total > 1.01
+
+      # Convert weights to ranges
+      cumulative = 0
+      ranges = []
+      weights.each do |w|
+        start = cumulative
+        cumulative += w
+        ranges << [start, start + coverage * w]
+      end
+
+      ranges
+    end
+
+    # Chose a variation based on a hash and range
+    def self.chooseVariationNew(n, ranges)
+      (0..ranges.length).each do |i|
+        return i if n >= ranges[i][0] && n < ranges[i][1]
+      end
+      -1
+    end
+
+    # Get an override variation from a url querystring
+    # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
+    def self.getQueryStringOverride(id, url, numVariations)
+      # Skip if url is empty
+      return nil if url == ''
+
+      # Parse out the query string
+      parsed = URI(url)
+      qs = URI.decode_www_form(parsed.query)
+
+      # Look for `id` in the querystring and get the value
+      val = qs.assoc(id).last
+      return nil unless val
+
+      # Parse the value as an integer
+      n = begin
+        Integer(val)
+      rescue StandardError
+        nil
+      end
+
+      # Make sure the integer is within range
+      return nil if n.nil?
+      return nil if n.negative?
+      return nil if n >= numVariations
+
+      n
+    end
   end
 end

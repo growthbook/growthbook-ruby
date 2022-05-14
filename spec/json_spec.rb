@@ -6,7 +6,13 @@ require 'json'
 file = File.read(File.join(File.dirname(__FILE__), 'cases.json'))
 test_cases = JSON.parse(file)
 
-describe 'tests' do
+def roundArray(arr)
+  return arr.map { 
+    |v| (v.is_a?(Float) || v.is_a?(Integer)) ? v.round(5) : roundArray(v) 
+  }
+end
+
+describe 'test suite' do
   # Test the 'getBucketRange' function
   describe 'getBucketRanges' do
     # Loop through each test case in the JSON file
@@ -22,7 +28,8 @@ describe 'tests' do
           coverage,
           weights
         )
-        expect(result).to eq(expected)
+
+        expect(roundArray(result)).to eq(roundArray(expected))
       end
     end
   end
