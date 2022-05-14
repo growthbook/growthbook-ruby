@@ -8,6 +8,35 @@ module Growthbook
     attr_accessor :qaMode
     attr_accessor :trackingCallback
 
+    def initialize(options = {})
+      @features = {}
+      @forcedVariations = {}
+      @attributes = {}
+
+      options.each do |key, value|
+        case key.to_sym
+        when :enabled
+          @enabled = value
+        when :attributes
+          @attributes = value
+        when :url
+          @url = value
+        when :features
+          value.each do |k,v|
+            @features[k] = Growthbook::Feature.new(v)
+          end
+        when :forcedVariations
+          @forcedVariations = value
+        when :qaMode
+          @qaMode = value
+        when :trackingCallback
+          @trackingCallback = value
+        else
+          warn("Unknown context option: #{key}")
+        end
+      end
+    end
+
     def getExperimentResult(experiment, variationIndex = 0, inExperiment = false)
       if variationIndex < 0 || variationIndex >= experiment.variations.length
         variationIndex = 0
@@ -16,11 +45,11 @@ module Growthbook
       hashAttribute = experiment.hashAttribute || 'id'
       hashValue = @attributes[hashAttribute] || ''
 
-      return ExperimentResult.new(inExperiment, variationIndex, experiment.variations[variationIndex], hashAttribute, hashValue)
+      return Growthbook::InlineExperimentResult.new(inExperiment, variationIndex, experiment.variations[variationIndex], hashAttribute, hashValue)
     end
 
     def getFeatureResult(value, source, experiment = nil, experiment_result = nil)
-      return FeatureResult.new(value, source, experiment, experiment_result)
+      return Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
     end
 
     def evalFeature(key)
@@ -29,9 +58,9 @@ module Growthbook
       end
 
       feature = @features[key]
-      feature.rules.each |rule| do
+      feature.rules.each do |rule|
         # Targeting condition
-        if rule.condition && !Util.evalCondition(@attributes, rule.condition)
+        if rule.condition && !Growthbook::Util.evalCondition(@attributes, rule.condition)
           continue
         end
         # Rollout or forced value rule
@@ -41,7 +70,7 @@ module Growthbook
             if !hashValue
               continue
             end
-            n = Util.hash(hashValue + key)
+            n = Growthbook::Util.hash(hashValue + key)
             if n > rule.coverage
               continue
             end
@@ -109,7 +138,7 @@ module Growthbook
         exp["weights"]
       )
       n = Growthbook::Util.hash(hashValue + key)
-      assigned = Growthbook::Util.chooseVariation(n, ranges)
+      assigned = Growthbook::Util.chooseVariationNew(n, ranges)
 
       # 10. Return if not in experiment
       return getExperimentResult(exp) if assigned < 0

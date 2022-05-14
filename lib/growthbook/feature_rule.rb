@@ -31,8 +31,8 @@ module Growthbook
 
 
     def toExperiment(feature_key)
-      if !isset($this->variations)
-          return null
+      if !@variations
+          return nil
       end
 
       options = {
@@ -42,7 +42,7 @@ module Growthbook
         :namespace => @namespace
       }
 
-      return GrowthBook.Experiment.new(@key || feature_key, @variations, options)
+      return Growthbook::InlineExperiment.new(@key || feature_key, @variations, options)
     end
   end
 end

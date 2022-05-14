@@ -17,11 +17,11 @@ module Growthbook
     attr_reader :source
 
     # The experiment used to decide the feature value
-    # @return [GrowthBook.Experiment, nil]
+    # @return [Growthbook.Experiment, nil]
     attr_reader :experiment
 
     # The result of the experiment
-    # @return [GrowthBook.ExperimentResult, nil]
+    # @return [Growthbook.ExperimentResult, nil]
     attr_reader :experiment_result
 
     def initialize(
@@ -38,4 +38,20 @@ module Growthbook
       @experiment = experiment
       @experiment_result = experiment_result
     end
+
+    def to_json
+      json = {}
+      json['on'] = @on
+      json['off'] = @off
+      json['value'] = @value
+      json['source'] = @source
+
+      if @experiment
+        json['experiment'] = @experiment
+        json['experiment_result'] = @experiment_result
+      end
+
+      return json
+    end
   end
+end

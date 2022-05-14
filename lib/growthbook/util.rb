@@ -72,6 +72,8 @@ module Growthbook
     end
 
     def self.getEqualWeights(numVariations)
+      return [] if numVariations < 1
+
       weights = []
       (1..numVariations).each do |_i|
         weights << (1.0 / numVariations)
@@ -106,10 +108,10 @@ module Growthbook
 
     # Chose a variation based on a hash and range
     def self.chooseVariationNew(n, ranges)
-      (0..ranges.length).each do |i|
-        return i if n >= ranges[i][0] && n < ranges[i][1]
+      ranges.each_with_index do |range, i|
+        return i if (n >= range[0] && n < range[1])
       end
-      -1
+      return -1
     end
 
     # Get an override variation from a url querystring
@@ -120,11 +122,14 @@ module Growthbook
 
       # Parse out the query string
       parsed = URI(url)
+      return nil unless parsed.query
       qs = URI.decode_www_form(parsed.query)
 
       # Look for `id` in the querystring and get the value
-      val = qs.assoc(id).last
-      return nil unless val
+      vals = qs.assoc(id)
+      return nil unless vals
+      val = vals.last
+      return nill unless val
 
       # Parse the value as an integer
       n = begin

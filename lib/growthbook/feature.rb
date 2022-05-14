@@ -5,14 +5,18 @@ module Growthbook
     # @return [Any , nil]
     attr_reader :default_value
 
-    # @return [Array<GrowthBook.FeatureRule>]
+    # @return [Array<Growthbook::FeatureRule>]
     attr_reader :rules
 
     def initialize(feature)
       @default_value = feature.key?('defaultValue') ? feature['defaultValue'] : nil
 
       @rules = []
-      feature['rules'].each | rule | @rules[] = GrowthBook.FeatureRule.new(rule) if feature.key?('rules')
+      if feature.key?('rules')
+        feature['rules'].each do | rule | 
+          @rules << Growthbook::FeatureRule.new(rule)
+        end
+      end
     end
   end
 end
