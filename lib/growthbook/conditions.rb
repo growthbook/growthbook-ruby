@@ -1,7 +1,7 @@
 require 'json'
 
 module Growthbook
-  class Mongrule
+  class Conditions
     def self.evalCondition(attributes, condition)
       if condition.has_key?("$or")
         return self.evalOr(attributes, condition["$or"])
@@ -121,7 +121,7 @@ module Growthbook
       when "$in"
         return conditionValue.include? attributeValue
       when "$nin"
-        return !conditionValue.include? attributeValue
+        return !(conditionValue.include? attributeValue)
       when "$elemMatch"
         return self.elemMatch(conditionValue, attributeValue)
       when "$size"

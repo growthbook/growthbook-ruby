@@ -1,35 +1,38 @@
 # frozen_string_literal: true
 
 module Growthbook
-  class Experiment
+  class InlineExperiment
     # @returns [String]
-    attr_accessor :id
+    attr_accessor :key
 
-    # @returns [Integer]
+    # @returns [Any]
     attr_accessor :variations
 
-    # @returns [Float]
-    attr_accessor :coverage
-
-    # @returns [Array<Float>]
-    attr_accessor :weights
-
-    # @returns [Boolean]
-    attr_accessor :anon
-
-    # @returns [Array<String>]
-    attr_accessor :targeting
+    # @returns [Bool]
+    attr_accessor :active
 
     # @returns [Integer, nil]
     attr_accessor :force
 
-    # @returns [Hash]
-    attr_accessor :data
+    # @returns [Array<Float>, nil]
+    attr_accessor :weights
+
+    # @returns [Float]
+    attr_accessor :coverage
+
+    # @returns [Hash, nil]
+    attr_accessor :condition
+
+    # @returns [Array]
+    attr_accessor :namespace
+
+    # @returns [String]
+    attr_accessor :hashAttribute
 
     # Constructor for an Experiment
     #
-    # @param id [String] The unique id for this experiment
-    # @param variations [Integer] The number of variations in this experiment (including the Control)
+    # @param key [String] The unique key for this experiment
+    # @param variations [Any] The array of possible variations
     # @param options [Hash]
     # @option options [Float] :coverage (1.0) The percent of elegible traffic to include in the experiment
     # @option options [Array<Float>] :weights The relative weights of the variations.
@@ -41,32 +44,16 @@ module Growthbook
     #    where op is one of: =, !=, <, >, ~, !~
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
-    def initialize(id, variations, options = {})
-      @id = id
+    def initialize(key, variations, options = {})
+      @key = key
       @variations = variations
-      @coverage = options[:coverage] || 1
-      @weights = options[:weights] || getEqualWeights
+      @active = options.key?(:active) ? options[:active] : nil
       @force = options.key?(:force) ? options[:force] : nil
-      @anon = options.key?(:anon) ? options[:anon] : false
-      @targeting = options[:targeting] || []
-      @data = options[:data] || {}
-    end
-
-    def getScaledWeights
-      @weights.map do |n|
-        n * @coverage
-      end
-    end
-
-    private
-
-    def getEqualWeights
-      weights = []
-      n = @variations
-      (1..n).each do |_i|
-        weights << (1.0 / n)
-      end
-      weights
+      @weights = options[:weights] || nil
+      @coverage = options[:coverage] || 1
+      @condition = options[:condition] || nil
+      @namespace = options[:namespace] || nil
+      @hashAttribute = options[:hashAttribute] || 'id'
     end
   end
 end

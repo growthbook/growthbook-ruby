@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Growthbook
   class LookupResult
     # The first matching experiment
@@ -31,8 +33,8 @@ module Growthbook
       @forced = result.forced?
 
       @data = {}
-      if @experiment && @experiment.data
-        var = @variation <0 ? 0 : @variation
+      if @experiment&.data
+        var = @variation.negative? ? 0 : @variation
         @experiment.data.each do |k, v|
           @data[k] = v[var]
         end
