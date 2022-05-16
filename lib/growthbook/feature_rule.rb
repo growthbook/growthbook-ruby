@@ -19,16 +19,15 @@ module Growthbook
     attr_reader :hashAttribute
 
     def initialize(rule)
-      @condition = rule.has_key?(:condition) ? rule[:condition] : nil
-      @coverage = rule.has_key?(:coverage) ? rule[:coverage] : nil
-      @force = rule.has_key?(:force) ? rule[:force] : nil
-      @variations = rule.has_key?(:variations) ? rule[:variations] : nil
-      @key = rule.has_key?(:key) ? rule[:key] : nil
-      @weights = rule.has_key?(:weights) ? rule[:weights] : nil
-      @namespace = rule.has_key?(:namespace) ? rule[:namespace] : nil
-      @hashAttribute = rule.has_key?(:hashAttribute) ? rule[:hashAttribute] : nil
+      @condition = getOption(rule, :condition)
+      @coverage = getOption(rule, :coverage)
+      @force = getOption(rule, :force)
+      @variations = getOption(rule, :variations)
+      @key = getOption(rule, :key)
+      @weights = getOption(rule, :weights)
+      @namespace = getOption(rule, :namespace)
+      @hashAttribute = getOption(rule, :hashAttribute)
     end
-
 
     def toExperiment(feature_key)
       if !@variations
@@ -43,6 +42,34 @@ module Growthbook
       }
 
       return Growthbook::InlineExperiment.new(@key || feature_key, @variations, options)
+    end
+
+    def is_experiment?
+      return !!@variations
+    end
+
+    def is_force?
+      return !is_experiment? && @force != nil
+    end
+
+    def to_json
+      res = {}
+      res["condition"] = @condition if @condition != nil
+      res["coverage"] = @coverage if @coverage != nil
+      res["force"] = @force if @force != nil
+      res["variations"] = @variations if @variations != nil
+      res["key"] = @key if @key != nil
+      res["weights"] = @weights if @weights != nil
+      res["namespace"] = @namespace if @namespace != nil
+      res["hashAttribute"] = @hashAttribute if @hashAttribute != nil
+      return res
+    end
+
+    private 
+    def getOption(hash, key)
+      return hash[key.to_sym] if hash.key?(key.to_sym)
+      return hash[key.to_s] if hash.key?(key.to_s)
+      return nil
     end
   end
 end

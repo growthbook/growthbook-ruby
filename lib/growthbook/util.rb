@@ -84,6 +84,7 @@ module Growthbook
     # Determine bucket ranges for experiment variations
     def self.getBucketRanges(numVariations, coverage = 1, weights = [])
       # Make sure coverage is within bounds
+      coverage = 1 if coverage == nil
       coverage = 0 if coverage.negative?
       coverage = 1 if coverage > 1
 

@@ -47,13 +47,33 @@ module Growthbook
     def initialize(key, variations, options = {})
       @key = key
       @variations = variations
-      @active = options.key?(:active) ? options[:active] : nil
-      @force = options.key?(:force) ? options[:force] : nil
-      @weights = options[:weights] || nil
-      @coverage = options[:coverage] || 1
-      @condition = options[:condition] || nil
-      @namespace = options[:namespace] || nil
-      @hashAttribute = options[:hashAttribute] || 'id'
+      @active = getOption(options, :active, true)
+      @force = getOption(options, :force)
+      @weights = getOption(options, :weights)
+      @coverage = getOption(options, :coverage, 1)
+      @condition = getOption(options, :condition)
+      @namespace = getOption(options, :namespace)
+      @hashAttribute = getOption(options, :hashAttribute, 'id')
+    end
+
+    def getOption(hash, key, default=nil)
+      return hash[key.to_sym] if hash.key?(key.to_sym)
+      return hash[key.to_s] if hash.key?(key.to_s)
+      return default
+    end
+
+    def to_json
+      res = {}
+      res["key"] = @key
+      res["variations"] = @variations
+      res['active'] = @active if @active != true && @active != nil
+      res['force'] = @force if @force != nil
+      res['weights'] = @weights if @weights != nil
+      res['coverage'] = @coverage if @coverage != 1 && @coverage != nil
+      res['condition'] = @condition if @condition != nil
+      res['namespace'] = @namespace if @namespace != nil
+      res['hashAttribute'] = @hashAttribute if @hashAttribute != 'id' && @hashAttribute != nil
+      return res
     end
   end
 end

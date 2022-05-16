@@ -12,6 +12,7 @@ module Growthbook
       @features = {}
       @forcedVariations = {}
       @attributes = {}
+      @enabled = true
 
       options.each do |key, value|
         case key.to_sym
@@ -23,7 +24,7 @@ module Growthbook
           @url = value
         when :features
           value.each do |k,v|
-            @features[k] = Growthbook::Feature.new(v)
+            @features[k.to_s] = Growthbook::Feature.new(v)
           end
         when :forcedVariations
           @forcedVariations = value
@@ -37,53 +38,44 @@ module Growthbook
       end
     end
 
-    def getExperimentResult(experiment, variationIndex = 0, inExperiment = false)
-      if variationIndex < 0 || variationIndex >= experiment.variations.length
-        variationIndex = 0
-      end
-
-      hashAttribute = experiment.hashAttribute || 'id'
-      hashValue = @attributes[hashAttribute] || ''
-
-      return Growthbook::InlineExperimentResult.new(inExperiment, variationIndex, experiment.variations[variationIndex], hashAttribute, hashValue)
-    end
-
-    def getFeatureResult(value, source, experiment = nil, experiment_result = nil)
-      return Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    def getAttribute(key)
+      return @attributes[key.to_sym] if @attributes.key?(key.to_sym)
+      return @attributes[key.to_s] if @attributes.key?(key.to_s)
+      return ''
     end
 
     def evalFeature(key)
-      if !@features.has_key?(key)
+      feature = getFeature(key)
+      if !feature
         return getFeatureResult(nil, "unknownFeature")
       end
 
-      feature = @features[key]
       feature.rules.each do |rule|
         # Targeting condition
-        if rule.condition && !Growthbook::Util.evalCondition(@attributes, rule.condition)
-          continue
+        if rule.condition && !conditionPasses(rule.condition)
+          next
         end
         # Rollout or forced value rule
-        if rule.force != nil
+        if rule.is_force?
           if rule.coverage != nil
-            hashValue = @attributes[rule.hashAttribute || "id"]
+            hashValue = getAttribute(rule.hashAttribute || "id")
             if !hashValue
-              continue
+              next
             end
             n = Growthbook::Util.hash(hashValue + key)
             if n > rule.coverage
-              continue
+              next
             end
           end
           return getFeatureResult(rule.force, "force")
         end
         # Experiment rule
-        if rule.variations
+        if rule.is_experiment?
           exp = rule.toExperiment(key)
           result = run(exp)
 
           if !result.in_experiment
-            continue
+            next
           end
 
           return getFeatureResult(result.value, "experiment", exp, result)
@@ -94,11 +86,11 @@ module Growthbook
       return getFeatureResult(feature.default_value || nil, "defaultValue")
     end
 
-    def _run(exp)
-      key = exp["key"]
+    def run(exp)
+      key = exp.key
 
       # 1. If experiment doesn't have enough variations, return immediately
-      return getExperimentResult(exp) if exp["variations"].length < 2
+      return getExperimentResult(exp) if exp.variations.length < 2
 
       # 2. If context is disabled, return immediately
       return getExperimentResult(exp) if !@enabled
@@ -115,27 +107,28 @@ module Growthbook
       end
 
       # 5. Exclude if not active
-      return getExperimentResult(exp) if !exp["active"]
+      return getExperimentResult(exp) if !exp.active
 
       # 6. Get hashAttribute/value and return if empty
-      hashAttribute, hashValue = getHashAttribute(exp["hashAttribute"])
+      hashAttribute = exp.hashAttribute || 'id'
+      hashValue = getAttribute(hashAttribute)
       return getExperimentResult(exp) if !hashValue.length
 
       # 7. Exclude if user not in namespace
-      if exp.has_key?("namespace")
-        return getExperimentResult(exp) if !Growthbook::Util.inNamespace(hashValue, exp["namespace"])
+      if exp.namespace
+        return getExperimentResult(exp) if !Growthbook::Util.inNamespace(hashValue, exp.namespace)
       end
 
       # 8. Exclude if condition is false
-      if exp.has_key?("condition")
-        return getExperimentResult(exp) if !conditionPasses(exp["condition"])
+      if exp.condition
+        return getExperimentResult(exp) if !conditionPasses(exp.condition)
       end
 
       # 9. Calculate bucket ranges and choose one
       ranges = Growthbook::Util.getBucketRanges(
-        exp["variations"].length,
-        exp["coverage"],
-        exp["weights"]
+        exp.variations.length,
+        exp.coverage,
+        exp.weights
       )
       n = Growthbook::Util.hash(hashValue + key)
       assigned = Growthbook::Util.chooseVariationNew(n, ranges)
@@ -144,8 +137,8 @@ module Growthbook
       return getExperimentResult(exp) if assigned < 0
 
       # 11. Experiment has a forced variation
-      if exp.has_key?("force")
-        return getExperimentResult(exp, exp["force"])
+      if exp.force != nil
+        return getExperimentResult(exp, exp.force)
       end
 
       # 12. Exclude if in QA mode
@@ -161,10 +154,6 @@ module Growthbook
       return result
     end
 
-    def conditionPasses(condition)
-      return Growthbook::Conditions.evalCondition(@attributes, condition)
-    end
-
     def isOn(key)
       return this.evalFeature(key).on
     end
@@ -176,6 +165,33 @@ module Growthbook
     def getFeatureValue(key, fallback)
       value = this.evalFeature(key).value
       return value == nil ? fallback : value
+    end
+
+    private
+
+    def conditionPasses(condition)
+      return Growthbook::Conditions.evalCondition(@attributes, condition)
+    end
+
+    def getExperimentResult(experiment, variationIndex = 0, inExperiment = false)
+      if variationIndex < 0 || variationIndex >= experiment.variations.length
+        variationIndex = 0
+      end
+
+      hashAttribute = experiment.hashAttribute || 'id'
+      hashValue = getAttribute(hashAttribute)
+
+      return Growthbook::InlineExperimentResult.new(inExperiment, variationIndex, experiment.variations[variationIndex], hashAttribute, hashValue)
+    end
+
+    def getFeatureResult(value, source, experiment = nil, experiment_result = nil)
+      return Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    end
+
+    def getFeature(key)
+      return @features[key.to_sym] if @features.key?(key.to_sym)
+      return @features[key.to_s] if @features.key?(key.to_s)
+      return nil
     end
   end
 end

@@ -36,5 +36,15 @@ module Growthbook
       @hashAttribute = hashAttribute
       @hashValue = hashValue
     end
+
+    def to_json
+      res = {}
+      res["inExperiment"] = @inExperiment
+      res["variationId"] = @variationId
+      res["value"] = @value
+      res["hashAttribute"] = @hashAttribute
+      res["hashValue"] = @hashValue
+      return res
+    end
   end
 end
