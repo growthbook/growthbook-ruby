@@ -23,15 +23,11 @@ module Growthbook
           @url = value
         when :features
           self.features = value
-        when :forced_variations
-          self.forced_variations = value
-        when :forcedVariations
+        when :forced_variations, :forcedVariations
           self.forced_variations = value
         when :forced_features
           self.forced_features = value
-        when :qaMode
-          @qa_mode = value
-        when :qa_mode
+        when :qa_mode, :qaMode
           @qa_mode = value
         when :listener
           @listener = value
@@ -41,13 +37,6 @@ module Growthbook
       end
     end
 
-    def attributes=(attrs)
-      @attributes = {}
-
-      attrs.each do |k, v|
-        @attributes[k.to_s] = v
-      end
-    end
 
     def features=(features)
       @features = {}
@@ -60,20 +49,16 @@ module Growthbook
       end
     end
 
+    def attributes=(attrs)
+      @attributes = stringify_keys(attrs || {})
+    end
+
     def forced_variations=(forced_variations)
-      @forced_variations = {}
-      forced_variations.each do |k, v|
-        # Require string keys in the forced variations hash
-        @forced_variations[k.to_s] = v
-      end
+      @forced_variations = stringify_keys(forced_variations || {})
     end
 
     def forced_features=(forced_features)
-      @forced_features = {}
-      forced_features.each do |k, v|
-        # Require string keys in the forced features hash
-        @forced_features[k.to_s] = v
-      end
+      @forced_features = stringify_keys(forced_features || {})
     end
 
     def eval_feature(key)
@@ -82,6 +67,7 @@ module Growthbook
         return get_feature_result(@forced_features[key.to_s], 'override') 
       end
 
+      # Return if we can't find the feature definition
       feature = get_feature(key)
       return get_feature_result(nil, 'unknownFeature') unless feature
 
@@ -189,6 +175,14 @@ module Growthbook
     end
 
     private
+
+    def stringify_keys(hash)
+      new_hash = {}
+      hash.each do |key, value|
+        new_hash[key.to_s] = value
+      end
+      return new_hash
+    end
 
     def condition_passes(condition)
       Growthbook::Conditions.eval_condition(@attributes, condition)

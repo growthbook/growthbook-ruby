@@ -4,6 +4,8 @@ require 'json'
 
 module Growthbook
   class Conditions
+    # Evaluate a targeting conditions hash against an attributes hash
+    # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition(attributes, condition)
       return eval_or(attributes, condition['$or']) if condition.key?('$or')
       return !eval_or(attributes, condition['$nor']) if condition.key?('$nor')
@@ -17,7 +19,7 @@ module Growthbook
       true
     end
 
-    # Conditions need to have stringified keys
+    # Helper function to ensure conditions only have string keys (no symbols)
     def self.parse_condition(condition)
       case condition
       when Array
@@ -56,7 +58,7 @@ module Growthbook
       return 'string' if attribute_value.is_a? String
       return 'number' if attribute_value.is_a? Integer
       return 'number' if attribute_value.is_a? Float
-      return 'boolean' if !!attribute_value == attribute_value
+      return 'boolean' if (attribute_value == true || attribute_value == false)
       return 'array' if attribute_value.is_a? Array
       return 'null' if attribute_value.nil?
 
@@ -68,7 +70,7 @@ module Growthbook
       current = attributes
 
       parts.each do |value|
-        if current.key?(value)
+        if current && current.is_a?(Hash) && current.key?(value)
           current = current[value]
         else
           return nil
