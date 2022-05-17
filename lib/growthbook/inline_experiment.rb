@@ -31,9 +31,9 @@ module Growthbook
 
     # Constructor for an Experiment
     #
-    # @param key [String] The unique key for this experiment
-    # @param variations [Any] The array of possible variations
     # @param options [Hash]
+    # @option options [Array<Any>] :variations The variations to pick between
+    # @option options [String] :key The unique identifier for this experiment
     # @option options [Float] :coverage (1.0) The percent of elegible traffic to include in the experiment
     # @option options [Array<Float>] :weights The relative weights of the variations.
     #    Length must be the same as the number of variations. Total should add to 1.0.
@@ -44,15 +44,9 @@ module Growthbook
     #    where op is one of: =, !=, <, >, ~, !~
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
-    def initialize(key, variations = nil, options = nil)
-      if variations.nil? && options.nil? && key.is_a?(Hash)
-        options = key
-        key = options['key']
-        variations = options['variations']
-      end
-
-      @key = key
-      @variations = variations
+    def initialize(options = {})
+      @key = getOption(options, :key, '')
+      @variations = getOption(options, :variations, [])
       @active = getOption(options, :active, true)
       @force = getOption(options, :force)
       @weights = getOption(options, :weights)

@@ -2,14 +2,16 @@
 
 module Growthbook
   class Context
-    attr_accessor :enabled, :url, :forcedVariations, :qaMode, :trackingCallback
-    attr_reader :attributes, :features
+    attr_accessor :enabled, :url, :qa_mode, :listener
+    attr_reader :attributes, :features, :impressions, :forced_variations, :forced_features
 
     def initialize(options = {})
       @features = {}
-      @forcedVariations = {}
+      @forced_variations = {}
+      @forced_features = {}
       @attributes = {}
       @enabled = true
+      @impressions = {}
 
       options.each do |key, value|
         case key.to_sym
@@ -21,12 +23,18 @@ module Growthbook
           @url = value
         when :features
           self.features = value
+        when :forced_variations
+          self.forced_variations = value
         when :forcedVariations
-          @forcedVariations = value
+          self.forced_variations = value
+        when :forced_features
+          self.forced_features = value
         when :qaMode
-          @qaMode = value
-        when :trackingCallback
-          @trackingCallback = value
+          @qa_mode = value
+        when :qa_mode
+          @qa_mode = value
+        when :listener
+          @listener = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -52,7 +60,28 @@ module Growthbook
       end
     end
 
+    def forced_variations=(forced_variations)
+      @forced_variations = {}
+      forced_variations.each do |k, v|
+        # Require string keys in the forced variations hash
+        @forced_variations[k.to_s] = v
+      end
+    end
+
+    def forced_features=(forced_features)
+      @forced_features = {}
+      forced_features.each do |k, v|
+        # Require string keys in the forced features hash
+        @forced_features[k.to_s] = v
+      end
+    end
+
     def eval_feature(key)
+      # Forced in the context
+      if @forced_features.key?(key.to_s)
+        return get_feature_result(@forced_features[key.to_s], 'override') 
+      end
+
       feature = get_feature(key)
       return get_feature_result(nil, 'unknownFeature') unless feature
 
@@ -102,7 +131,7 @@ module Growthbook
       end
 
       # 4. If variation is forced in the context, return the forced value
-      return get_experiment_result(exp, @forcedVariations[key]) if @forcedVariations.key?(key)
+      return get_experiment_result(exp, @forced_variations[key.to_s]) if @forced_variations.key?(key.to_s)
 
       # 5. Exclude if not active
       return get_experiment_result(exp) unless exp.active
@@ -134,15 +163,16 @@ module Growthbook
       return get_experiment_result(exp, exp.force) unless exp.force.nil?
 
       # 12. Exclude if in QA mode
-      return get_experiment_result(exp) if @qaMode
+      return get_experiment_result(exp) if @qa_mode
 
       # 13. Build the result object
-      get_experiment_result(exp, assigned, true)
+      result = get_experiment_result(exp, assigned, true)
 
       # 14. Fire tracking callback
-      # TODO
+      track_experiment(exp, result)
 
       # 15. Return the result
+      return result
     end
 
     def is_on?(key)
@@ -153,7 +183,7 @@ module Growthbook
       this.eval_feature(key).off
     end
 
-    def feature_value(key, fallback)
+    def feature_value(key, fallback=nil)
       value = this.eval_feature(key).value
       value.nil? ? fallback : value
     end
@@ -190,6 +220,13 @@ module Growthbook
       return @attributes[key.to_s] if @attributes.key?(key.to_s)
 
       ''
+    end
+
+    def track_experiment(experiment, result)
+      if @listener && @listener.respond_to?(:on_experiment_viewed)
+        @listener.on_experiment_viewed(experiment, result)
+      end
+      @impressions[experiment.key] = result
     end
   end
 end

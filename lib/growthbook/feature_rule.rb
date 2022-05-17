@@ -35,14 +35,14 @@ module Growthbook
     def to_experiment(feature_key)
       return nil unless @variations
 
-      options = {
+      Growthbook::InlineExperiment.new(
+        key: @key || feature_key,
+        variations: @variations,
         coverage: @coverage,
         weights: @weights,
         hash_attribute: @hash_attribute,
         namespace: @namespace
-      }
-
-      Growthbook::InlineExperiment.new(@key || feature_key, @variations, options)
+      )
     end
 
     def is_experiment?
