@@ -1,12 +1,9 @@
+# frozen_string_literal: true
+
 module Growthbook
   class Context
-    attr_accessor :enabled
-    attr_accessor :attributes
-    attr_accessor :url
-    attr_accessor :features
-    attr_accessor :forcedVariations
-    attr_accessor :qaMode
-    attr_accessor :trackingCallback
+    attr_accessor :enabled, :url, :forcedVariations, :qaMode, :trackingCallback
+    attr_reader :attributes, :features
 
     def initialize(options = {})
       @features = {}
@@ -19,13 +16,11 @@ module Growthbook
         when :enabled
           @enabled = value
         when :attributes
-          @attributes = value
+          self.attributes = value
         when :url
           @url = value
         when :features
-          value.each do |k,v|
-            @features[k.to_s] = Growthbook::Feature.new(v)
-          end
+          self.features = value
         when :forcedVariations
           @forcedVariations = value
         when :qaMode
@@ -38,160 +33,163 @@ module Growthbook
       end
     end
 
-    def getAttribute(key)
-      return @attributes[key.to_sym] if @attributes.key?(key.to_sym)
-      return @attributes[key.to_s] if @attributes.key?(key.to_s)
-      return ''
+    def attributes=(attrs)
+      @attributes = {}
+
+      attrs.each do |k, v|
+        @attributes[k.to_s] = v
+      end
     end
 
-    def evalFeature(key)
-      feature = getFeature(key)
-      if !feature
-        return getFeatureResult(nil, "unknownFeature")
+    def features=(features)
+      @features = {}
+
+      features.each do |k, v|
+        # Convert to a Feature object if it's not already
+        v = Growthbook::Feature.new(v) unless v.is_a? Growthbook::Feature
+
+        @features[k.to_s] = v
       end
+    end
+
+    def eval_feature(key)
+      feature = get_feature(key)
+      return get_feature_result(nil, 'unknownFeature') unless feature
 
       feature.rules.each do |rule|
         # Targeting condition
-        if rule.condition && !conditionPasses(rule.condition)
-          next
-        end
+        next if rule.condition && !condition_passes(rule.condition)
+
         # Rollout or forced value rule
         if rule.is_force?
-          if rule.coverage != nil
-            hashValue = getAttribute(rule.hashAttribute || "id")
-            if !hashValue
-              next
-            end
-            n = Growthbook::Util.hash(hashValue + key)
-            if n > rule.coverage
-              next
-            end
+          unless rule.coverage.nil?
+            hash_value = get_attribute(rule.hash_attribute || 'id')
+            next if hash_value.length.zero?
+
+            n = Growthbook::Util.hash(hash_value + key)
+            next if n > rule.coverage
           end
-          return getFeatureResult(rule.force, "force")
+          return get_feature_result(rule.force, 'force')
         end
         # Experiment rule
-        if rule.is_experiment?
-          exp = rule.toExperiment(key)
-          result = run(exp)
+        next unless rule.is_experiment?
 
-          if !result.in_experiment
-            next
-          end
+        exp = rule.to_experiment(key)
+        result = run(exp)
 
-          return getFeatureResult(result.value, "experiment", exp, result)
-        end
+        next unless result.in_experiment
+
+        return get_feature_result(result.value, 'experiment', exp, result)
       end
 
       # Fallback
-      return getFeatureResult(feature.default_value || nil, "defaultValue")
+      get_feature_result(feature.default_value || nil, 'defaultValue')
     end
 
     def run(exp)
       key = exp.key
 
       # 1. If experiment doesn't have enough variations, return immediately
-      return getExperimentResult(exp) if exp.variations.length < 2
+      return get_experiment_result(exp) if exp.variations.length < 2
 
       # 2. If context is disabled, return immediately
-      return getExperimentResult(exp) if !@enabled
+      return get_experiment_result(exp) unless @enabled
 
       # 3. If forced via URL querystring
       if @url
-        qsOverride = Util.getQueryStringOverride(key, @url)
-        return getExperimentResult(exp, qsOverride) if qsOverride != nil
+        qsOverride = Util.get_query_string_override(key, @url, exp.variations.length)
+        return get_experiment_result(exp, qsOverride) unless qsOverride.nil?
       end
 
       # 4. If variation is forced in the context, return the forced value
-      if @forcedVariations.has_key?(key)
-        return getExperimentResult(exp, @forcedVariations[key])
-      end
+      return get_experiment_result(exp, @forcedVariations[key]) if @forcedVariations.key?(key)
 
       # 5. Exclude if not active
-      return getExperimentResult(exp) if !exp.active
+      return get_experiment_result(exp) unless exp.active
 
-      # 6. Get hashAttribute/value and return if empty
-      hashAttribute = exp.hashAttribute || 'id'
-      hashValue = getAttribute(hashAttribute)
-      return getExperimentResult(exp) if !hashValue.length
+      # 6. Get hash_attribute/value and return if empty
+      hash_attribute = exp.hash_attribute || 'id'
+      hash_value = get_attribute(hash_attribute)
+      return get_experiment_result(exp) if hash_value.length.zero?
 
       # 7. Exclude if user not in namespace
-      if exp.namespace
-        return getExperimentResult(exp) if !Growthbook::Util.inNamespace(hashValue, exp.namespace)
-      end
+      return get_experiment_result(exp) if exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
 
       # 8. Exclude if condition is false
-      if exp.condition
-        return getExperimentResult(exp) if !conditionPasses(exp.condition)
-      end
+      return get_experiment_result(exp) if exp.condition && !condition_passes(exp.condition)
 
       # 9. Calculate bucket ranges and choose one
-      ranges = Growthbook::Util.getBucketRanges(
+      ranges = Growthbook::Util.get_bucket_ranges(
         exp.variations.length,
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.hash(hashValue + key)
-      assigned = Growthbook::Util.chooseVariationNew(n, ranges)
+      n = Growthbook::Util.hash(hash_value + key)
+      assigned = Growthbook::Util.choose_variation(n, ranges)
 
       # 10. Return if not in experiment
-      return getExperimentResult(exp) if assigned < 0
+      return get_experiment_result(exp) if assigned.negative?
 
       # 11. Experiment has a forced variation
-      if exp.force != nil
-        return getExperimentResult(exp, exp.force)
-      end
+      return get_experiment_result(exp, exp.force) unless exp.force.nil?
 
       # 12. Exclude if in QA mode
-      return getExperimentResult(exp) if @qaMode
+      return get_experiment_result(exp) if @qaMode
 
       # 13. Build the result object
-      result = getExperimentResult(exp, assigned, true)
+      get_experiment_result(exp, assigned, true)
 
       # 14. Fire tracking callback
       # TODO
 
       # 15. Return the result
-      return result
     end
 
-    def isOn(key)
-      return this.evalFeature(key).on
+    def is_on?(key)
+      this.eval_feature(key).on
     end
 
-    def isOff(key)
-      return this.evalFeature(key).off
+    def is_off?(key)
+      this.eval_feature(key).off
     end
 
-    def getFeatureValue(key, fallback)
-      value = this.evalFeature(key).value
-      return value == nil ? fallback : value
+    def feature_value(key, fallback)
+      value = this.eval_feature(key).value
+      value.nil? ? fallback : value
     end
 
     private
 
-    def conditionPasses(condition)
-      return Growthbook::Conditions.evalCondition(@attributes, condition)
+    def condition_passes(condition)
+      Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
-    def getExperimentResult(experiment, variationIndex = 0, inExperiment = false)
-      if variationIndex < 0 || variationIndex >= experiment.variations.length
-        variationIndex = 0
-      end
+    def get_experiment_result(experiment, variation_index = 0, in_experiment = false)
+      variation_index = 0 if variation_index.negative? || variation_index >= experiment.variations.length
 
-      hashAttribute = experiment.hashAttribute || 'id'
-      hashValue = getAttribute(hashAttribute)
+      hash_attribute = experiment.hash_attribute || 'id'
+      hash_value = get_attribute(hash_attribute)
 
-      return Growthbook::InlineExperimentResult.new(inExperiment, variationIndex, experiment.variations[variationIndex], hashAttribute, hashValue)
+      Growthbook::InlineExperimentResult.new(in_experiment, variation_index,
+                                             experiment.variations[variation_index], hash_attribute, hash_value)
     end
 
-    def getFeatureResult(value, source, experiment = nil, experiment_result = nil)
-      return Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    def get_feature_result(value, source, experiment = nil, experiment_result = nil)
+      Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
     end
 
-    def getFeature(key)
+    def get_feature(key)
       return @features[key.to_sym] if @features.key?(key.to_sym)
       return @features[key.to_s] if @features.key?(key.to_s)
-      return nil
+
+      nil
+    end
+
+    def get_attribute(key)
+      return @attributes[key.to_sym] if @attributes.key?(key.to_sym)
+      return @attributes[key.to_s] if @attributes.key?(key.to_s)
+
+      ''
     end
   end
 end

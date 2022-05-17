@@ -27,7 +27,7 @@ module Growthbook
     attr_accessor :namespace
 
     # @returns [String]
-    attr_accessor :hashAttribute
+    attr_accessor :hash_attribute
 
     # Constructor for an Experiment
     #
@@ -44,7 +44,13 @@ module Growthbook
     #    where op is one of: =, !=, <, >, ~, !~
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
-    def initialize(key, variations, options = {})
+    def initialize(key, variations = nil, options = nil)
+      if variations.nil? && options.nil? && key.is_a?(Hash)
+        options = key
+        key = options['key']
+        variations = options['variations']
+      end
+
       @key = key
       @variations = variations
       @active = getOption(options, :active, true)
@@ -53,27 +59,28 @@ module Growthbook
       @coverage = getOption(options, :coverage, 1)
       @condition = getOption(options, :condition)
       @namespace = getOption(options, :namespace)
-      @hashAttribute = getOption(options, :hashAttribute, 'id')
+      @hash_attribute = getOption(options, :hash_attribute) || getOption(options, :hashAttribute) || 'id'
     end
 
-    def getOption(hash, key, default=nil)
+    def getOption(hash, key, default = nil)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
-      return default
+
+      default
     end
 
-    def to_json
+    def to_json(*_args)
       res = {}
-      res["key"] = @key
-      res["variations"] = @variations
-      res['active'] = @active if @active != true && @active != nil
-      res['force'] = @force if @force != nil
-      res['weights'] = @weights if @weights != nil
-      res['coverage'] = @coverage if @coverage != 1 && @coverage != nil
-      res['condition'] = @condition if @condition != nil
-      res['namespace'] = @namespace if @namespace != nil
-      res['hashAttribute'] = @hashAttribute if @hashAttribute != 'id' && @hashAttribute != nil
-      return res
+      res['key'] = @key
+      res['variations'] = @variations
+      res['active'] = @active if @active != true && !@active.nil?
+      res['force'] = @force unless @force.nil?
+      res['weights'] = @weights unless @weights.nil?
+      res['coverage'] = @coverage if @coverage != 1 && !@coverage.nil?
+      res['condition'] = @condition unless @condition.nil?
+      res['namespace'] = @namespace unless @namespace.nil?
+      res['hashAttribute'] = @hash_attribute if @hash_attribute != 'id' && !@hash_attribute.nil?
+      res
     end
   end
 end

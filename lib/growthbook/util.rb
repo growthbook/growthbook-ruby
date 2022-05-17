@@ -66,12 +66,12 @@ module Growthbook
       (FNV.new.fnv1a_32(str) % 1000) / 1000.0
     end
 
-    def self.inNamespace(userId, namespace)
+    def self.in_namespace(userId, namespace)
       n = hash("#{userId}__#{namespace[0]}")
       n >= namespace[1] && n < namespace[2]
     end
 
-    def self.getEqualWeights(numVariations)
+    def self.get_equal_weights(numVariations)
       return [] if numVariations < 1
 
       weights = []
@@ -82,18 +82,18 @@ module Growthbook
     end
 
     # Determine bucket ranges for experiment variations
-    def self.getBucketRanges(numVariations, coverage = 1, weights = [])
+    def self.get_bucket_ranges(numVariations, coverage = 1, weights = [])
       # Make sure coverage is within bounds
-      coverage = 1 if coverage == nil
+      coverage = 1 if coverage.nil?
       coverage = 0 if coverage.negative?
       coverage = 1 if coverage > 1
 
       # Default to equal weights
-      weights = getEqualWeights(numVariations) if !weights || weights.length != numVariations
+      weights = get_equal_weights(numVariations) if !weights || weights.length != numVariations
 
       # If weights don't add up to 1 (or close to it), default to equal weights
       total = weights.sum
-      weights = getEqualWeights(numVariations) if total < 0.99 || total > 1.01
+      weights = get_equal_weights(numVariations) if total < 0.99 || total > 1.01
 
       # Convert weights to ranges
       cumulative = 0
@@ -108,27 +108,29 @@ module Growthbook
     end
 
     # Chose a variation based on a hash and range
-    def self.chooseVariationNew(n, ranges)
+    def self.choose_variation(n, ranges)
       ranges.each_with_index do |range, i|
-        return i if (n >= range[0] && n < range[1])
+        return i if n >= range[0] && n < range[1]
       end
-      return -1
+      -1
     end
 
     # Get an override variation from a url querystring
     # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
-    def self.getQueryStringOverride(id, url, numVariations)
+    def self.get_query_string_override(id, url, numVariations)
       # Skip if url is empty
       return nil if url == ''
 
       # Parse out the query string
       parsed = URI(url)
       return nil unless parsed.query
+
       qs = URI.decode_www_form(parsed.query)
 
       # Look for `id` in the querystring and get the value
       vals = qs.assoc(id)
       return nil unless vals
+
       val = vals.last
       return nill unless val
 

@@ -4,62 +4,71 @@ require 'json'
 
 module Growthbook
   class Conditions
-
-    def self.evalCondition(attributes, condition)
-      return self.evalOr(attributes, condition['$or']) if condition.has_key?('$or')
-      return !self.evalOr(attributes, condition['$nor']) if condition.has_key?('$nor')
-      return self.evalAnd(attributes, condition['$and']) if condition.has_key?('$and')
-      return !self.evalCondition(attributes, condition['$not']) if condition.has_key?('$not')
+    def self.eval_condition(attributes, condition)
+      return eval_or(attributes, condition['$or']) if condition.key?('$or')
+      return !eval_or(attributes, condition['$nor']) if condition.key?('$nor')
+      return eval_and(attributes, condition['$and']) if condition.key?('$and')
+      return !eval_condition(attributes, condition['$not']) if condition.key?('$not')
 
       condition.each do |key, value|
-        return false unless self.evalConditionValue(value, getPath(attributes, key))
+        return false unless eval_condition_value(value, get_path(attributes, key))
       end
 
       true
     end
 
-    private
+    # Conditions need to have stringified keys
+    def self.parse_condition(condition)
+      case condition
+      when Array
+        return condition.map { |v| parse_condition(v) }
+      when Hash
+        return condition.map { |k, v| [k.to_s, parse_condition(v)] }.to_h
+      end
 
-    def self.evalOr(attributes, conditions)
+      condition
+    end
+
+    def self.eval_or(attributes, conditions)
       return true if conditions.length <= 0
 
       conditions.each do |condition|
-        return true if self.evalCondition(attributes, condition)
+        return true if eval_condition(attributes, condition)
       end
       false
     end
 
-    def self.evalAnd(attributes, conditions)
+    def self.eval_and(attributes, conditions)
       conditions.each do |condition|
-        return false unless self.evalCondition(attributes, condition)
+        return false unless eval_condition(attributes, condition)
       end
       true
     end
 
-    def self.isOperatorObject(obj)
+    def self.is_operator_object(obj)
       obj.each do |key, _value|
         return false if key[0] != '$'
       end
       true
     end
 
-    def self.getType(attributeValue)
-      return 'string' if attributeValue.is_a? String
-      return 'number' if attributeValue.is_a? Integer
-      return 'number' if attributeValue.is_a? Float
-      return 'boolean' if !!attributeValue == attributeValue
-      return 'array' if attributeValue.is_a? Array
-      return 'null' if attributeValue.nil?
+    def self.get_type(attribute_value)
+      return 'string' if attribute_value.is_a? String
+      return 'number' if attribute_value.is_a? Integer
+      return 'number' if attribute_value.is_a? Float
+      return 'boolean' if !!attribute_value == attribute_value
+      return 'array' if attribute_value.is_a? Array
+      return 'null' if attribute_value.nil?
 
       'object'
     end
 
-    def self.getPath(attributes, path)
+    def self.get_path(attributes, path)
       parts = path.split('.')
       current = attributes
 
       parts.each do |value|
-        if current.has_key?(value)
+        if current.key?(value)
           current = current[value]
         else
           return nil
@@ -69,84 +78,82 @@ module Growthbook
       current
     end
 
-    def self.evalConditionValue(conditionValue, attributeValue)      
-      if conditionValue.is_a?(Hash) && self.isOperatorObject(conditionValue)
-        conditionValue.each do |key, value|
-          return false unless self.evalOperatorCondition(key, attributeValue, value)
+    def self.eval_condition_value(condition_value, attribute_value)
+      if condition_value.is_a?(Hash) && is_operator_object(condition_value)
+        condition_value.each do |key, value|
+          return false unless eval_operator_condition(key, attribute_value, value)
         end
         return true
       end
-      conditionValue.to_json == attributeValue.to_json
+      condition_value.to_json == attribute_value.to_json
     end
 
-    def self.elemMatch(condition, attributeValue)
-      return false unless attributeValue.is_a? Array
+    def self.elem_match(condition, attribute_value)
+      return false unless attribute_value.is_a? Array
 
-      attributeValue.each do |item|
-        if self.isOperatorObject(condition)
-          return true if self.evalConditionValue(condition, item)
-        elsif self.evalCondition(item, condition)
+      attribute_value.each do |item|
+        if is_operator_object(condition)
+          return true if eval_condition_value(condition, item)
+        elsif eval_condition(item, condition)
           return true
         end
       end
       false
     end
 
-    def self.evalOperatorCondition(operator, attributeValue, conditionValue)
+    def self.eval_operator_condition(operator, attribute_value, condition_value)
       case operator
       when '$eq'
-        attributeValue == conditionValue
+        attribute_value == condition_value
       when '$ne'
-        attributeValue != conditionValue
+        attribute_value != condition_value
       when '$lt'
-        attributeValue < conditionValue
+        attribute_value < condition_value
       when '$lte'
-        attributeValue <= conditionValue
+        attribute_value <= condition_value
       when '$gt'
-        attributeValue > conditionValue
+        attribute_value > condition_value
       when '$gte'
-        attributeValue >= conditionValue
+        attribute_value >= condition_value
       when '$regex'
-        self.silence_warnings do
-          begin
-            re = Regexp.new(conditionValue)
-            !!attributeValue.match(re)
-          rescue => e
-            false
-          end
+        silence_warnings do
+          re = Regexp.new(condition_value)
+          !!attribute_value.match(re)
+        rescue StandardError => e
+          false
         end
       when '$in'
-        conditionValue.include? attributeValue
+        condition_value.include? attribute_value
       when '$nin'
-        !(conditionValue.include? attributeValue)
+        !(condition_value.include? attribute_value)
       when '$elemMatch'
-        self.elemMatch(conditionValue, attributeValue)
+        elem_match(condition_value, attribute_value)
       when '$size'
-        return false unless attributeValue.is_a? Array
+        return false unless attribute_value.is_a? Array
 
-        self.evalConditionValue(conditionValue, attributeValue.length)
+        eval_condition_value(condition_value, attribute_value.length)
       when '$all'
-        return false unless attributeValue.is_a? Array
+        return false unless attribute_value.is_a? Array
 
-        conditionValue.each do |condition|
+        condition_value.each do |condition|
           passed = false
-          attributeValue.each do |attr|
-            passed = true if self.evalConditionValue(condition, attr)
+          attribute_value.each do |attr|
+            passed = true if eval_condition_value(condition, attr)
           end
           return false unless passed
         end
         true
       when '$exists'
-        exists = !attributeValue.nil?
-        if !conditionValue
+        exists = !attribute_value.nil?
+        if !condition_value
           !exists
         else
           exists
         end
       when '$type'
-        conditionValue == self.getType(attributeValue)
+        condition_value == get_type(attribute_value)
       when '$not'
-        !self.evalConditionValue(conditionValue, attributeValue)
+        !eval_condition_value(condition_value, attribute_value)
       else
         false
       end
@@ -154,8 +161,9 @@ module Growthbook
 
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.
-    def self.silence_warnings(&block)
-      old_verbose, $VERBOSE = $VERBOSE, nil
+    def self.silence_warnings
+      old_verbose = $VERBOSE
+      $VERBOSE = nil
       yield
     ensure
       $VERBOSE = old_verbose

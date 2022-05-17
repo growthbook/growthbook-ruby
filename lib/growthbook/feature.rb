@@ -14,28 +14,28 @@ module Growthbook
       rules = getOption(feature, :rules)
 
       @rules = []
-      if rules
-        rules.each do | rule | 
-          @rules << Growthbook::FeatureRule.new(rule)
-        end
+      rules&.each do |rule|
+        @rules << Growthbook::FeatureRule.new(rule)
       end
     end
 
-    def to_json
+    def to_json(*_args)
       res = {}
-      res["defaultValue"] = @default_value if @default_value != nil
-      res["rules"] = []
-      @rules.each do | rule |
-        res["rules"] << rule.to_json
+      res['defaultValue'] = @default_value unless @default_value.nil?
+      res['rules'] = []
+      @rules.each do |rule|
+        res['rules'] << rule.to_json
       end
-      return res
+      res
     end
 
-    private 
+    private
+
     def getOption(hash, key)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
-      return nil
+
+      nil
     end
   end
 end

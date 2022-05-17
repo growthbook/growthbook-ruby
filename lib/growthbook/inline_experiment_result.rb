@@ -8,7 +8,7 @@ module Growthbook
 
     # The array index of the assigned variation
     # @return [Integer]
-    attr_reader :variationId
+    attr_reader :variation_id
 
     # The assigned variation value
     # @return [Any]
@@ -16,35 +16,35 @@ module Growthbook
 
     # The attribute used to split traffic
     # @return [String]
-    attr_reader :hashAttribute
+    attr_reader :hash_attribute
 
     # The value of the hashAttribute
     # @return [String]
-    attr_reader :hashValue
+    attr_reader :hash_value
 
     def initialize(
-      inExperiment,
-      variationId,
+      in_experiment,
+      variation_id,
       value,
-      hashAttribute,
-      hashValue
+      hash_attribute,
+      hash_value
     )
 
-      @inExperiment = inExperiment
-      @variationId = variationId
+      @in_experiment = in_experiment
+      @variation_id = variation_id
       @value = value
-      @hashAttribute = hashAttribute
-      @hashValue = hashValue
+      @hash_attribute = hash_attribute
+      @hash_value = hash_value
     end
 
-    def to_json
+    def to_json(*_args)
       res = {}
-      res["inExperiment"] = @inExperiment
-      res["variationId"] = @variationId
-      res["value"] = @value
-      res["hashAttribute"] = @hashAttribute
-      res["hashValue"] = @hashValue
-      return res
+      res['inExperiment'] = @in_experiment
+      res['variationId'] = @variation_id
+      res['value'] = @value
+      res['hashAttribute'] = @hash_attribute
+      res['hashValue'] = @hash_value
+      res
     end
   end
 end

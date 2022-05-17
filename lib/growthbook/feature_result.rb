@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Growthbook
   class FeatureResult
     # The assigned value of the feature
@@ -31,15 +33,17 @@ module Growthbook
       experiment_result
     )
 
+      on = !value.nil? && value != 0 && value != '' && value != false
+
       @value = value
-      @on = value ? true : false
-      @off = value ? false : true
+      @on = on
+      @off = !on
       @source = source
       @experiment = experiment
       @experiment_result = experiment_result
     end
 
-    def to_json
+    def to_json(*_args)
       json = {}
       json['on'] = @on
       json['off'] = @off
@@ -47,11 +51,11 @@ module Growthbook
       json['source'] = @source
 
       if @experiment
-        json['experiment'] = @experiment
-        json['experiment_result'] = @experiment_result
+        json['experiment'] = @experiment.to_json
+        json['experimentResult'] = @experiment_result.to_json
       end
 
-      return json
+      json
     end
   end
 end

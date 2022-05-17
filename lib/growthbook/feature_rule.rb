@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Growthbook
   class FeatureRule
-
     # @return [Hash , nil]
     attr_reader :condition
     # @return [Float , nil]
@@ -16,60 +17,62 @@ module Growthbook
     # @return [Array , nil]
     attr_reader :namespace
     # @return [String , nil]
-    attr_reader :hashAttribute
+    attr_reader :hash_attribute
 
     def initialize(rule)
-      @condition = getOption(rule, :condition)
       @coverage = getOption(rule, :coverage)
       @force = getOption(rule, :force)
       @variations = getOption(rule, :variations)
       @key = getOption(rule, :key)
       @weights = getOption(rule, :weights)
       @namespace = getOption(rule, :namespace)
-      @hashAttribute = getOption(rule, :hashAttribute)
+      @hash_attribute = getOption(rule, :hash_attribute) || getOption(rule, :hashAttribute)
+
+      cond = getOption(rule, :condition)
+      @condition = Growthbook::Conditions.parse_condition(cond) unless cond.nil?
     end
 
-    def toExperiment(feature_key)
-      if !@variations
-          return nil
-      end
+    def to_experiment(feature_key)
+      return nil unless @variations
 
       options = {
-        :coverage => @coverage,
-        :weights => @weights,
-        :hashAttribute => @hashAttribute,
-        :namespace => @namespace
+        coverage: @coverage,
+        weights: @weights,
+        hash_attribute: @hash_attribute,
+        namespace: @namespace
       }
 
-      return Growthbook::InlineExperiment.new(@key || feature_key, @variations, options)
+      Growthbook::InlineExperiment.new(@key || feature_key, @variations, options)
     end
 
     def is_experiment?
-      return !!@variations
+      !!@variations
     end
 
     def is_force?
-      return !is_experiment? && @force != nil
+      !is_experiment? && !@force.nil?
     end
 
-    def to_json
+    def to_json(*_args)
       res = {}
-      res["condition"] = @condition if @condition != nil
-      res["coverage"] = @coverage if @coverage != nil
-      res["force"] = @force if @force != nil
-      res["variations"] = @variations if @variations != nil
-      res["key"] = @key if @key != nil
-      res["weights"] = @weights if @weights != nil
-      res["namespace"] = @namespace if @namespace != nil
-      res["hashAttribute"] = @hashAttribute if @hashAttribute != nil
-      return res
+      res['condition'] = @condition unless @condition.nil?
+      res['coverage'] = @coverage unless @coverage.nil?
+      res['force'] = @force unless @force.nil?
+      res['variations'] = @variations unless @variations.nil?
+      res['key'] = @key unless @key.nil?
+      res['weights'] = @weights unless @weights.nil?
+      res['namespace'] = @namespace unless @namespace.nil?
+      res['hashAttribute'] = @hash_attribute unless @hash_attribute.nil?
+      res
     end
 
-    private 
+    private
+
     def getOption(hash, key)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
-      return nil
+
+      nil
     end
   end
 end

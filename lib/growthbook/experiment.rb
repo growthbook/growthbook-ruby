@@ -45,7 +45,7 @@ module Growthbook
       @id = id
       @variations = variations
       @coverage = options[:coverage] || 1
-      @weights = options[:weights] || getEqualWeights
+      @weights = options[:weights] || Growthbook::Util.get_equal_weights(variations)
       @force = options.key?(:force) ? options[:force] : nil
       @anon = options.key?(:anon) ? options[:anon] : false
       @targeting = options[:targeting] || []
@@ -56,17 +56,6 @@ module Growthbook
       @weights.map do |n|
         n * @coverage
       end
-    end
-
-    private
-
-    def getEqualWeights
-      weights = []
-      n = @variations
-      (1..n).each do |_i|
-        weights << (1.0 / n)
-      end
-      weights
     end
   end
 end

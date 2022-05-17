@@ -7,9 +7,9 @@ file = File.read(File.join(File.dirname(__FILE__), 'cases.json'))
 test_cases = JSON.parse(file)
 
 def roundArray(arr)
-  return arr.map { 
-    |v| (v.is_a?(Float) || v.is_a?(Integer)) ? v.round(5) : roundArray(v) 
-  }
+  arr.map do |v|
+    v.is_a?(Float) || v.is_a?(Integer) ? v.round(5) : roundArray(v)
+  end
 end
 
 describe 'test suite' do
@@ -33,7 +33,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Util.getBucketRanges(
+        result = Growthbook::Util.get_bucket_ranges(
           num_variations,
           coverage,
           weights
@@ -52,7 +52,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Util.chooseVariationNew(n, ranges)
+        result = Growthbook::Util.choose_variation(n, ranges)
         expect(result).to eq(expected)
       end
     end
@@ -66,7 +66,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Util.getQueryStringOverride(
+        result = Growthbook::Util.get_query_string_override(
           key,
           url,
           num_variations
@@ -84,8 +84,8 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Util.inNamespace(
-          id, 
+        result = Growthbook::Util.in_namespace(
+          id,
           namespace
         )
         expect(result).to eq(expected)
@@ -101,7 +101,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it num_variations.to_s do
-        result = Growthbook::Util.getEqualWeights(
+        result = Growthbook::Util.get_equal_weights(
           num_variations
         )
         expect(roundArray(result)).to eq(roundArray(expected))
@@ -117,7 +117,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Conditions.evalCondition(
+        result = Growthbook::Conditions.eval_condition(
           attributes,
           condition
         )
@@ -125,7 +125,6 @@ describe 'test suite' do
       end
     end
   end
-
   describe 'feature' do
     # Loop through each test case in the JSON file
     test_cases['feature'].each do |test_case|
@@ -135,8 +134,25 @@ describe 'test suite' do
       # Run the actual test case
       it test_name do
         gb = Growthbook::Context.new(context)
-        result = gb.evalFeature(key)
+        result = gb.eval_feature(key)
         expect(result.to_json).to eq(expected)
+      end
+    end
+  end
+
+  describe 'run' do
+    # Loop through each test case in the JSON file
+    test_cases['run'].each do |test_case|
+      # Extract data about the test case
+      test_name, context, experiment, value, in_experiment = test_case
+
+      # Run the actual test case
+      it test_name do
+        gb = Growthbook::Context.new(context)
+        exp = Growthbook::InlineExperiment.new(experiment)
+        result = gb.run(exp)
+        expect(result.value).to eq(value)
+        expect(result.in_experiment).to eq(in_experiment)
       end
     end
   end
