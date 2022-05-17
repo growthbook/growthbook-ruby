@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'set'
 
 module Growthbook
@@ -15,7 +13,7 @@ module Growthbook
 
     # @returns [Array<Growthbook::ExperimentResult>]
     attr_reader :resultsToTrack
-
+    
     @client
     @attributeMap = {}
     @experimentsTracked
@@ -32,7 +30,7 @@ module Growthbook
     end
 
     # Set the user attributes
-    #
+    # 
     # @params attributes [Hash, nil] Any user attributes you want to use for experiment targeting
     #    Values can be any type, even nested arrays and hashes
     def attributes=(attributes)
@@ -48,7 +46,7 @@ module Growthbook
       return getExperimentResult unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
-      id = ''
+      id = ""
       if experiment.is_a? String
         id = experiment
         experiment = @client.getExperiment(id)
@@ -63,13 +61,19 @@ module Growthbook
 
       # User missing required user id type
       userId = experiment.anon ? @anonId : @id
-      return getExperimentResult(experiment) unless userId
+      if !userId
+        return getExperimentResult(experiment)
+      end
 
       # Experiment has targeting rules, check if user passes
-      return getExperimentResult(experiment) if experiment.targeting && !isTargeted(experiment.targeting)
+      if experiment.targeting
+        return getExperimentResult(experiment) unless isTargeted(experiment.targeting)
+      end
 
       # Experiment has a specific variation forced
-      return getExperimentResult(experiment, experiment.force, true) unless experiment.force.nil?
+      if experiment.force != nil
+        return getExperimentResult(experiment, experiment.force, true)
+      end
 
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(userId, experiment)
@@ -81,7 +85,7 @@ module Growthbook
         @resultsToTrack << result
       end
 
-      result
+      return result
     end
 
     # Run the first matching experiment that defines variation data for the requested key
@@ -89,13 +93,15 @@ module Growthbook
     # @return [Growthbook::LookupResult, nil] If nil, no matching experiments found
     def lookupByDataKey(key)
       @client.experiments.each do |exp|
-        next unless exp.data&.key?(key)
-
-        ret = experiment(exp)
-        return Growthbook::LookupResult.new(ret, key) if ret.variation >= 0
+        if exp.data && exp.data.key?(key)
+          ret = experiment(exp)
+          if ret.variation >= 0
+            return Growthbook::LookupResult.new(ret, key)
+          end
+        end
       end
 
-      nil
+      return nil
     end
 
     private
@@ -105,54 +111,55 @@ module Growthbook
     end
 
     def flattenUserValues(prefix, val)
-      return [] if val.nil?
-
+      if val.nil? 
+        return []
+      end
+      
       if val.is_a? Hash
         ret = []
         val.each do |k, v|
-          ret.concat(flattenUserValues(prefix.length.positive? ? "#{prefix}.#{k}" : k.to_s, v))
+          ret.concat(flattenUserValues(prefix.length>0 ? prefix.to_s + "." + k.to_s : k.to_s, v))
         end
         return ret
       end
 
-      case val
-      when Array
-        val = val.join ','
-      when !val.nil?
-        val = val ? 'true' : 'false'
+      if val.is_a? Array
+        val = val.join ","
+      elsif !!val == val
+        val = val ? "true" : "false"
       end
 
-      [
+      return [
         {
-          'k' => prefix.to_s,
-          'v' => val.to_s
+          "k" => prefix.to_s,
+          "v" => val.to_s
         }
       ]
     end
 
     def updateAttributeMap
       @attributeMap = {}
-      flat = flattenUserValues('', @attributes)
+      flat = flattenUserValues("", @attributes)
       flat.each do |item|
-        @attributeMap[item['k']] = item['v']
+        @attributeMap[item["k"]] = item["v"]
       end
     end
 
     def isTargeted(rules)
       pass = true
       rules.each do |rule|
-        parts = rule.split(' ', 3)
-        next unless parts.length == 3
-
-        key = parts[0].strip
-        actual = @attributeMap[key] || ''
-        unless Growthbook::Util.checkRule(actual, parts[1].strip, parts[2].strip)
-          pass = false
-          break
+        parts = rule.split(" ", 3)
+        if parts.length == 3
+          key = parts[0].strip
+          actual = @attributeMap[key] || ""
+          if !Growthbook::Util.checkRule(actual, parts[1].strip, parts[2].strip)
+            pass = false
+            break
+          end
         end
       end
 
-      pass
+      return pass
     end
   end
 end

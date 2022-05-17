@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Growthbook
   class ExperimentResult
     # The experiment that was performed
@@ -28,14 +26,14 @@ module Growthbook
       !@forced && @variation >= 0
     end
 
-    def initialize(_user = nil, experiment = nil, variation = -1, forced = false)
+    def initialize(user = nil, experiment = nil, variation = -1, forced = false)
       @experiment = experiment
       @variation = variation
       @forced = forced
 
       @data = {}
-      if experiment&.data
-        var = variation.negative? ? 0 : variation
+      if experiment && experiment.data
+        var = variation < 0 ? 0 : variation
         experiment.data.each do |k, v|
           @data[k] = v[var]
         end
