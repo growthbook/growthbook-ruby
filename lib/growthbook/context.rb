@@ -37,7 +37,6 @@ module Growthbook
       end
     end
 
-
     def features=(features)
       @features = {}
 
@@ -158,19 +157,19 @@ module Growthbook
       track_experiment(exp, result)
 
       # 15. Return the result
-      return result
+      result
     end
 
-    def is_on?(key)
-      this.eval_feature(key).on
+    def on?(key)
+      eval_feature(key).on
     end
 
-    def is_off?(key)
-      this.eval_feature(key).off
+    def off?(key)
+      eval_feature(key).off
     end
 
-    def feature_value(key, fallback=nil)
-      value = this.eval_feature(key).value
+    def feature_value(key, fallback = nil)
+      value = eval_feature(key).value
       value.nil? ? fallback : value
     end
 
@@ -181,7 +180,7 @@ module Growthbook
       hash.each do |key, value|
         new_hash[key.to_s] = value
       end
-      return new_hash
+      new_hash
     end
 
     def condition_passes(condition)

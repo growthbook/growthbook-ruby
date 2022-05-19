@@ -1,10 +1,10 @@
 # GrowthBook Ruby SDK
 
-[GrowthBook](https://www.growthbook.io) is a modular Feature Flagging and Experimentation platform.
+[GrowthBook](https://www.growthbook.io) is a modular feature flagging and experimentation platform.
 
 This is the Ruby client library that lets you evaluate feature flags and run experiments (A/B tests) within a Ruby application.
 
-![Build Status](https://github.com/growthbook/growthbook-ruby/workflows/Build/badge.svg)
+![Build Status](https://github.com/growthbook/growthbook-ruby/workflows/Build/badge.svg) [![Gem Version](https://badge.fury.io/rb/growthbook.svg)](https://badge.fury.io/rb/growthbook)
 
 ## Installation
 
@@ -12,7 +12,7 @@ Install the gem
 
 `gem install growthbook`
 
-## Quick Usage
+## Quick start
 
 ```ruby
 require 'growthbook'
@@ -23,28 +23,28 @@ require 'json'
 # Fetch features from GrowthBook API (or a Redis cache, etc.)
 uri = URI('https://cdn.growthbook.io/api/features/MY_API_KEY')
 res = Net::HTTP.get_response(uri)
-features = res.is_a?(Net::HTTPSuccess) ? JSON.parse(res.body)["features"] : nil
+features = res.is_a?(Net::HTTPSuccess) ? JSON.parse(res.body)['features'] : nil
 
 # Create a context for the current user/request
 gb = Growthbook::Context.new(
   features: features,
   # User attributes for targeting / variation assignment
   attributes: {
-    id: "123",
-    country: "US"
+    id: '123',
+    country: 'US'
   }
 )
 
 # Use a boolean feature flag
-if gb.is_on? :my_feature_key
-  puts "My feature is on!"
+if gb.on? :my_feature_key
+  puts 'My feature is on!'
 end
 
 # Get the value of a multivariate feature with a fallback
-btn_color = gb.feature_value(:signup_btn_color, "pink")
+btn_color = gb.feature_value(:signup_btn_color, 'pink')
 ```
 
-## Track Experiment Impressions
+## Track experiment impressions
 
 When a feature's value is determined by an experiment (A/B test), you typically want to track that assignment event for later analysis.
 
@@ -77,7 +77,7 @@ The recommended way to use GrowthBook with a Rails app is as follows:
 4. At the end of a request, track experiment impressions (if any) and destroy the Context instance
 5. (optional) Periodically refresh the list of features from the GrowthBook API in the background
 
-## Dev and QA Helpers
+## Dev and QA helpers
 
 For dev/QA it's often useful to force specific feature values.
 
@@ -101,7 +101,7 @@ For more predictability during QA, you can also globally disable all random assi
 gb.enabled = false
 ```
 
-## Inline Experiments
+## Inline experiments
 
 It's also possible to directly run an experiment directly in code without going through a feature flag.
 

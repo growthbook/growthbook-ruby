@@ -45,7 +45,7 @@ module Growthbook
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
     def initialize(options = {})
-      @key = getOption(options, :key, '')
+      @key = getOption(options, :key, '').to_s
       @variations = getOption(options, :variations, [])
       @active = getOption(options, :active, true)
       @force = getOption(options, :force)

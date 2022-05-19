@@ -58,7 +58,7 @@ module Growthbook
       return 'string' if attribute_value.is_a? String
       return 'number' if attribute_value.is_a? Integer
       return 'number' if attribute_value.is_a? Float
-      return 'boolean' if (attribute_value == true || attribute_value == false)
+      return 'boolean' if attribute_value == true || attribute_value == false
       return 'array' if attribute_value.is_a? Array
       return 'null' if attribute_value.nil?
 
@@ -121,7 +121,7 @@ module Growthbook
         silence_warnings do
           re = Regexp.new(condition_value)
           !!attribute_value.match(re)
-        rescue StandardError => e
+        rescue StandardError
           false
         end
       when '$in'

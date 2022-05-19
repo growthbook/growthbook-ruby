@@ -8,22 +8,8 @@ Gem::Specification.new do |s|
   s.authors       = ['GrowthBook']
   s.email         = 'jeremy@growthbook.io'
   s.homepage      = 'https://github.com/growthbook/growthbook-ruby'
-  s.files         = [
-    'lib/growthbook.rb',
-    'lib/growthbook/client.rb',
-    'lib/growthbook/conditions.rb',
-    'lib/growthbook/context.rb',
-    'lib/growthbook/experiment.rb',
-    'lib/growthbook/experiment_result.rb',
-    'lib/growthbook/feature.rb',
-    'lib/growthbook/feature_result.rb',
-    'lib/growthbook/feature_rule.rb',
-    'lib/growthbook/inline_experiment.rb',
-    'lib/growthbook/inline_experiment_result.rb',
-    'lib/growthbook/lookup_result.rb',
-    'lib/growthbook/user.rb',
-    'lib/growthbook/util.rb'
-  ]
+  s.files         = Dir.glob("lib/**/*")
+  s.test_files    = Dir.glob("spec/**/*")
   s.license       = 'MIT'
   s.require_paths = ['lib']
 
