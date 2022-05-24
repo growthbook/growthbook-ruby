@@ -14,6 +14,10 @@ module Growthbook
     # @return [Any]
     attr_reader :value
 
+    # If the variation was randomly assigned based on user attribute hashes
+    # @return [Bool]
+    attr_reader :hash_used
+
     # The attribute used to split traffic
     # @return [String]
     attr_reader :hash_attribute
@@ -23,6 +27,7 @@ module Growthbook
     attr_reader :hash_value
 
     def initialize(
+      hash_used,
       in_experiment,
       variation_id,
       value,
@@ -30,6 +35,7 @@ module Growthbook
       hash_value
     )
 
+      @hash_used = hash_used
       @in_experiment = in_experiment
       @variation_id = variation_id
       @value = value
@@ -40,6 +46,7 @@ module Growthbook
     def to_json(*_args)
       res = {}
       res['inExperiment'] = @in_experiment
+      res['hashUsed'] = @hash_used
       res['variationId'] = @variation_id
       res['value'] = @value
       res['hashAttribute'] = @hash_attribute
