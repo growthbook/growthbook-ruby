@@ -144,7 +144,7 @@ describe 'test suite' do
     # Loop through each test case in the JSON file
     test_cases['run'].each do |test_case|
       # Extract data about the test case
-      test_name, context, experiment, value, in_experiment = test_case
+      test_name, context, experiment, value, in_experiment, hash_used = test_case
 
       # Run the actual test case
       it test_name do
@@ -153,6 +153,7 @@ describe 'test suite' do
         result = gb.run(exp)
         expect(result.value).to eq(value)
         expect(result.in_experiment).to eq(in_experiment)
+        expect(result.hash_used).to eq(hash_used)
       end
     end
   end

@@ -187,13 +187,17 @@ module Growthbook
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
-    def get_experiment_result(experiment, variation_index = 0, in_experiment = false)
-      variation_index = 0 if variation_index.negative? || variation_index >= experiment.variations.length
+    def get_experiment_result(experiment, variation_index = -1, hash_used = false)
+      in_experiment = true
+      if variation_index.negative? || variation_index >= experiment.variations.length
+        variation_index = 0
+        in_experiment = false
+      end
 
       hash_attribute = experiment.hash_attribute || 'id'
       hash_value = get_attribute(hash_attribute)
 
-      Growthbook::InlineExperimentResult.new(in_experiment, variation_index,
+      Growthbook::InlineExperimentResult.new(hash_used, in_experiment, variation_index,
                                              experiment.variations[variation_index], hash_attribute, hash_value)
     end
 

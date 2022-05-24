@@ -103,7 +103,7 @@ gb.enabled = false
 
 ## Inline experiments
 
-It's also possible to directly run an experiment directly in code without going through a feature flag.
+It's also possible to run an experiment directly in code without going through a feature flag.
 
 ```ruby
 # Simple 50/50 experiment
@@ -120,6 +120,9 @@ puts(result.value)
 
 # The variation index (either 0 or 1)
 puts(result.variation_id)
+
+# If a variation was randomly assigned based on hashing user attributes (either true or false)
+puts(result.hash_used ? 'included' : 'excluded')
 ```
 
 There are lots of additional options when running inline experiments:

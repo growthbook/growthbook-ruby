@@ -98,6 +98,7 @@ describe 'context' do
         "hashAttribute" => "id",
         "hashValue" => "123",
         "inExperiment" => true,
+        "hashUsed" => true,
         "value" => 2,
         "variationId" => 0,
       })
@@ -111,6 +112,7 @@ describe 'context' do
           "hashAttribute" => "id",
           "hashValue" => "123",
           "inExperiment" => true,
+          "hashUsed" => true,
           "value" => 2,
           "variationId" => 0,
         }
