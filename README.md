@@ -1,3 +1,5 @@
+![](https://docs.growthbook.io/images/hero-ruby-sdk.png)
+
 # GrowthBook Ruby SDK
 
 [GrowthBook](https://www.growthbook.io) is a modular feature flagging and experimentation platform.
