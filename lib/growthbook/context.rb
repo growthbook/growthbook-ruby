@@ -77,7 +77,7 @@ module Growthbook
         # Rollout or forced value rule
         if rule.is_force?
           unless rule.coverage.nil?
-            hash_value = get_attribute(rule.hash_attribute || 'id')
+            hash_value = get_attribute(rule.hash_attribute || 'id').to_s
             next if hash_value.length.zero?
 
             n = Growthbook::Util.hash(hash_value + key)
@@ -89,7 +89,7 @@ module Growthbook
         next unless rule.is_experiment?
 
         exp = rule.to_experiment(key)
-        result = run(exp)
+        result = _run(exp, key)
 
         next unless result.in_experiment
 
@@ -101,63 +101,7 @@ module Growthbook
     end
 
     def run(exp)
-      key = exp.key
-
-      # 1. If experiment doesn't have enough variations, return immediately
-      return get_experiment_result(exp) if exp.variations.length < 2
-
-      # 2. If context is disabled, return immediately
-      return get_experiment_result(exp) unless @enabled
-
-      # 3. If forced via URL querystring
-      if @url
-        qsOverride = Util.get_query_string_override(key, @url, exp.variations.length)
-        return get_experiment_result(exp, qsOverride) unless qsOverride.nil?
-      end
-
-      # 4. If variation is forced in the context, return the forced value
-      return get_experiment_result(exp, @forced_variations[key.to_s]) if @forced_variations.key?(key.to_s)
-
-      # 5. Exclude if not active
-      return get_experiment_result(exp) unless exp.active
-
-      # 6. Get hash_attribute/value and return if empty
-      hash_attribute = exp.hash_attribute || 'id'
-      hash_value = get_attribute(hash_attribute)
-      return get_experiment_result(exp) if hash_value.length.zero?
-
-      # 7. Exclude if user not in namespace
-      return get_experiment_result(exp) if exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
-
-      # 8. Exclude if condition is false
-      return get_experiment_result(exp) if exp.condition && !condition_passes(exp.condition)
-
-      # 9. Calculate bucket ranges and choose one
-      ranges = Growthbook::Util.get_bucket_ranges(
-        exp.variations.length,
-        exp.coverage,
-        exp.weights
-      )
-      n = Growthbook::Util.hash(hash_value + key)
-      assigned = Growthbook::Util.choose_variation(n, ranges)
-
-      # 10. Return if not in experiment
-      return get_experiment_result(exp) if assigned.negative?
-
-      # 11. Experiment has a forced variation
-      return get_experiment_result(exp, exp.force) unless exp.force.nil?
-
-      # 12. Exclude if in QA mode
-      return get_experiment_result(exp) if @qa_mode
-
-      # 13. Build the result object
-      result = get_experiment_result(exp, assigned, true)
-
-      # 14. Fire tracking callback
-      track_experiment(exp, result)
-
-      # 15. Return the result
-      result
+      _run(exp)
     end
 
     def on?(key)
@@ -175,6 +119,66 @@ module Growthbook
 
     private
 
+    def _run(exp, feature_id="")
+      key = exp.key
+
+      # 1. If experiment doesn't have enough variations, return immediately
+      return get_experiment_result(exp, -1, false, feature_id) if exp.variations.length < 2
+
+      # 2. If context is disabled, return immediately
+      return get_experiment_result(exp, -1, false, feature_id) unless @enabled
+
+      # 3. If forced via URL querystring
+      if @url
+        qsOverride = Util.get_query_string_override(key, @url, exp.variations.length)
+        return get_experiment_result(exp, qsOverride, false, feature_id) unless qsOverride.nil?
+      end
+
+      # 4. If variation is forced in the context, return the forced value
+      return get_experiment_result(exp, @forced_variations[key.to_s], false, feature_id) if @forced_variations.key?(key.to_s)
+
+      # 5. Exclude if not active
+      return get_experiment_result(exp, -1, false, feature_id) unless exp.active
+
+      # 6. Get hash_attribute/value and return if empty
+      hash_attribute = exp.hash_attribute || 'id'
+      hash_value = get_attribute(hash_attribute).to_s
+      return get_experiment_result(exp, -1, false, feature_id) if hash_value.length.zero?
+
+      # 7. Exclude if user not in namespace
+      return get_experiment_result(exp, -1, false, feature_id) if exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
+
+      # 8. Exclude if condition is false
+      return get_experiment_result(exp, -1, false, feature_id) if exp.condition && !condition_passes(exp.condition)
+
+      # 9. Calculate bucket ranges and choose one
+      ranges = Growthbook::Util.get_bucket_ranges(
+        exp.variations.length,
+        exp.coverage,
+        exp.weights
+      )
+      n = Growthbook::Util.hash(hash_value + key)
+      assigned = Growthbook::Util.choose_variation(n, ranges)
+
+      # 10. Return if not in experiment
+      return get_experiment_result(exp, -1, false, feature_id) if assigned.negative?
+
+      # 11. Experiment has a forced variation
+      return get_experiment_result(exp, exp.force, false, feature_id) unless exp.force.nil?
+
+      # 12. Exclude if in QA mode
+      return get_experiment_result(exp, -1, false, feature_id) if @qa_mode
+
+      # 13. Build the result object
+      result = get_experiment_result(exp, assigned, true, feature_id)
+
+      # 14. Fire tracking callback
+      track_experiment(exp, result)
+
+      # 15. Return the result
+      result
+    end
+
     def stringify_keys(hash)
       new_hash = {}
       hash.each do |key, value|
@@ -187,7 +191,7 @@ module Growthbook
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
-    def get_experiment_result(experiment, variation_index = -1, hash_used = false)
+    def get_experiment_result(experiment, variation_index = -1, hash_used = false, feature_id = "")
       in_experiment = true
       if variation_index.negative? || variation_index >= experiment.variations.length
         variation_index = 0
@@ -198,7 +202,7 @@ module Growthbook
       hash_value = get_attribute(hash_attribute)
 
       Growthbook::InlineExperimentResult.new(hash_used, in_experiment, variation_index,
-                                             experiment.variations[variation_index], hash_attribute, hash_value)
+                                             experiment.variations[variation_index], hash_attribute, hash_value, feature_id)
     end
 
     def get_feature_result(value, source, experiment = nil, experiment_result = nil)
