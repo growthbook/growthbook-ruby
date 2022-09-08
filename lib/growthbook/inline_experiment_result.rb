@@ -26,13 +26,16 @@ module Growthbook
     # @return [String]
     attr_reader :hash_value
 
+    attr_reader :feature_id
+
     def initialize(
       hash_used,
       in_experiment,
       variation_id,
       value,
       hash_attribute,
-      hash_value
+      hash_value,
+      feature_id
     )
 
       @hash_used = hash_used
@@ -41,6 +44,7 @@ module Growthbook
       @value = value
       @hash_attribute = hash_attribute
       @hash_value = hash_value
+      @feature_id = feature_id
     end
 
     def to_json(*_args)
@@ -51,6 +55,7 @@ module Growthbook
       res['value'] = @value
       res['hashAttribute'] = @hash_attribute
       res['hashValue'] = @hash_value
+      res['featureId'] = @feature_id.to_s
       res
     end
   end
