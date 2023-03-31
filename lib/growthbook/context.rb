@@ -2,8 +2,28 @@
 
 module Growthbook
   class Context
-    attr_accessor :enabled, :url, :qa_mode, :listener
-    attr_reader :attributes, :features, :impressions, :forced_variations, :forced_features
+    # @return [true, false] Switch to globally disable all experiments. Default true.
+    attr_accessor :enabled
+
+    # @return [String] The URL of the current page
+    attr_accessor :url
+
+    # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
+    attr_accessor :qa_mode
+
+    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
+    attr_accessor :listener
+
+    # @return [Hash] Map of user attributes that are used to assign variations
+    attr_reader :attributes
+
+    # @return [Hash] Feature definitions (usually pulled from an API or cache)
+    attr_reader :features
+
+    # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
+    attr_reader :forced_variations
+
+    attr_reader :impressions, :forced_features
 
     def initialize(options = {})
       @features = {}
@@ -201,8 +221,10 @@ module Growthbook
       hash_attribute = experiment.hash_attribute || 'id'
       hash_value = get_attribute(hash_attribute)
 
-      Growthbook::InlineExperimentResult.new(hash_used, in_experiment, variation_index,
-                                             experiment.variations[variation_index], hash_attribute, hash_value, feature_id)
+      Growthbook::InlineExperimentResult.new(
+        { in_experiment: in_experiment, variation_id: variation_index, value: experiment.variations[variation_index],
+          hash_used: hash_used, hash_attribute: hash_attribute, hash_value: hash_value, feature_id: feature_id }
+      )
     end
 
     def get_feature_result(value, source, experiment = nil, experiment_result = nil)
