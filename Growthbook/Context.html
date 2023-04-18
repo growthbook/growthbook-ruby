@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Growthbook::Context
+  
+    &mdash; Documentation by YARD 0.9.34
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Growthbook::Context";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span>
+     &raquo; 
+    <span class="title">Context</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Growthbook::Context
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Growthbook::Context</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/growthbook/context.rb</dd>
+  </dl>
+  
+</div>
+
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attributes-instance_method" title="#attributes (instance method)">#<strong>attributes</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute attributes.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enabled-instance_method" title="#enabled (instance method)">#<strong>enabled</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute enabled.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#features-instance_method" title="#features (instance method)">#<strong>features</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute features.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#forced_features-instance_method" title="#forced_features (instance method)">#<strong>forced_features</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute forced_features.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#forced_variations-instance_method" title="#forced_variations (instance method)">#<strong>forced_variations</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute forced_variations.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#impressions-instance_method" title="#impressions (instance method)">#<strong>impressions</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute impressions.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#listener-instance_method" title="#listener (instance method)">#<strong>listener</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute listener.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#qa_mode-instance_method" title="#qa_mode (instance method)">#<strong>qa_mode</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute qa_mode.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#url-instance_method" title="#url (instance method)">#<strong>url</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute url.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#eval_feature-instance_method" title="#eval_feature (instance method)">#<strong>eval_feature</strong>(key)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#feature_value-instance_method" title="#feature_value (instance method)">#<strong>feature_value</strong>(key, fallback = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(options = {})  &#x21d2; Context </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Context.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#off%3F-instance_method" title="#off? (instance method)">#<strong>off?</strong>(key)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on%3F-instance_method" title="#on? (instance method)">#<strong>on?</strong>(key)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(exp)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(options = {})  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::Context (class)">Context</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of Context.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 8</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='ivar'>@features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@forced_variations</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@forced_features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@enabled</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='ivar'>@impressions</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+    <span class='kw'>when</span> <span class='symbol'>:enabled</span>
+      <span class='ivar'>@enabled</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:attributes</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:url</span>
+      <span class='ivar'>@url</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:features</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_features'>features</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:forced_variations</span><span class='comma'>,</span> <span class='symbol'>:forcedVariations</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_forced_variations'>forced_variations</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:forced_features</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_forced_features'>forced_features</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:qa_mode</span><span class='comma'>,</span> <span class='symbol'>:qaMode</span>
+      <span class='ivar'>@qa_mode</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>when</span> <span class='symbol'>:listener</span>
+      <span class='ivar'>@listener</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown context option: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="attributes=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="attributes-instance_method">
+  
+    #<strong>attributes</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute attributes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
+  <span class='ivar'>@attributes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="enabled=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="enabled-instance_method">
+  
+    #<strong>enabled</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute enabled.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+5
+6
+7</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 5</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enabled'>enabled</span>
+  <span class='ivar'>@enabled</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="features=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="features-instance_method">
+  
+    #<strong>features</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute features.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_features'>features</span>
+  <span class='ivar'>@features</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="forced_features=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="forced_features-instance_method">
+  
+    #<strong>forced_features</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute forced_features.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_forced_features'>forced_features</span>
+  <span class='ivar'>@forced_features</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="forced_variations=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="forced_variations-instance_method">
+  
+    #<strong>forced_variations</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute forced_variations.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_forced_variations'>forced_variations</span>
+  <span class='ivar'>@forced_variations</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="impressions-instance_method">
+  
+    #<strong>impressions</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute impressions.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+6
+7
+8</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 6</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_impressions'>impressions</span>
+  <span class='ivar'>@impressions</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="listener=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="listener-instance_method">
+  
+    #<strong>listener</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute listener.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+5
+6
+7</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 5</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_listener'>listener</span>
+  <span class='ivar'>@listener</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="qa_mode=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="qa_mode-instance_method">
+  
+    #<strong>qa_mode</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute qa_mode.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+5
+6
+7</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 5</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_qa_mode'>qa_mode</span>
+  <span class='ivar'>@qa_mode</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="url=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="url-instance_method">
+  
+    #<strong>url</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute url.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+5
+6
+7</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 5</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_url'>url</span>
+  <span class='ivar'>@url</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="eval_feature-instance_method">
+  
+    #<strong>eval_feature</strong>(key)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='comment'># Forced in the context
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='ivar'>@forced_features</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>override</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@forced_features</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+  <span class='comment'># Return if we can&#39;t find the feature definition
+</span>  <span class='id identifier rubyid_feature'>feature</span> <span class='op'>=</span> <span class='id identifier rubyid_get_feature'>get_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unknownFeature</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_feature'>feature</span>
+
+  <span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_rules'>rules</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_rule'>rule</span><span class='op'>|</span>
+    <span class='comment'># Targeting condition
+</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_condition_passes'>condition_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span>
+
+    <span class='comment'># Rollout or forced value rule
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_is_force?'>is_force?</span>
+      <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_coverage'>coverage</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_hash_value'>hash_value</span> <span class='op'>=</span> <span class='id identifier rubyid_get_attribute'>get_attribute</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_hash_attribute'>hash_attribute</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+        <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_hash_value'>hash_value</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+        <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util.html" title="Growthbook::Util (class)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_hash'><span class='object_link'><a href="Util.html#hash-class_method" title="Growthbook::Util.hash (method)">hash</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_hash_value'>hash_value</span> <span class='op'>+</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+        <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_coverage'>coverage</span>
+      <span class='kw'>end</span>
+      <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>force</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='comment'># Experiment rule
+</span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_is_experiment?'>is_experiment?</span>
+
+    <span class='id identifier rubyid_exp'>exp</span> <span class='op'>=</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_to_experiment'>to_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_in_experiment'>in_experiment</span>
+
+    <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>experiment</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_exp'>exp</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Fallback
+</span>  <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span> <span class='op'>||</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defaultValue</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="feature_value-instance_method">
+  
+    #<strong>feature_value</strong>(key, fallback = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113
+114
+115
+116</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_feature_value'>feature_value</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback'>fallback</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+  <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_fallback'>fallback</span> <span class='op'>:</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="off?-instance_method">
+  
+    #<strong>off?</strong>(key)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_off?'>off?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_off'>off</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on?-instance_method">
+  
+    #<strong>on?</strong>(key)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on?'>on?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run-instance_method">
+  
+    #<strong>run</strong>(exp)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+101
+102
+103</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 101</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Tue Apr 18 23:06:20 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.34 (ruby-3.2.2).
+</div>
+
+    </div>
+  </body>
+</html>
