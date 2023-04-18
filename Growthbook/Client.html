@@ -99,7 +99,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>internal use only</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -109,7 +120,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#enabled-instance_method" title="#enabled (instance method)">#<strong>enabled</strong>  &#x21d2; Object </a>
+      <a href="#enabled-instance_method" title="#enabled (instance method)">#<strong>enabled</strong>  &#x21d2; Boolean </a>
     
 
     
@@ -126,9 +137,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute enabled.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -136,7 +145,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#experiments-instance_method" title="#experiments (instance method)">#<strong>experiments</strong>  &#x21d2; Object </a>
+      <a href="#experiments-instance_method" title="#experiments (instance method)">#<strong>experiments</strong>  &#x21d2; Array&lt;Growthbook::Experiment&gt; </a>
     
 
     
@@ -153,9 +162,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute experiments.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -359,14 +366,14 @@
       <pre class="lines">
 
 
-14
 15
 16
 17
-18</pre>
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@enabled</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:enabled</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:enabled</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>true</span>
@@ -388,7 +395,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="enabled-instance_method">
   
-    #<strong>enabled</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>enabled</strong>  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -397,13 +404,24 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute enabled.</p>
-
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -411,12 +429,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enabled'>enabled</span>
   <span class='ivar'>@enabled</span>
@@ -431,7 +449,7 @@
       <div class="method_details ">
   <h3 class="signature " id="experiments-instance_method">
   
-    #<strong>experiments</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>experiments</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Experiment.html" title="Growthbook::Experiment (class)">Growthbook::Experiment</a></span>&gt;</tt> 
   
 
   
@@ -440,13 +458,24 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute experiments.</p>
-
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Experiment.html" title="Growthbook::Experiment (class)">Growthbook::Experiment</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -454,12 +483,12 @@
       <pre class="lines">
 
 
-9
 10
-11</pre>
+11
+12</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiments'>experiments</span>
   <span class='ivar'>@experiments</span>
@@ -540,7 +569,6 @@
       <pre class="lines">
 
 
-24
 25
 26
 27
@@ -549,10 +577,11 @@
 30
 31
 32
-33</pre>
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_getExperiment'>getExperiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_match'>match</span> <span class='op'>=</span> <span class='kw'>nil</span>
@@ -584,7 +613,6 @@
       <pre class="lines">
 
 
-52
 53
 54
 55
@@ -599,10 +627,11 @@
 64
 65
 66
-67</pre>
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_importExperimentsHash'>importExperimentsHash</span><span class='lparen'>(</span><span class='id identifier rubyid_experimentsHash'>experimentsHash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@experiments</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -734,17 +763,17 @@
       <pre class="lines">
 
 
-43
 44
 45
 46
 47
 48
 49
-50</pre>
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/client.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_user'>user</span><span class='lparen'>(</span><span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="User.html" title="Growthbook::User (class)">User</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="User.html#initialize-instance_method" title="Growthbook::User#initialize (method)">new</a></span></span><span class='lparen'>(</span>
@@ -764,7 +793,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Apr 18 23:06:20 2023 by
+  Generated on Tue Apr 18 23:26:17 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

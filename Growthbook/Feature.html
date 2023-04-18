@@ -99,7 +99,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>The feature with a generic value type.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -253,7 +264,6 @@
       <pre class="lines">
 
 
-11
 12
 13
 14
@@ -262,15 +272,16 @@
 17
 18
 19
-20</pre>
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='rparen'>)</span>
-  <span class='ivar'>@default_value</span> <span class='op'>=</span> <span class='id identifier rubyid_getOption'>getOption</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='comma'>,</span> <span class='symbol'>:defaultValue</span><span class='rparen'>)</span>
+  <span class='ivar'>@default_value</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='comma'>,</span> <span class='symbol'>:defaultValue</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_rules'>rules</span> <span class='op'>=</span> <span class='id identifier rubyid_getOption'>getOption</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='comma'>,</span> <span class='symbol'>:rules</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_rules'>rules</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='comma'>,</span> <span class='symbol'>:rules</span><span class='rparen'>)</span>
 
   <span class='ivar'>@rules</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_rules'>rules</span><span class='op'>&amp;.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_rule'>rule</span><span class='op'>|</span>
@@ -326,12 +337,12 @@
       <pre class="lines">
 
 
-6
 7
-8</pre>
+8
+9</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 7</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_value'>default_value</span>
   <span class='ivar'>@default_value</span>
@@ -380,12 +391,12 @@
       <pre class="lines">
 
 
-9
 10
-11</pre>
+11
+12</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_rules'>rules</span>
   <span class='ivar'>@rules</span>
@@ -417,7 +428,6 @@
       <pre class="lines">
 
 
-22
 23
 24
 25
@@ -425,10 +435,11 @@
 27
 28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_json'>to_json</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid__args'>_args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -449,7 +460,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Apr 18 23:06:20 2023 by
+  Generated on Tue Apr 18 23:26:17 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
