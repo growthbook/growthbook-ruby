@@ -62,12 +62,15 @@ module Growthbook
       match
     end
 
-    def self.hash(str)
-      (FNV.new.fnv1a_32(str) % 1000) / 1000.0
+    def self.hash(seed:, value:, version:)
+      return (FNV.new.fnv1a_32(value + seed) % 1000) / 1000.0 if version == 1
+      return (FNV.new.fnv1a_32(FNV.new.fnv1a_32(seed + value).to_s) % 10000) / 10000.0 if version == 2
+
+      -1
     end
 
-    def self.in_namespace(userId, namespace)
-      n = hash("#{userId}__#{namespace[0]}")
+    def self.in_namespace(hash_value, namespace)
+      n = hash(seed: "__" + namespace[0], value: hash_value, version: 1)
       n >= namespace[1] && n < namespace[2]
     end
 
@@ -147,6 +150,10 @@ module Growthbook
       return nil if n >= numVariations
 
       n
+    end
+
+    def self.in_range(n, range)
+      n >= range[0] && n < range[1]
     end
   end
 end

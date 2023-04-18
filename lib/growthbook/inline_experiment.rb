@@ -2,58 +2,71 @@
 
 module Growthbook
   class InlineExperiment
-    # @returns [String]
+    # @returns [String] The globally unique identifier for the experiment
     attr_accessor :key
 
-    # @returns [Any]
+    # @returns [Array<String, Integer, Hash>] The different variations to choose between
     attr_accessor :variations
 
-    # @returns [Bool]
-    attr_accessor :active
-
-    # @returns [Integer, nil]
-    attr_accessor :force
-
-    # @returns [Array<Float>, nil]
+    # @returns [Array<Float>] How to weight traffic between variations. Must add to 1.
     attr_accessor :weights
 
-    # @returns [Float]
+    # @returns [true, false] If set to false, always return the control (first variation)
+    attr_accessor :active
+
+    # @returns [Float] What percent of users should be included in the experiment (between 0 and 1, inclusive)
     attr_accessor :coverage
 
-    # @returns [Hash, nil]
+    # @returns [Array<Hash>] Array of ranges, one per variation
+    attr_accessor :ranges
+
+    # @returns [Hash] Optional targeting condition
     attr_accessor :condition
 
-    # @returns [Array]
+    # @returns [String, nil] Adds the experiment to a namespace
     attr_accessor :namespace
 
-    # @returns [String]
+    # @returns [integer, nil] All users included in the experiment will be forced into the specific variation index
+    attr_accessor :force
+
+    # @returns [String] What user attribute should be used to assign variations (defaults to id)
     attr_accessor :hash_attribute
 
-    # Constructor for an Experiment
-    #
-    # @param options [Hash]
-    # @option options [Array<Any>] :variations The variations to pick between
-    # @option options [String] :key The unique identifier for this experiment
-    # @option options [Float] :coverage (1.0) The percent of elegible traffic to include in the experiment
-    # @option options [Array<Float>] :weights The relative weights of the variations.
-    #    Length must be the same as the number of variations. Total should add to 1.0.
-    #    Default is an even split between variations
-    # @option options [Boolean] :anon (false) If false, the experiment uses the logged-in user id for bucketing
-    #    If true, the experiment uses the anonymous id for bucketing
-    # @option options [Array<String>] :targeting Array of targeting rules in the format "key op value"
-    #    where op is one of: =, !=, <, >, ~, !~
-    # @option options [Integer, nil] :force If an integer, force all users to get this variation
-    # @option options [Hash] :data Data to attach to the variations
+    # @returns [Integer] The hash version to use (default to 1)
+    attr_accessor :hash_version
+
+    # @returns [Array<Hash>] Meta info about the variations
+    attr_accessor :meta
+
+    # @returns [Array<Hash>] Array of filters to apply
+    attr_accessor :filters
+
+    # @returns [String, nil] The hash seed to use
+    attr_accessor :seed
+
+    # @returns [String] Human-readable name for the experiment
+    attr_accessor :name
+
+    # @returns [String, nil] Id of the current experiment phase
+    attr_accessor :phase
+
     def initialize(options = {})
       @key = getOption(options, :key, '').to_s
       @variations = getOption(options, :variations, [])
-      @active = getOption(options, :active, true)
-      @force = getOption(options, :force)
       @weights = getOption(options, :weights)
+      @active = getOption(options, :active, true)
       @coverage = getOption(options, :coverage, 1)
+      @ranges = getOption(options, :ranges)
       @condition = getOption(options, :condition)
       @namespace = getOption(options, :namespace)
+      @force = getOption(options, :force)
       @hash_attribute = getOption(options, :hash_attribute) || getOption(options, :hashAttribute) || 'id'
+      @hash_version = getOption(options, :hash_version) || getOption(options, :hashVersion)
+      @meta = getOption(options, :meta)
+      @filters = getOption(options, :filters)
+      @seed = getOption(options, :seed)
+      @name = getOption(options, :name)
+      @phase = getOption(options, :phase)
     end
 
     def getOption(hash, key, default = nil)
@@ -67,14 +80,21 @@ module Growthbook
       res = {}
       res['key'] = @key
       res['variations'] = @variations
-      res['active'] = @active if @active != true && !@active.nil?
-      res['force'] = @force unless @force.nil?
       res['weights'] = @weights unless @weights.nil?
+      res['active'] = @active if @active != true && !@active.nil?
       res['coverage'] = @coverage if @coverage != 1 && !@coverage.nil?
-      res['condition'] = @condition unless @condition.nil?
-      res['namespace'] = @namespace unless @namespace.nil?
+      res['ranges'] = @ranges
+      res['condition'] = @condition
+      res['namespace'] = @namespace
+      res['force'] = @force unless @force.nil?
       res['hashAttribute'] = @hash_attribute if @hash_attribute != 'id' && !@hash_attribute.nil?
-      res
+      res['hashVersion'] = @hash_version
+      res['meta'] = @meta
+      res['filters'] = @filters
+      res['seed'] = @seed
+      res['name'] = @name
+      res['phase'] = @phase
+      res.compact
     end
   end
 end

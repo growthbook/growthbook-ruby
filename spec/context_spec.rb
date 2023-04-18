@@ -95,11 +95,13 @@ describe 'context' do
       gb.on? :feature1
 
       expect(gb.impressions["feature1"].to_json).to eq({
+        "bucket"=>0.154,
         "featureId" => "feature1",
         "hashAttribute" => "id",
         "hashValue" => "123",
         "inExperiment" => true,
         "hashUsed" => true,
+        "key"=>"0",
         "value" => 2,
         "variationId" => 0,
       })
@@ -110,11 +112,13 @@ describe 'context' do
           "variations" => [2, 3]
         },
         {
+          "bucket"=>0.154,
           "featureId" => "feature1",
           "hashAttribute" => "id",
           "hashValue" => "123",
           "inExperiment" => true,
           "hashUsed" => true,
+          "key"=>"0",
           "value" => 2,
           "variationId" => 0,
         }

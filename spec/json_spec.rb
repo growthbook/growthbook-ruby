@@ -15,10 +15,10 @@ end
 describe 'test suite' do
   describe 'hash' do
     test_cases['hash'].each do |test_case|
-      value, expected = test_case
+      seed, value, version, expected = test_case
 
       it value do
-        result = Growthbook::Util.hash(value)
+        result = Growthbook::Util.hash(seed: seed, value: value, version: version)
         expect(result.round(5)).to eq expected.round(5)
       end
     end
