@@ -12,7 +12,10 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Lint
-        run: bundle exec rubocop
+        run: |
+          gem install rubocop -v 1.50.2
+          gem install rubocop-rspec -v 2.20.0
+          rubocop
 
   build-test:
     runs-on: ubuntu-latest

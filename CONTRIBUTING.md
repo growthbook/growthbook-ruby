@@ -6,6 +6,14 @@ We welcome all contributions!
 
 Run unit tests with `bundler exec rspec`
 
+## Linting
+
+To use the linter, install it:
+
+    gem install rubocop -v 1.50.2
+    gem install rubocop-rspec -v 2.20.0
+
+
 ## Releasing
 
 1. Bump version in `Gemfile.lock` and `growthbook.gemspec`
