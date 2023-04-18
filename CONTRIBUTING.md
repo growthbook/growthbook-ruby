@@ -13,6 +13,18 @@ To use the linter, install it:
     gem install rubocop -v 1.50.2
     gem install rubocop-rspec -v 2.20.0
 
+To auto-fix formatting, run the following:
+
+    rubocop -x
+
+To auto-fix correctable linting errors, run the following:
+
+    rubocop -A
+
+To run it as CI would, run:
+
+    rubocop
+
 
 ## Releasing
 
