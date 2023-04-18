@@ -2,6 +2,18 @@ name: Build
 on:
   - push
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+      - run: bundle install
+      - name: Lint
+        run: bundle exec rubocop
+
   build-test:
     runs-on: ubuntu-latest
     strategy:
@@ -19,5 +31,3 @@ jobs:
       - run: bundle install
       - name: Test
         run: bundle exec rspec
-      - name: Lint
-        run: bundle exec rubocop
