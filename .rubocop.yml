@@ -8,8 +8,19 @@ Lint:
   Severity: error
 
 Metrics/CyclomaticComplexity:
-  Severity: warning
   Max: 9
+
+Metrics/AbcSize:
+  Max: 55
+
+Metrics/ClassLength:
+  Max: 165
+
+Metrics/MethodLength:
+  Max: 20
+
+Naming/MethodParameterName:
+  MinNameLength: 2
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_first_argument
