@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'fnv'
+require 'bigdecimal'
+require 'bigdecimal/util'
 
 module Growthbook
   # internal use only
