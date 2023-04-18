@@ -700,7 +700,7 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
   <span class='comment'># If experiments are disabled globally
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span> <span class='kw'>unless</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_enabled'>enabled</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span> <span class='kw'>unless</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_enabled'>enabled</span>
 
   <span class='comment'># Make sure experiment is always an object (or nil)
 </span>  <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
@@ -714,21 +714,21 @@
   <span class='kw'>end</span>
 
   <span class='comment'># No experiment found
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span>
 
   <span class='comment'># User missing required user id type
 </span>  <span class='id identifier rubyid_user_id'>user_id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_anon'>anon</span> <span class='op'>?</span> <span class='ivar'>@anonId</span> <span class='op'>:</span> <span class='ivar'>@id</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_user_id'>user_id</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_user_id'>user_id</span>
 
   <span class='comment'># Experiment has targeting rules, check if user passes
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_isTargeted'>isTargeted</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span><span class='rparen'>)</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_isTargeted'>isTargeted</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span><span class='rparen'>)</span>
 
   <span class='comment'># Experiment has a specific variation forced
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='label'>forced:</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='comment'># Choose a variation for the user
 </span>  <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util.html" title="Growthbook::Util (class)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_chooseVariation'><span class='object_link'><a href="Util.html#chooseVariation-class_method" title="Growthbook::Util.chooseVariation (method)">chooseVariation</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_getExperimentResult'>getExperimentResult</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span><span class='rparen'>)</span>
 
   <span class='comment'># Add to the list of experiments that should be tracked in analytics
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@experimentsTracked</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
@@ -841,7 +841,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Apr 18 23:26:17 2023 by
+  Generated on Tue Apr 18 23:49:06 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
