@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_development_dependency 'rspec', '~> 3.2'
+  s.add_development_dependency 'rubocop', '~> 1.50.2'
 
   s.add_runtime_dependency 'fnv', '~> 0.2.0'
 end
