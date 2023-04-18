@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rspec', '~> 3.2'
   s.add_development_dependency 'rubocop', '~> 1.50.2'
+  s.add_development_dependency 'rubocop-rspec', '~> 2.20.0'
 
   s.add_runtime_dependency 'fnv', '~> 0.2.0'
 end

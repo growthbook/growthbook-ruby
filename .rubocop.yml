@@ -1,0 +1,48 @@
+require:
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+
+Lint:
+  Severity: error
+
+Metrics/CyclomaticComplexity:
+  Severity: warning
+  Max: 9
+
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_first_argument
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented_relative_to_receiver
+
+Layout/MultilineAssignmentLayout:
+  EnforcedStyle: same_line
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
