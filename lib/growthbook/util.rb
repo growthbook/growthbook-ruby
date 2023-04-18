@@ -3,6 +3,7 @@
 require 'fnv'
 
 module Growthbook
+  # internal use only
   class Util
     def self.checkRule(actual, op, desired)
       # Check if both strings are numeric so we can do natural ordering
@@ -15,9 +16,9 @@ module Growthbook
 
       case op
       when '='
-        numeric ? Float(actual) == Float(desired) : actual == desired
+        numeric ? Float(actual).to_d == Float(desired).to_d : actual == desired
       when '!='
-        numeric ? Float(actual) != Float(desired) : actual != desired
+        numeric ? Float(actual).to_d != Float(desired).to_d : actual != desired
       when '>'
         numeric ? Float(actual) > Float(desired) : actual > desired
       when '<'
