@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Growthbook
   class Experiment
     # @returns [String]
@@ -25,12 +27,12 @@ module Growthbook
     attr_accessor :data
 
     # Constructor for an Experiment
-    # 
+    #
     # @param id [String] The unique id for this experiment
     # @param variations [Integer] The number of variations in this experiment (including the Control)
     # @param options [Hash]
     # @option options [Float] :coverage (1.0) The percent of elegible traffic to include in the experiment
-    # @option options [Array<Float>] :weights The relative weights of the variations. 
+    # @option options [Array<Float>] :weights The relative weights of the variations.
     #    Length must be the same as the number of variations. Total should add to 1.0.
     #    Default is an even split between variations
     # @option options [Boolean] :anon (false) If false, the experiment uses the logged-in user id for bucketing
@@ -43,19 +45,17 @@ module Growthbook
       @id = id
       @variations = variations
       @coverage = options[:coverage] || 1
-      @weights = options[:weights] || getEqualWeights()
-      @force = options.has_key?(:force) ? options[:force] : nil
-      @anon = options.has_key?(:anon) ? options[:anon] : false
+      @weights = options[:weights] || getEqualWeights
+      @force = options.key?(:force) ? options[:force] : nil
+      @anon = options.key?(:anon) ? options[:anon] : false
       @targeting = options[:targeting] || []
       @data = options[:data] || {}
     end
 
     def getScaledWeights
-      scaled = @weights.map do |n|
-        n*@coverage
+      @weights.map do |n|
+        n * @coverage
       end
-
-      return scaled
     end
 
     private
@@ -63,10 +63,10 @@ module Growthbook
     def getEqualWeights
       weights = []
       n = @variations
-      for i in 1..n
+      (1..n).each do |_i|
         weights << (1.0 / n)
       end
-      return weights
+      weights
     end
   end
 end

@@ -25,7 +25,7 @@ module Growthbook
       when Array
         return condition.map { |v| parse_condition(v) }
       when Hash
-        return condition.map { |k, v| [k.to_s, parse_condition(v)] }.to_h
+        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
       end
 
       condition
@@ -58,7 +58,7 @@ module Growthbook
       return 'string' if attribute_value.is_a? String
       return 'number' if attribute_value.is_a? Integer
       return 'number' if attribute_value.is_a? Float
-      return 'boolean' if attribute_value == true || attribute_value == false
+      return 'boolean' if [true, false].include?(attribute_value)
       return 'array' if attribute_value.is_a? Array
       return 'null' if attribute_value.nil?
 
@@ -70,11 +70,9 @@ module Growthbook
       current = attributes
 
       parts.each do |value|
-        if current && current.is_a?(Hash) && current.key?(value)
-          current = current[value]
-        else
-          return nil
-        end
+        return nil unless current.is_a?(Hash) && current&.key?(value)
+
+        current = current[value]
       end
 
       current
@@ -147,10 +145,10 @@ module Growthbook
         true
       when '$exists'
         exists = !attribute_value.nil?
-        if !condition_value
-          !exists
-        else
+        if condition_value
           exists
+        else
+          !exists
         end
       when '$type'
         condition_value == get_type(attribute_value)

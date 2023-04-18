@@ -62,9 +62,7 @@ module Growthbook
 
     def eval_feature(key)
       # Forced in the context
-      if @forced_features.key?(key.to_s)
-        return get_feature_result(@forced_features[key.to_s], 'override') 
-      end
+      return get_feature_result(@forced_features[key.to_s], 'override') if @forced_features.key?(key.to_s)
 
       # Return if we can't find the feature definition
       feature = get_feature(key)
@@ -78,7 +76,7 @@ module Growthbook
         if rule.is_force?
           unless rule.coverage.nil?
             hash_value = get_attribute(rule.hash_attribute || 'id').to_s
-            next if hash_value.length.zero?
+            next if hash_value.empty?
 
             n = Growthbook::Util.hash(hash_value + key)
             next if n > rule.coverage
@@ -119,7 +117,7 @@ module Growthbook
 
     private
 
-    def _run(exp, feature_id="")
+    def _run(exp, feature_id = '')
       key = exp.key
 
       # 1. If experiment doesn't have enough variations, return immediately
@@ -135,7 +133,12 @@ module Growthbook
       end
 
       # 4. If variation is forced in the context, return the forced value
-      return get_experiment_result(exp, @forced_variations[key.to_s], false, feature_id) if @forced_variations.key?(key.to_s)
+      if @forced_variations.key?(key.to_s)
+        return get_experiment_result(
+          exp, @forced_variations[key.to_s], false,
+          feature_id
+        )
+      end
 
       # 5. Exclude if not active
       return get_experiment_result(exp, -1, false, feature_id) unless exp.active
@@ -143,10 +146,12 @@ module Growthbook
       # 6. Get hash_attribute/value and return if empty
       hash_attribute = exp.hash_attribute || 'id'
       hash_value = get_attribute(hash_attribute).to_s
-      return get_experiment_result(exp, -1, false, feature_id) if hash_value.length.zero?
+      return get_experiment_result(exp, -1, false, feature_id) if hash_value.empty?
 
       # 7. Exclude if user not in namespace
-      return get_experiment_result(exp, -1, false, feature_id) if exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
+      return get_experiment_result(exp, -1, false, feature_id) if exp.namespace && !Growthbook::Util.in_namespace(
+        hash_value, exp.namespace
+      )
 
       # 8. Exclude if condition is false
       return get_experiment_result(exp, -1, false, feature_id) if exp.condition && !condition_passes(exp.condition)
@@ -191,7 +196,7 @@ module Growthbook
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
-    def get_experiment_result(experiment, variation_index = -1, hash_used = false, feature_id = "")
+    def get_experiment_result(experiment, variation_index = -1, hash_used = false, feature_id = '')
       in_experiment = true
       if variation_index.negative? || variation_index >= experiment.variations.length
         variation_index = 0
@@ -201,8 +206,10 @@ module Growthbook
       hash_attribute = experiment.hash_attribute || 'id'
       hash_value = get_attribute(hash_attribute)
 
-      Growthbook::InlineExperimentResult.new(hash_used, in_experiment, variation_index,
-                                             experiment.variations[variation_index], hash_attribute, hash_value, feature_id)
+      Growthbook::InlineExperimentResult.new(
+        hash_used, in_experiment, variation_index,
+        experiment.variations[variation_index], hash_attribute, hash_value, feature_id
+      )
     end
 
     def get_feature_result(value, source, experiment = nil, experiment_result = nil)
@@ -224,9 +231,7 @@ module Growthbook
     end
 
     def track_experiment(experiment, result)
-      if @listener && @listener.respond_to?(:on_experiment_viewed)
-        @listener.on_experiment_viewed(experiment, result)
-      end
+      @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
       @impressions[experiment.key] = result
     end
   end

@@ -125,6 +125,7 @@ describe 'test suite' do
       end
     end
   end
+
   describe 'feature' do
     # Loop through each test case in the JSON file
     test_cases['feature'].each do |test_case|

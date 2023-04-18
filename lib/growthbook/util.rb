@@ -101,7 +101,7 @@ module Growthbook
       weights.each do |w|
         start = cumulative
         cumulative += w
-        ranges << [start, start + coverage * w]
+        ranges << [start, start + (coverage * w)]
       end
 
       ranges

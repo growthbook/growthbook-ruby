@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'growthbook'
 require 'json'
 
 describe 'context' do
-  describe "feature helper methods" do
+  describe 'feature helper methods' do
     gb = Growthbook::Context.new(
       features: {
         feature1: {
@@ -14,26 +16,28 @@ describe 'context' do
       }
     )
 
-    it ".on?" do
-      expect(gb.on?(:feature1)).to eq(true)
-      expect(gb.on?(:feature2)).to eq(false)
+    it '.on?' do
+      expect(gb.on?(:feature1)).to be(true)
+      expect(gb.on?(:feature2)).to be(false)
     end
-    it ".off?" do
-      expect(gb.off?(:feature1)).to eq(false)
-      expect(gb.off?(:feature2)).to eq(true)
+
+    it '.off?' do
+      expect(gb.off?(:feature1)).to be(false)
+      expect(gb.off?(:feature2)).to be(true)
     end
-    it ".feature_value" do
+
+    it '.feature_value' do
       expect(gb.feature_value(:feature1)).to eq(1)
       expect(gb.feature_value(:feature2)).to eq(0)
     end
   end
 
-  describe "forced feature values" do
-    it "uses forced values" do
+  describe 'forced feature values' do
+    it 'uses forced values' do
       gb = Growthbook::Context.new(
         features: {
           feature: {
-            defaultValue: "a"
+            defaultValue: 'a'
           },
           feature2: {
             defaultValue: true
@@ -42,31 +46,28 @@ describe 'context' do
       )
 
       gb.forced_features = {
-        feature: "b",
+        feature: 'b',
         another: 2
       }
 
-      expect(gb.feature_value(:feature)).to eq("b")
-      expect(gb.feature_value(:feature2)).to eq(true)
+      expect(gb.feature_value(:feature)).to eq('b')
+      expect(gb.feature_value(:feature2)).to be(true)
       expect(gb.feature_value(:another)).to eq(2)
-      expect(gb.feature_value(:unknown)).to eq(nil)
+      expect(gb.feature_value(:unknown)).to be_nil
     end
   end
 
-  describe "tracking" do
-    it "queues up impressions" do
-      class MyImpressionListener
-        attr_accessor :tracked
-        def on_experiment_viewed(exp, res)
-          @tracked = [exp.to_json, res.to_json]
-        end
-      end
+  describe 'tracking' do
+    let(:impression_listener) { double }
 
-      listener = MyImpressionListener.new
+    before do
+      allow(impression_listener).to receive(:on_experiment_viewed)
+    end
 
+    it 'queues up impressions' do
       gb = Growthbook::Context.new(
         attributes: {
-          id: "123"
+          id: '123'
         },
         features: {
           feature1: {
@@ -86,39 +87,41 @@ describe 'context' do
             ]
           }
         },
-        listener: listener
+        listener: impression_listener
       )
 
       expect(gb.impressions).to eq({})
-      expect(listener.tracked).to eq(nil)
 
       gb.on? :feature1
 
-      expect(gb.impressions["feature1"].to_json).to eq({
-        "featureId" => "feature1",
-        "hashAttribute" => "id",
-        "hashValue" => "123",
-        "inExperiment" => true,
-        "hashUsed" => true,
-        "value" => 2,
-        "variationId" => 0,
-      })
-
-      expect(listener.tracked).to eq([
+      expect(gb.impressions['feature1'].to_json).to eq(
         {
-          "key" => "feature1",
-          "variations" => [2, 3]
-        },
-        {
-          "featureId" => "feature1",
-          "hashAttribute" => "id",
-          "hashValue" => "123",
-          "inExperiment" => true,
-          "hashUsed" => true,
-          "value" => 2,
-          "variationId" => 0,
+          'featureId'     => 'feature1',
+          'hashAttribute' => 'id',
+          'hashValue'     => '123',
+          'inExperiment'  => true,
+          'hashUsed'      => true,
+          'value'         => 2,
+          'variationId'   => 0
         }
-      ])
+      )
+      expect(impression_listener).to have_received(:on_experiment_viewed).with(
+        an_instance_of(Growthbook::InlineExperiment),
+        an_instance_of(Growthbook::InlineExperimentResult)
+      ) do |exp, res|
+        expect(exp.to_json).to eq({ 'key' => 'feature1', 'variations' => [2, 3] })
+        expect(res.to_json).to eq(
+          {
+            'featureId'     => 'feature1',
+            'hashAttribute' => 'id',
+            'hashValue'     => '123',
+            'inExperiment'  => true,
+            'hashUsed'      => true,
+            'value'         => 2,
+            'variationId'   => 0
+          }
+        )
+      end
     end
   end
 end
