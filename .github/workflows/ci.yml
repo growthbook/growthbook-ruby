@@ -23,6 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - 1.9.3
+          - 2.3.0
           - 2.5
           - 3.2.2
     steps:
