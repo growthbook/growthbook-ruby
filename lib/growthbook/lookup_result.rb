@@ -17,13 +17,13 @@ module Growthbook
     # The value of the data key that was used to lookup the experiment
     attr_reader :value
 
-    @forced
+    @forced = false
 
     def forced?
       @forced
     end
 
-    def shouldTrack?
+    def should_track?
       !@forced && @variation >= 0
     end
 

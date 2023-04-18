@@ -88,7 +88,7 @@ describe 'user' do
       # Normal
       expect(user.experiment('my-test').shouldTrack?).to be(true)
       expect(user.experiment('my-test').forced?).to be(false)
-      expect(user.lookupByDataKey('color').shouldTrack?).to be(true)
+      expect(user.lookupByDataKey('color').should_track?).to be(true)
       expect(user.lookupByDataKey('color').forced?).to be(false)
 
       # Failed coverage
@@ -102,7 +102,7 @@ describe 'user' do
       experiment.force = 1
       expect(user.experiment('my-test').shouldTrack?).to be(false)
       expect(user.experiment('my-test').forced?).to be(true)
-      expect(user.lookupByDataKey('color').shouldTrack?).to be(false)
+      expect(user.lookupByDataKey('color').should_track?).to be(false)
       expect(user.lookupByDataKey('color').forced?).to be(true)
     end
 

@@ -46,7 +46,7 @@ module Growthbook
     # @return [Growthbook::ExperimentResult]
     def experiment(experiment)
       # If experiments are disabled globally
-      return getExperimentResult unless @client.enabled
+      return get_experiment_result unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
       id = ''
@@ -60,21 +60,21 @@ module Growthbook
       end
 
       # No experiment found
-      return getExperimentResult unless experiment
+      return get_experiment_result unless experiment
 
       # User missing required user id type
       user_id = experiment.anon ? @anonId : @id
-      return getExperimentResult(experiment) unless user_id
+      return get_experiment_result(experiment) unless user_id
 
       # Experiment has targeting rules, check if user passes
-      return getExperimentResult(experiment) if experiment.targeting && !isTargeted(experiment.targeting)
+      return get_experiment_result(experiment) if experiment.targeting && !isTargeted(experiment.targeting)
 
       # Experiment has a specific variation forced
-      return getExperimentResult(experiment, experiment.force, true) unless experiment.force.nil?
+      return get_experiment_result(experiment, experiment.force, forced: true) unless experiment.force.nil?
 
       # Choose a variation for the user
       variation = Growthbook::Util.chooseVariation(user_id, experiment)
-      result = getExperimentResult(experiment, variation)
+      result = get_experiment_result(experiment, variation)
 
       # Add to the list of experiments that should be tracked in analytics
       if result.shouldTrack? && !@experimentsTracked.include?(experiment.id)
@@ -101,17 +101,17 @@ module Growthbook
 
     private
 
-    def getExperimentResult(experiment = nil, variation = -1, forced = false)
+    def get_experiment_result(experiment = nil, variation = -1, forced: false)
       Growthbook::ExperimentResult.new(self, experiment, variation, forced)
     end
 
-    def flattenUserValues(prefix, val)
+    def flatten_user_values(prefix, val)
       return [] if val.nil?
 
       if val.is_a? Hash
         ret = []
         val.each do |k, v|
-          ret.concat(flattenUserValues(prefix.length.positive? ? "#{prefix}.#{k}" : k.to_s, v))
+          ret.concat(flatten_user_values(prefix.length.positive? ? "#{prefix}.#{k}" : k.to_s, v))
         end
         return ret
       end
@@ -132,7 +132,7 @@ module Growthbook
 
     def updateAttributeMap
       @attributeMap = {}
-      flat = flattenUserValues('', @attributes)
+      flat = flatten_user_values('', @attributes)
       flat.each do |item|
         @attributeMap[item['k']] = item['v']
       end
