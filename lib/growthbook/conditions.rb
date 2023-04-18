@@ -3,6 +3,8 @@
 require 'json'
 
 module Growthbook
+  # internal use only
+  # Utils for condition evaluation
   class Conditions
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)

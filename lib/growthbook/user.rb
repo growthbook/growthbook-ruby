@@ -3,17 +3,18 @@
 require 'set'
 
 module Growthbook
+  # internal use only
   class User
-    # @returns [String, nil]
+    # @return [String, nil]
     attr_accessor :id
 
-    # @returns [String, nil]
+    # @return [String, nil]
     attr_accessor :anonId
 
-    # @returns [Hash, nil]
+    # @return [Hash, nil]
     attr_reader :attributes
 
-    # @returns [Array<Growthbook::ExperimentResult>]
+    # @return [Array<Growthbook::ExperimentResult>]
     attr_reader :resultsToTrack
 
     @client
@@ -33,7 +34,7 @@ module Growthbook
 
     # Set the user attributes
     #
-    # @params attributes [Hash, nil] Any user attributes you want to use for experiment targeting
+    # @param attributes [Hash, nil] Any user attributes you want to use for experiment targeting
     #    Values can be any type, even nested arrays and hashes
     def attributes=(attributes)
       @attributes = attributes
@@ -62,8 +63,8 @@ module Growthbook
       return getExperimentResult unless experiment
 
       # User missing required user id type
-      userId = experiment.anon ? @anonId : @id
-      return getExperimentResult(experiment) unless userId
+      user_id = experiment.anon ? @anonId : @id
+      return getExperimentResult(experiment) unless user_id
 
       # Experiment has targeting rules, check if user passes
       return getExperimentResult(experiment) if experiment.targeting && !isTargeted(experiment.targeting)
@@ -72,7 +73,7 @@ module Growthbook
       return getExperimentResult(experiment, experiment.force, true) unless experiment.force.nil?
 
       # Choose a variation for the user
-      variation = Growthbook::Util.chooseVariation(userId, experiment)
+      variation = Growthbook::Util.chooseVariation(user_id, experiment)
       result = getExperimentResult(experiment, variation)
 
       # Add to the list of experiments that should be tracked in analytics

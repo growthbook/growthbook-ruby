@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # The feature with a generic value type.
   class Feature
     # @return [Any , nil]
     attr_reader :default_value
@@ -9,9 +10,9 @@ module Growthbook
     attr_reader :rules
 
     def initialize(feature)
-      @default_value = getOption(feature, :defaultValue)
+      @default_value = get_option(feature, :defaultValue)
 
-      rules = getOption(feature, :rules)
+      rules = get_option(feature, :rules)
 
       @rules = []
       rules&.each do |rule|
@@ -31,7 +32,7 @@ module Growthbook
 
     private
 
-    def getOption(hash, key)
+    def get_option(hash, key)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
 

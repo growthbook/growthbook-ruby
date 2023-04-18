@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Overrides the default value of a Feature based on a set of requirements.
   class FeatureRule
     # @return [Hash , nil]
     attr_reader :condition

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # internal use only
   class Client
-    # @returns [Boolean]
+    # @return [Boolean]
     attr_accessor :enabled
 
-    # @returns [Array<Growthbook::Experiment>]
+    # @return [Array<Growthbook::Experiment>]
     attr_accessor :experiments
 
     # @param config [Hash]

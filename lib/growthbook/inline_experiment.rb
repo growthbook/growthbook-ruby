@@ -1,32 +1,33 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Class for creating an inline experiment for evaluating
   class InlineExperiment
-    # @returns [String]
+    # @return [String]
     attr_accessor :key
 
-    # @returns [Any]
+    # @return [Any]
     attr_accessor :variations
 
-    # @returns [Bool]
+    # @return [Bool]
     attr_accessor :active
 
-    # @returns [Integer, nil]
+    # @return [Integer, nil]
     attr_accessor :force
 
-    # @returns [Array<Float>, nil]
+    # @return [Array<Float>, nil]
     attr_accessor :weights
 
-    # @returns [Float]
+    # @return [Float]
     attr_accessor :coverage
 
-    # @returns [Hash, nil]
+    # @return [Hash, nil]
     attr_accessor :condition
 
-    # @returns [Array]
+    # @return [Array]
     attr_accessor :namespace
 
-    # @returns [String]
+    # @return [String]
     attr_accessor :hash_attribute
 
     # Constructor for an Experiment

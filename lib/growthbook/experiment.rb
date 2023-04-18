@@ -2,28 +2,28 @@
 
 module Growthbook
   class Experiment
-    # @returns [String]
+    # @return [String]
     attr_accessor :id
 
-    # @returns [Integer]
+    # @return [Integer]
     attr_accessor :variations
 
-    # @returns [Float]
+    # @return [Float]
     attr_accessor :coverage
 
-    # @returns [Array<Float>]
+    # @return [Array<Float>]
     attr_accessor :weights
 
-    # @returns [Boolean]
+    # @return [Boolean]
     attr_accessor :anon
 
-    # @returns [Array<String>]
+    # @return [Array<String>]
     attr_accessor :targeting
 
-    # @returns [Integer, nil]
+    # @return [Integer, nil]
     attr_accessor :force
 
-    # @returns [Hash]
+    # @return [Hash]
     attr_accessor :data
 
     # Constructor for an Experiment
