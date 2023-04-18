@@ -1,14 +1,21 @@
 name: Build
-on: [push]
+on:
+  - push
 jobs:
   build-test:
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          - 2.5
+          - 3.22
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - run: bundle install
       - name: Test
         run: bundle exec rspec

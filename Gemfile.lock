@@ -24,6 +24,7 @@ GEM
     rspec-support (3.10.0)
 
 PLATFORMS
+  x86_64-darwin-20
   x86_64-linux
 
 DEPENDENCIES
@@ -31,4 +32,4 @@ DEPENDENCIES
   rspec (~> 3.2)
 
 BUNDLED WITH
-   2.2.2
+   2.2.32
