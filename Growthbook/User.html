@@ -726,7 +726,7 @@
 </span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='label'>forced:</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='comment'># Choose a variation for the user
-</span>  <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util.html" title="Growthbook::Util (class)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_chooseVariation'><span class='object_link'><a href="Util.html#chooseVariation-class_method" title="Growthbook::Util.chooseVariation (method)">chooseVariation</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Growthbook.html" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util.html" title="Growthbook::Util (class)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_choose_variation_for_user'><span class='object_link'><a href="Util.html#choose_variation_for_user-class_method" title="Growthbook::Util.choose_variation_for_user (method)">choose_variation_for_user</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span><span class='rparen'>)</span>
 
   <span class='comment'># Add to the list of experiments that should be tracked in analytics
@@ -840,7 +840,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:40:38 2023 by
+  Generated on Wed Apr 19 00:45:09 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
