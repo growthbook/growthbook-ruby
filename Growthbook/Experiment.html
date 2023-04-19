@@ -331,28 +331,6 @@
 
     <ul class="summary">
       
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#getScaledWeights-instance_method" title="#getScaledWeights (instance method)">#<strong>getScaledWeights</strong>  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
-  
-</li>
-
-      
         <li class="public deprecated">
   <span class="summary_signature">
     
@@ -375,6 +353,28 @@
     <span class="summary_desc"><strong>Deprecated.</strong> <div class='inline'>
 <p>Constructor for an Experiment</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#scaled_weights-instance_method" title="#scaled_weights (instance method)">#<strong>scaled_weights</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -477,7 +477,7 @@
           </span>
           
             &mdash; <div class='inline'>
-<p>The percent of elegible traffic to include in the experiment</p>
+<p>The percent of eligible traffic to include in the experiment</p>
 </div>
           
         </li>
@@ -578,7 +578,7 @@
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@variations</span> <span class='op'>=</span> <span class='id identifier rubyid_variations'>variations</span>
   <span class='ivar'>@coverage</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:coverage</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='int'>1</span>
-  <span class='ivar'>@weights</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:weights</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_getEqualWeights'>getEqualWeights</span>
+  <span class='ivar'>@weights</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:weights</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_equal_weights'>equal_weights</span>
   <span class='ivar'>@force</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:force</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:force</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>nil</span>
   <span class='ivar'>@anon</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:anon</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:anon</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>false</span>
   <span class='ivar'>@targeting</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:targeting</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1034,9 +1034,9 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="getScaledWeights-instance_method">
+  <h3 class="signature first" id="scaled_weights-instance_method">
   
-    #<strong>getScaledWeights</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>scaled_weights</strong>  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1057,7 +1057,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/experiment.rb', line 58</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_getScaledWeights'>getScaledWeights</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_scaled_weights'>scaled_weights</span>
   <span class='ivar'>@weights</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span>
     <span class='id identifier rubyid_n'>n</span> <span class='op'>*</span> <span class='ivar'>@coverage</span>
   <span class='kw'>end</span>
@@ -1072,7 +1072,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 01:04:52 2023 by
+  Generated on Wed Apr 19 01:10:58 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

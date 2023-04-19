@@ -498,7 +498,7 @@
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_choose_variation_for_user'>choose_variation_for_user</span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_test_id'>test_id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-  <span class='id identifier rubyid_weights'>weights</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_getScaledWeights'>getScaledWeights</span>
+  <span class='id identifier rubyid_weights'>weights</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_scaled_weights'>scaled_weights</span>
 
   <span class='comment'># Hash the user id and testName to a number from 0 to 1
 </span>  <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_user_id'>user_id</span> <span class='op'>+</span> <span class='id identifier rubyid_test_id'>test_id</span><span class='rparen'>)</span> <span class='op'>%</span> <span class='int'>1000</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='float'>1000.0</span>
@@ -812,7 +812,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 01:04:52 2023 by
+  Generated on Wed Apr 19 01:10:58 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
