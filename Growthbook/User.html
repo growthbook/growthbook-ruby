@@ -61,7 +61,7 @@
 
       <div id="content"><h1>Class: Growthbook::User
   
-  
+  <span class="deprecated note title">Deprecated</span>
   
 </h1>
 <div class="box_info">
@@ -101,8 +101,9 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    
-<p>internal use only</p>
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'></div></div>
+
+<p>Internal use only</p>
 
 
   </div>
@@ -120,7 +121,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#anonId-instance_method" title="#anonId (instance method)">#<strong>anonId</strong>  &#x21d2; String<sup>?</sup> </a>
+      <a href="#anon_id-instance_method" title="#anon_id (instance method)">#<strong>anon_id</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
     
@@ -195,7 +196,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#resultsToTrack-instance_method" title="#resultsToTrack (instance method)">#<strong>resultsToTrack</strong>  &#x21d2; Array&lt;Growthbook::ExperimentResult&gt; </a>
+      <a href="#results_to_track-instance_method" title="#results_to_track (instance method)">#<strong>results_to_track</strong>  &#x21d2; Array&lt;Growthbook::ExperimentResult&gt; </a>
     
 
     
@@ -259,7 +260,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(anonId, id, attributes, client)  &#x21d2; User </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(anon_id, id, attributes, client)  &#x21d2; User </a>
     
 
     
@@ -285,7 +286,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#lookupByDataKey-instance_method" title="#lookupByDataKey (instance method)">#<strong>lookupByDataKey</strong>(key)  &#x21d2; Growthbook::LookupResult<sup>?</sup> </a>
+      <a href="#look_up_by_data_key-instance_method" title="#look_up_by_data_key (instance method)">#<strong>look_up_by_data_key</strong>(key)  &#x21d2; Growthbook::LookupResult<sup>?</sup> </a>
     
 
     
@@ -315,7 +316,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(anonId, id, attributes, client)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::User (class)">User</a></span></tt> 
+    #<strong>initialize</strong>(anon_id, id, attributes, client)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::User (class)">User</a></span></tt> 
   
 
   
@@ -338,7 +339,6 @@
       <pre class="lines">
 
 
-24
 25
 26
 27
@@ -347,20 +347,21 @@
 30
 31
 32
-33</pre>
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 25</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_anonId'>anonId</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
-  <span class='ivar'>@anonId</span> <span class='op'>=</span> <span class='id identifier rubyid_anonId'>anonId</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_anon_id'>anon_id</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
+  <span class='ivar'>@anon_id</span> <span class='op'>=</span> <span class='id identifier rubyid_anon_id'>anon_id</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@client</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span>
-  <span class='id identifier rubyid_updateAttributeMap'>updateAttributeMap</span>
+  <span class='id identifier rubyid_update_attribute_map'>update_attribute_map</span>
 
-  <span class='ivar'>@resultsToTrack</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@experimentsTracked</span> <span class='op'>=</span> <span class='const'>Set</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@results_to_track</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@experiments_tracked</span> <span class='op'>=</span> <span class='const'>Set</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -373,11 +374,11 @@
     <h2>Instance Attribute Details</h2>
     
       
-      <span id="anonId=-instance_method"></span>
+      <span id="anon_id=-instance_method"></span>
       <div class="method_details first">
-  <h3 class="signature first" id="anonId-instance_method">
+  <h3 class="signature first" id="anon_id-instance_method">
   
-    #<strong>anonId</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
+    #<strong>anon_id</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
   
 
   
@@ -411,15 +412,15 @@
       <pre class="lines">
 
 
-12
 13
-14</pre>
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 12</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 13</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_anonId'>anonId</span>
-  <span class='ivar'>@anonId</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_anon_id'>anon_id</span>
+  <span class='ivar'>@anon_id</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -465,12 +466,12 @@
       <pre class="lines">
 
 
-15
 16
-17</pre>
+17
+18</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@attributes</span>
@@ -519,12 +520,12 @@
       <pre class="lines">
 
 
-9
 10
-11</pre>
+11
+12</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 9</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_id'>id</span>
   <span class='ivar'>@id</span>
@@ -537,9 +538,9 @@
       
       <span id=""></span>
       <div class="method_details ">
-  <h3 class="signature " id="resultsToTrack-instance_method">
+  <h3 class="signature " id="results_to_track-instance_method">
   
-    #<strong>resultsToTrack</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="ExperimentResult.html" title="Growthbook::ExperimentResult (class)">Growthbook::ExperimentResult</a></span>&gt;</tt>  <span class="extras">(readonly)</span>
+    #<strong>results_to_track</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="ExperimentResult.html" title="Growthbook::ExperimentResult (class)">Growthbook::ExperimentResult</a></span>&gt;</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -573,15 +574,15 @@
       <pre class="lines">
 
 
-18
 19
-20</pre>
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 19</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_resultsToTrack'>resultsToTrack</span>
-  <span class='ivar'>@resultsToTrack</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_results_to_track'>results_to_track</span>
+  <span class='ivar'>@results_to_track</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -654,7 +655,6 @@
       <pre class="lines">
 
 
-47
 48
 49
 50
@@ -696,15 +696,14 @@
 86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span>
   <span class='comment'># If experiments are disabled globally
 </span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span> <span class='kw'>unless</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_enabled'>enabled</span>
 
   <span class='comment'># Make sure experiment is always an object (or nil)
-</span>  <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>String</span>
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>String</span>
     <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span>
     <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_getExperiment'>getExperiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
@@ -717,11 +716,11 @@
 </span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span>
 
   <span class='comment'># User missing required user id type
-</span>  <span class='id identifier rubyid_user_id'>user_id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_anon'>anon</span> <span class='op'>?</span> <span class='ivar'>@anonId</span> <span class='op'>:</span> <span class='ivar'>@id</span>
+</span>  <span class='id identifier rubyid_user_id'>user_id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_anon'>anon</span> <span class='op'>?</span> <span class='ivar'>@anon_id</span> <span class='op'>:</span> <span class='ivar'>@id</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_user_id'>user_id</span>
 
   <span class='comment'># Experiment has targeting rules, check if user passes
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_isTargeted'>isTargeted</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span><span class='rparen'>)</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_targeted?'>targeted?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_targeting'>targeting</span><span class='rparen'>)</span>
 
   <span class='comment'># Experiment has a specific variation forced
 </span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='label'>forced:</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -731,9 +730,9 @@
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span><span class='rparen'>)</span>
 
   <span class='comment'># Add to the list of experiments that should be tracked in analytics
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@experimentsTracked</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
-    <span class='ivar'>@experimentsTracked</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-    <span class='ivar'>@resultsToTrack</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_result'>result</span>
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@experiments_tracked</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+    <span class='ivar'>@experiments_tracked</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+    <span class='ivar'>@results_to_track</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_result'>result</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_result'>result</span>
@@ -744,9 +743,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="lookupByDataKey-instance_method">
+  <h3 class="signature " id="look_up_by_data_key-instance_method">
   
-    #<strong>lookupByDataKey</strong>(key)  &#x21d2; <tt><span class='object_link'><a href="LookupResult.html" title="Growthbook::LookupResult (class)">Growthbook::LookupResult</a></span></tt><sup>?</sup> 
+    #<strong>look_up_by_data_key</strong>(key)  &#x21d2; <tt><span class='object_link'><a href="LookupResult.html" title="Growthbook::LookupResult (class)">Growthbook::LookupResult</a></span></tt><sup>?</sup> 
   
 
   
@@ -821,7 +820,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/user.rb', line 91</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_lookupByDataKey'>lookupByDataKey</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_look_up_by_data_key'>look_up_by_data_key</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_experiments'>experiments</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_exp'>exp</span><span class='op'>|</span>
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_data'>data</span><span class='op'>&amp;.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
 
@@ -841,7 +840,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Apr 18 23:49:06 2023 by
+  Generated on Wed Apr 19 00:40:38 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

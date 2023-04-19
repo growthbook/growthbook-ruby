@@ -61,7 +61,7 @@
 
       <div id="content"><h1>Class: Growthbook::ExperimentResult
   
-  
+  <span class="deprecated note title">Deprecated</span>
   
 </h1>
 <div class="box_info">
@@ -99,7 +99,19 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <div class="note deprecated"><strong>Deprecated.</strong> <div class='inline'></div></div>
 
+<p>Internal use only</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -337,8 +349,6 @@
       <pre class="lines">
 
 
-31
-32
 33
 34
 35
@@ -349,10 +359,12 @@
 40
 41
 42
-43</pre>
+43
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid__user'>_user</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span><span class='comma'>,</span> <span class='id identifier rubyid_forced'>forced</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@experiment</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span>
@@ -418,12 +430,12 @@
       <pre class="lines">
 
 
-19
-20
-21</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_data'>data</span>
   <span class='ivar'>@data</span>
@@ -479,12 +491,12 @@
       <pre class="lines">
 
 
-7
-8
-9</pre>
+9
+10
+11</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiment'>experiment</span>
   <span class='ivar'>@experiment</span>
@@ -535,12 +547,12 @@
       <pre class="lines">
 
 
-11
-12
-13</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_user'>user</span>
   <span class='ivar'>@user</span>
@@ -591,12 +603,12 @@
       <pre class="lines">
 
 
-15
-16
-17</pre>
+17
+18
+19</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_variation'>variation</span>
   <span class='ivar'>@variation</span>
@@ -650,12 +662,12 @@
       <pre class="lines">
 
 
-23
-24
-25</pre>
+25
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_forced?'>forced?</span>
   <span class='ivar'>@forced</span>
@@ -702,12 +714,12 @@
       <pre class="lines">
 
 
-27
-28
-29</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span>
   <span class='op'>!</span><span class='ivar'>@forced</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@variation</span> <span class='op'>&gt;=</span> <span class='int'>0</span>
@@ -722,7 +734,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Apr 18 23:49:07 2023 by
+  Generated on Wed Apr 19 00:40:39 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
