@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# The GrowthBook SDK
 module Growthbook
 end
 

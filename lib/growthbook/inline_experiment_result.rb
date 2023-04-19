@@ -3,10 +3,6 @@
 module Growthbook
   # Result of running an experiment.
   class InlineExperimentResult
-    # Whether or not the user is in the experiment
-    # @return [Bool]
-    attr_reader :in_experiment
-
     # The array index of the assigned variation
     # @return [Integer]
     attr_reader :variation_id
@@ -14,10 +10,6 @@ module Growthbook
     # The assigned variation value
     # @return [Any]
     attr_reader :value
-
-    # If the variation was randomly assigned based on user attribute hashes
-    # @return [Bool]
-    attr_reader :hash_used
 
     # The attribute used to split traffic
     # @return [String]
@@ -45,6 +37,18 @@ module Growthbook
       @hash_attribute = hash_attribute
       @hash_value = hash_value
       @feature_id = feature_id
+    end
+
+    # If the variation was randomly assigned based on user attribute hashes
+    # @return [Bool]
+    def hash_used?
+      @hash_used
+    end
+
+    # Whether or not the user is in the experiment
+    # @return [Bool]
+    def in_experiment?
+      @in_experiment
     end
 
     def to_json(*_args)

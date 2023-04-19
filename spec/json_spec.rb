@@ -153,8 +153,8 @@ describe 'test suite' do
         exp = Growthbook::InlineExperiment.new(experiment)
         result = gb.run(exp)
         expect(result.value).to eq(value)
-        expect(result.in_experiment).to eq(in_experiment)
-        expect(result.hash_used).to eq(hash_used)
+        expect(result.in_experiment?).to eq(in_experiment)
+        expect(result.hash_used?).to eq(hash_used)
       end
     end
   end
