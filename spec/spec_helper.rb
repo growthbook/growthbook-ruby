@@ -3,5 +3,12 @@
 require 'simplecov'
 require 'shields_badge'
 
-SimpleCov.start
-SimpleCov.formatter = SimpleCov::Formatter::ShieldsBadge
+SimpleCov.start do
+  add_filter %r{^/spec/}
+end
+SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new(
+  [
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::ShieldsBadge
+  ]
+)
