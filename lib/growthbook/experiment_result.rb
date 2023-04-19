@@ -26,11 +26,11 @@ module Growthbook
       @forced
     end
 
-    def shouldTrack?
+    def should_track?
       !@forced && @variation >= 0
     end
 
-    def initialize(_user = nil, experiment = nil, variation = -1, forced = false)
+    def initialize(_user = nil, experiment = nil, variation = -1, forced: false)
       @experiment = experiment
       @variation = variation
       @forced = forced

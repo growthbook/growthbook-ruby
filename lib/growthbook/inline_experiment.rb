@@ -46,22 +46,15 @@ module Growthbook
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
     def initialize(options = {})
-      @key = getOption(options, :key, '').to_s
-      @variations = getOption(options, :variations, [])
-      @active = getOption(options, :active, true)
-      @force = getOption(options, :force)
-      @weights = getOption(options, :weights)
-      @coverage = getOption(options, :coverage, 1)
-      @condition = getOption(options, :condition)
-      @namespace = getOption(options, :namespace)
-      @hash_attribute = getOption(options, :hash_attribute) || getOption(options, :hashAttribute) || 'id'
-    end
-
-    def getOption(hash, key, default = nil)
-      return hash[key.to_sym] if hash.key?(key.to_sym)
-      return hash[key.to_s] if hash.key?(key.to_s)
-
-      default
+      @key = get_option(options, :key, '').to_s
+      @variations = get_option(options, :variations, [])
+      @active = get_option(options, :active, true)
+      @force = get_option(options, :force)
+      @weights = get_option(options, :weights)
+      @coverage = get_option(options, :coverage, 1)
+      @condition = get_option(options, :condition)
+      @namespace = get_option(options, :namespace)
+      @hash_attribute = get_option(options, :hash_attribute) || get_option(options, :hashAttribute) || 'id'
     end
 
     def to_json(*_args)
@@ -76,6 +69,15 @@ module Growthbook
       res['namespace'] = @namespace unless @namespace.nil?
       res['hashAttribute'] = @hash_attribute if @hash_attribute != 'id' && !@hash_attribute.nil?
       res
+    end
+
+    private
+
+    def get_option(hash, key, default = nil)
+      return hash[key.to_sym] if hash.key?(key.to_sym)
+      return hash[key.to_s] if hash.key?(key.to_s)
+
+      default
     end
   end
 end

@@ -21,18 +21,19 @@ module Growthbook
     attr_reader :hash_attribute
 
     def initialize(rule)
-      @coverage = getOption(rule, :coverage)
-      @force = getOption(rule, :force)
-      @variations = getOption(rule, :variations)
-      @key = getOption(rule, :key)
-      @weights = getOption(rule, :weights)
-      @namespace = getOption(rule, :namespace)
-      @hash_attribute = getOption(rule, :hash_attribute) || getOption(rule, :hashAttribute)
+      @coverage = get_option(rule, :coverage)
+      @force = get_option(rule, :force)
+      @variations = get_option(rule, :variations)
+      @key = get_option(rule, :key)
+      @weights = get_option(rule, :weights)
+      @namespace = get_option(rule, :namespace)
+      @hash_attribute = get_option(rule, :hash_attribute) || get_option(rule, :hashAttribute)
 
-      cond = getOption(rule, :condition)
+      cond = get_option(rule, :condition)
       @condition = Growthbook::Conditions.parse_condition(cond) unless cond.nil?
     end
 
+    # @return [Growthbook::InlineExperiment, nil]
     def to_experiment(feature_key)
       return nil unless @variations
 
@@ -69,7 +70,7 @@ module Growthbook
 
     private
 
-    def getOption(hash, key)
+    def get_option(hash, key)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
 

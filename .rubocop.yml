@@ -15,6 +15,7 @@ Metrics/PerceivedComplexity:
 
 Metrics/ParameterLists:
   Max: 10
+  MaxOptionalParameters: 5
 
 Metrics/AbcSize:
   Max: 55

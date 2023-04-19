@@ -77,7 +77,7 @@ module Growthbook
       result = get_experiment_result(experiment, variation)
 
       # Add to the list of experiments that should be tracked in analytics
-      if result.shouldTrack? && !@experiments_tracked.include?(experiment.id)
+      if result.should_track? && !@experiments_tracked.include?(experiment.id)
         @experiments_tracked << experiment.id
         @results_to_track << result
       end
@@ -102,7 +102,7 @@ module Growthbook
     private
 
     def get_experiment_result(experiment = nil, variation = -1, forced: false)
-      Growthbook::ExperimentResult.new(self, experiment, variation, forced)
+      Growthbook::ExperimentResult.new(self, experiment, variation, forced: forced)
     end
 
     def flatten_user_values(prefix, val)

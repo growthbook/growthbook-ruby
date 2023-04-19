@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Result of a feature evaluation
   class FeatureResult
     # The assigned value of the feature
     # @return [Any, nil]

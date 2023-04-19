@@ -86,21 +86,21 @@ describe 'user' do
       user = client.user(id: '1')
 
       # Normal
-      expect(user.experiment('my-test').shouldTrack?).to be(true)
+      expect(user.experiment('my-test').should_track?).to be(true)
       expect(user.experiment('my-test').forced?).to be(false)
       expect(user.look_up_by_data_key('color').should_track?).to be(true)
       expect(user.look_up_by_data_key('color').forced?).to be(false)
 
       # Failed coverage
       experiment.coverage = 0.01
-      expect(user.experiment('my-test').shouldTrack?).to be(false)
+      expect(user.experiment('my-test').should_track?).to be(false)
       expect(user.experiment('my-test').forced?).to be(false)
       expect(user.look_up_by_data_key('color')).to be_nil
 
       # Forced variation
       experiment.coverage = 1.0
       experiment.force = 1
-      expect(user.experiment('my-test').shouldTrack?).to be(false)
+      expect(user.experiment('my-test').should_track?).to be(false)
       expect(user.experiment('my-test').forced?).to be(true)
       expect(user.look_up_by_data_key('color').should_track?).to be(false)
       expect(user.look_up_by_data_key('color').forced?).to be(true)
