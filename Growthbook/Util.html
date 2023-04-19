@@ -150,7 +150,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#choose_variation-class_method" title="choose_variation (class method)">.<strong>choose_variation</strong>(n, ranges)  &#x21d2; Object </a>
+      <a href="#choose_variation-class_method" title="choose_variation (class method)">.<strong>choose_variation</strong>(num, ranges)  &#x21d2; Object </a>
     
 
     
@@ -411,7 +411,7 @@
       <div class="method_details ">
   <h3 class="signature " id="choose_variation-class_method">
   
-    .<strong>choose_variation</strong>(n, ranges)  &#x21d2; <tt>Object</tt> 
+    .<strong>choose_variation</strong>(num, ranges)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -444,9 +444,9 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 114</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_choose_variation'>choose_variation</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='id identifier rubyid_ranges'>ranges</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_choose_variation'>choose_variation</span><span class='lparen'>(</span><span class='id identifier rubyid_num'>num</span><span class='comma'>,</span> <span class='id identifier rubyid_ranges'>ranges</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ranges'>ranges</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_i'>i</span> <span class='kw'>if</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_i'>i</span> <span class='kw'>if</span> <span class='id identifier rubyid_num'>num</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_num'>num</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
   <span class='kw'>end</span>
   <span class='op'>-</span><span class='int'>1</span>
 <span class='kw'>end</span></pre>
@@ -812,7 +812,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:45:09 2023 by
+  Generated on Wed Apr 19 00:49:46 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

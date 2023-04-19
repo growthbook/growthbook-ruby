@@ -99,7 +99,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Result of running an experiment.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -325,7 +336,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(hash_used, in_experiment, variation_id, value, hash_attribute, hash_value, feature_id)  &#x21d2; InlineExperimentResult </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(hash_used:, in_experiment:, variation_id:, value:, hash_attribute:, hash_value:, feature_id:)  &#x21d2; InlineExperimentResult </a>
     
 
     
@@ -379,7 +390,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(hash_used, in_experiment, variation_id, value, hash_attribute, hash_value, feature_id)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::InlineExperimentResult (class)">InlineExperimentResult</a></span></tt> 
+    #<strong>initialize</strong>(hash_used:, in_experiment:, variation_id:, value:, hash_attribute:, hash_value:, feature_id:)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::InlineExperimentResult (class)">InlineExperimentResult</a></span></tt> 
   
 
   
@@ -402,7 +413,6 @@
       <pre class="lines">
 
 
-31
 32
 33
 34
@@ -422,18 +432,17 @@
 48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
-  <span class='id identifier rubyid_hash_used'>hash_used</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_in_experiment'>in_experiment</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_variation_id'>variation_id</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_hash_attribute'>hash_attribute</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_hash_value'>hash_value</span><span class='comma'>,</span>
-  <span class='id identifier rubyid_feature_id'>feature_id</span>
+  <span class='label'>hash_used:</span><span class='comma'>,</span>
+  <span class='label'>in_experiment:</span><span class='comma'>,</span>
+  <span class='label'>variation_id:</span><span class='comma'>,</span>
+  <span class='label'>value:</span><span class='comma'>,</span>
+  <span class='label'>hash_attribute:</span><span class='comma'>,</span>
+  <span class='label'>hash_value:</span><span class='comma'>,</span>
+  <span class='label'>feature_id:</span>
 <span class='rparen'>)</span>
-
   <span class='ivar'>@hash_used</span> <span class='op'>=</span> <span class='id identifier rubyid_hash_used'>hash_used</span>
   <span class='ivar'>@in_experiment</span> <span class='op'>=</span> <span class='id identifier rubyid_in_experiment'>in_experiment</span>
   <span class='ivar'>@variation_id</span> <span class='op'>=</span> <span class='id identifier rubyid_variation_id'>variation_id</span>
@@ -480,12 +489,12 @@
       <pre class="lines">
 
 
-29
 30
-31</pre>
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_feature_id'>feature_id</span>
   <span class='ivar'>@feature_id</span>
@@ -536,12 +545,12 @@
       <pre class="lines">
 
 
-23
 24
-25</pre>
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash_attribute'>hash_attribute</span>
   <span class='ivar'>@hash_attribute</span>
@@ -592,12 +601,12 @@
       <pre class="lines">
 
 
-19
 20
-21</pre>
+21
+22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 20</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash_used'>hash_used</span>
   <span class='ivar'>@hash_used</span>
@@ -648,12 +657,12 @@
       <pre class="lines">
 
 
-27
 28
-29</pre>
+29
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hash_value'>hash_value</span>
   <span class='ivar'>@hash_value</span>
@@ -704,12 +713,12 @@
       <pre class="lines">
 
 
-7
 8
-9</pre>
+9
+10</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 8</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_in_experiment'>in_experiment</span>
   <span class='ivar'>@in_experiment</span>
@@ -760,12 +769,12 @@
       <pre class="lines">
 
 
-15
 16
-17</pre>
+17
+18</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 16</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_value'>value</span>
   <span class='ivar'>@value</span>
@@ -816,12 +825,12 @@
       <pre class="lines">
 
 
-11
 12
-13</pre>
+13
+14</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 11</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment_result.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_variation_id'>variation_id</span>
   <span class='ivar'>@variation_id</span>
@@ -889,7 +898,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:45:09 2023 by
+  Generated on Wed Apr 19 00:49:47 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
