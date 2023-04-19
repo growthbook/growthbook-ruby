@@ -120,7 +120,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#active-instance_method" title="#active (instance method)">#<strong>active</strong>  &#x21d2; Object </a>
+      <a href="#active-instance_method" title="#active (instance method)">#<strong>active</strong>  &#x21d2; true, false </a>
     
 
     
@@ -138,7 +138,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute active.</p>
+<p>If set to false, always return the control (first variation).</p>
 </div></span>
   
 </li>
@@ -147,7 +147,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#condition-instance_method" title="#condition (instance method)">#<strong>condition</strong>  &#x21d2; Object </a>
+      <a href="#condition-instance_method" title="#condition (instance method)">#<strong>condition</strong>  &#x21d2; Hash </a>
     
 
     
@@ -165,7 +165,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute condition.</p>
+<p>Optional targeting condition.</p>
 </div></span>
   
 </li>
@@ -174,7 +174,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#coverage-instance_method" title="#coverage (instance method)">#<strong>coverage</strong>  &#x21d2; Object </a>
+      <a href="#coverage-instance_method" title="#coverage (instance method)">#<strong>coverage</strong>  &#x21d2; Float </a>
     
 
     
@@ -192,7 +192,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute coverage.</p>
+<p>What percent of users should be included in the experiment (between 0 and 1, inclusive).</p>
 </div></span>
   
 </li>
@@ -201,7 +201,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#filters-instance_method" title="#filters (instance method)">#<strong>filters</strong>  &#x21d2; Object </a>
+      <a href="#filters-instance_method" title="#filters (instance method)">#<strong>filters</strong>  &#x21d2; Array&lt;Hash&gt; </a>
     
 
     
@@ -219,7 +219,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute filters.</p>
+<p>Array of filters to apply.</p>
 </div></span>
   
 </li>
@@ -228,7 +228,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#force-instance_method" title="#force (instance method)">#<strong>force</strong>  &#x21d2; Object </a>
+      <a href="#force-instance_method" title="#force (instance method)">#<strong>force</strong>  &#x21d2; integer<sup>?</sup> </a>
     
 
     
@@ -246,7 +246,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute force.</p>
+<p>All users included in the experiment will be forced into the specific variation index.</p>
 </div></span>
   
 </li>
@@ -255,7 +255,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#hash_attribute-instance_method" title="#hash_attribute (instance method)">#<strong>hash_attribute</strong>  &#x21d2; Object </a>
+      <a href="#hash_attribute-instance_method" title="#hash_attribute (instance method)">#<strong>hash_attribute</strong>  &#x21d2; String </a>
     
 
     
@@ -273,7 +273,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute hash_attribute.</p>
+<p>What user attribute should be used to assign variations (defaults to id).</p>
 </div></span>
   
 </li>
@@ -282,7 +282,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#hash_version-instance_method" title="#hash_version (instance method)">#<strong>hash_version</strong>  &#x21d2; Object </a>
+      <a href="#hash_version-instance_method" title="#hash_version (instance method)">#<strong>hash_version</strong>  &#x21d2; Integer </a>
     
 
     
@@ -300,7 +300,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute hash_version.</p>
+<p>The hash version to use (default to 1).</p>
 </div></span>
   
 </li>
@@ -309,7 +309,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#key-instance_method" title="#key (instance method)">#<strong>key</strong>  &#x21d2; Object </a>
+      <a href="#key-instance_method" title="#key (instance method)">#<strong>key</strong>  &#x21d2; String </a>
     
 
     
@@ -327,7 +327,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute key.</p>
+<p>The globally unique identifier for the experiment.</p>
 </div></span>
   
 </li>
@@ -336,7 +336,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#meta-instance_method" title="#meta (instance method)">#<strong>meta</strong>  &#x21d2; Object </a>
+      <a href="#meta-instance_method" title="#meta (instance method)">#<strong>meta</strong>  &#x21d2; Array&lt;Hash&gt; </a>
     
 
     
@@ -354,7 +354,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute meta.</p>
+<p>Meta info about the variations.</p>
 </div></span>
   
 </li>
@@ -363,7 +363,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; Object </a>
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; String </a>
     
 
     
@@ -381,7 +381,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute name.</p>
+<p>Human-readable name for the experiment.</p>
 </div></span>
   
 </li>
@@ -390,7 +390,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#namespace-instance_method" title="#namespace (instance method)">#<strong>namespace</strong>  &#x21d2; Object </a>
+      <a href="#namespace-instance_method" title="#namespace (instance method)">#<strong>namespace</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
     
@@ -408,7 +408,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute namespace.</p>
+<p>Adds the experiment to a namespace.</p>
 </div></span>
   
 </li>
@@ -417,7 +417,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#phase-instance_method" title="#phase (instance method)">#<strong>phase</strong>  &#x21d2; Object </a>
+      <a href="#phase-instance_method" title="#phase (instance method)">#<strong>phase</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
     
@@ -435,7 +435,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute phase.</p>
+<p>Id of the current experiment phase.</p>
 </div></span>
   
 </li>
@@ -444,7 +444,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#ranges-instance_method" title="#ranges (instance method)">#<strong>ranges</strong>  &#x21d2; Object </a>
+      <a href="#ranges-instance_method" title="#ranges (instance method)">#<strong>ranges</strong>  &#x21d2; Array&lt;Hash&gt; </a>
     
 
     
@@ -462,7 +462,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute ranges.</p>
+<p>Array of ranges, one per variation.</p>
 </div></span>
   
 </li>
@@ -471,7 +471,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#seed-instance_method" title="#seed (instance method)">#<strong>seed</strong>  &#x21d2; Object </a>
+      <a href="#seed-instance_method" title="#seed (instance method)">#<strong>seed</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
     
@@ -489,7 +489,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute seed.</p>
+<p>The hash seed to use.</p>
 </div></span>
   
 </li>
@@ -498,7 +498,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#variations-instance_method" title="#variations (instance method)">#<strong>variations</strong>  &#x21d2; Object </a>
+      <a href="#variations-instance_method" title="#variations (instance method)">#<strong>variations</strong>  &#x21d2; Array&lt;String, Integer, Hash&gt; </a>
     
 
     
@@ -516,7 +516,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute variations.</p>
+<p>The different variations to choose between.</p>
 </div></span>
   
 </li>
@@ -525,7 +525,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#weights-instance_method" title="#weights (instance method)">#<strong>weights</strong>  &#x21d2; Object </a>
+      <a href="#weights-instance_method" title="#weights (instance method)">#<strong>weights</strong>  &#x21d2; Array&lt;Float&gt; </a>
     
 
     
@@ -543,7 +543,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute weights.</p>
+<p>How to weight traffic between variations.</p>
 </div></span>
   
 </li>
@@ -697,7 +697,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="active-instance_method">
   
-    #<strong>active</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>active</strong>  &#x21d2; <tt>true</tt>, <tt>false</tt> 
   
 
   
@@ -706,13 +706,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute active.</p>
+<p>Returns If set to false, always return the control (first variation).</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>, <tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>If set to false, always return the control (first variation)</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -740,7 +758,7 @@
       <div class="method_details ">
   <h3 class="signature " id="condition-instance_method">
   
-    #<strong>condition</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>condition</strong>  &#x21d2; <tt>Hash</tt> 
   
 
   
@@ -749,13 +767,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute condition.</p>
+<p>Returns Optional targeting condition.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Optional targeting condition</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -783,7 +819,7 @@
       <div class="method_details ">
   <h3 class="signature " id="coverage-instance_method">
   
-    #<strong>coverage</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>coverage</strong>  &#x21d2; <tt>Float</tt> 
   
 
   
@@ -792,13 +828,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute coverage.</p>
+<p>Returns What percent of users should be included in the experiment (between 0 and 1, inclusive).</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>What percent of users should be included in the experiment (between 0 and 1, inclusive)</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -826,7 +880,7 @@
       <div class="method_details ">
   <h3 class="signature " id="filters-instance_method">
   
-    #<strong>filters</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>filters</strong>  &#x21d2; <tt>Array&lt;Hash&gt;</tt> 
   
 
   
@@ -835,13 +889,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute filters.</p>
+<p>Returns Array of filters to apply.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Array of filters to apply</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -869,7 +941,7 @@
       <div class="method_details ">
   <h3 class="signature " id="force-instance_method">
   
-    #<strong>force</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>force</strong>  &#x21d2; <tt>integer</tt><sup>?</sup> 
   
 
   
@@ -878,13 +950,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute force.</p>
+<p>Returns All users included in the experiment will be forced into the specific variation index.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>integer</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>All users included in the experiment will be forced into the specific variation index</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -912,7 +1002,7 @@
       <div class="method_details ">
   <h3 class="signature " id="hash_attribute-instance_method">
   
-    #<strong>hash_attribute</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>hash_attribute</strong>  &#x21d2; <tt>String</tt> 
   
 
   
@@ -921,13 +1011,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute hash_attribute.</p>
+<p>Returns What user attribute should be used to assign variations (defaults to id).</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>What user attribute should be used to assign variations (defaults to id)</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -955,7 +1063,7 @@
       <div class="method_details ">
   <h3 class="signature " id="hash_version-instance_method">
   
-    #<strong>hash_version</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>hash_version</strong>  &#x21d2; <tt>Integer</tt> 
   
 
   
@@ -964,13 +1072,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute hash_version.</p>
+<p>Returns The hash version to use (default to 1).</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The hash version to use (default to 1)</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -998,7 +1124,7 @@
       <div class="method_details ">
   <h3 class="signature " id="key-instance_method">
   
-    #<strong>key</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>key</strong>  &#x21d2; <tt>String</tt> 
   
 
   
@@ -1007,13 +1133,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute key.</p>
+<p>Returns The globally unique identifier for the experiment.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The globally unique identifier for the experiment</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1041,7 +1185,7 @@
       <div class="method_details ">
   <h3 class="signature " id="meta-instance_method">
   
-    #<strong>meta</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>meta</strong>  &#x21d2; <tt>Array&lt;Hash&gt;</tt> 
   
 
   
@@ -1050,13 +1194,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute meta.</p>
+<p>Returns Meta info about the variations.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Meta info about the variations</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1084,7 +1246,7 @@
       <div class="method_details ">
   <h3 class="signature " id="name-instance_method">
   
-    #<strong>name</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>name</strong>  &#x21d2; <tt>String</tt> 
   
 
   
@@ -1093,13 +1255,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute name.</p>
+<p>Returns Human-readable name for the experiment.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Human-readable name for the experiment</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1127,7 +1307,7 @@
       <div class="method_details ">
   <h3 class="signature " id="namespace-instance_method">
   
-    #<strong>namespace</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>namespace</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
   
 
   
@@ -1136,13 +1316,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute namespace.</p>
+<p>Returns Adds the experiment to a namespace.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Adds the experiment to a namespace</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1170,7 +1368,7 @@
       <div class="method_details ">
   <h3 class="signature " id="phase-instance_method">
   
-    #<strong>phase</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>phase</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
   
 
   
@@ -1179,13 +1377,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute phase.</p>
+<p>Returns Id of the current experiment phase.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Id of the current experiment phase</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1213,7 +1429,7 @@
       <div class="method_details ">
   <h3 class="signature " id="ranges-instance_method">
   
-    #<strong>ranges</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>ranges</strong>  &#x21d2; <tt>Array&lt;Hash&gt;</tt> 
   
 
   
@@ -1222,13 +1438,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute ranges.</p>
+<p>Returns Array of ranges, one per variation.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Array of ranges, one per variation</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1256,7 +1490,7 @@
       <div class="method_details ">
   <h3 class="signature " id="seed-instance_method">
   
-    #<strong>seed</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>seed</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
   
 
   
@@ -1265,13 +1499,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute seed.</p>
+<p>Returns The hash seed to use.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The hash seed to use</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1299,7 +1551,7 @@
       <div class="method_details ">
   <h3 class="signature " id="variations-instance_method">
   
-    #<strong>variations</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>variations</strong>  &#x21d2; <tt>Array&lt;String, Integer, Hash&gt;</tt> 
   
 
   
@@ -1308,13 +1560,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute variations.</p>
+<p>Returns The different variations to choose between.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String, Integer, Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The different variations to choose between</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1342,7 +1612,7 @@
       <div class="method_details ">
   <h3 class="signature " id="weights-instance_method">
   
-    #<strong>weights</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>weights</strong>  &#x21d2; <tt>Array&lt;Float&gt;</tt> 
   
 
   
@@ -1351,13 +1621,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute weights.</p>
+<p>Returns How to weight traffic between variations. Must add to 1.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Float&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>How to weight traffic between variations. Must add to 1.</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1456,7 +1744,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 02:02:37 2023 by
+  Generated on Wed Apr 19 03:15:12 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
