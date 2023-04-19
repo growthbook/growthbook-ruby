@@ -185,8 +185,10 @@ module Growthbook
       # 8. Exclude if condition is false
       if exp.condition && !condition_passes(exp.condition)
         return get_experiment_result(
-          exp, -1, hash_used: false,
-                   feature_id: feature_id
+          exp,
+          -1,
+          hash_used: false,
+          feature_id: feature_id
         )
       end
 
