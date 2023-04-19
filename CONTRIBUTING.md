@@ -25,6 +25,8 @@ To run it as CI would, run:
 
     rubocop
 
+If you use Visual Studio Code, you can use the extension [ruby-rubocop](https://marketplace.visualstudio.com/items?itemName=misogi.ruby-rubocop) to see editor hints.
+
 
 ## Releasing
 
