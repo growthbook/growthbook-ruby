@@ -49,7 +49,7 @@ module Growthbook
       true
     end
 
-    def self.is_operator_object(obj)
+    def self.operator_object?(obj)
       obj.each do |key, _value|
         return false if key[0] != '$'
       end
@@ -81,7 +81,7 @@ module Growthbook
     end
 
     def self.eval_condition_value(condition_value, attribute_value)
-      if condition_value.is_a?(Hash) && is_operator_object(condition_value)
+      if condition_value.is_a?(Hash) && operator_object?(condition_value)
         condition_value.each do |key, value|
           return false unless eval_operator_condition(key, attribute_value, value)
         end
@@ -94,7 +94,7 @@ module Growthbook
       return false unless attribute_value.is_a? Array
 
       attribute_value.each do |item|
-        if is_operator_object(condition)
+        if operator_object?(condition)
           return true if eval_condition_value(condition, item)
         elsif eval_condition(item, condition)
           return true

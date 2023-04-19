@@ -44,7 +44,7 @@ module Growthbook
 
     def self.choose_variation_for_user(user_id, experiment)
       test_id = experiment.id
-      weights = experiment.getScaledWeights
+      weights = experiment.scaled_weights
 
       # Hash the user id and testName to a number from 0 to 1
       n = (FNV.new.fnv1a_32(user_id + test_id) % 1000) / 1000.0

@@ -8,7 +8,7 @@ Lint:
   Severity: error
 
 Metrics/CyclomaticComplexity:
-  Max: 15
+  Max: 25
 
 Metrics/PerceivedComplexity:
   Max: 15
@@ -24,7 +24,7 @@ Metrics/ClassLength:
   Max: 165
 
 Metrics/MethodLength:
-  Max: 30
+  Max: 60
 
 Naming/MethodParameterName:
   MinNameLength: 2

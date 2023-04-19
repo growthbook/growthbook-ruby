@@ -33,7 +33,7 @@ module Growthbook
     # @param id [String] The unique id for this experiment
     # @param variations [Integer] The number of variations in this experiment (including the Control)
     # @param options [Hash]
-    # @option options [Float] :coverage (1.0) The percent of elegible traffic to include in the experiment
+    # @option options [Float] :coverage (1.0) The percent of eligible traffic to include in the experiment
     # @option options [Array<Float>] :weights The relative weights of the variations.
     #    Length must be the same as the number of variations. Total should add to 1.0.
     #    Default is an even split between variations
@@ -48,14 +48,14 @@ module Growthbook
       @id = id
       @variations = variations
       @coverage = options[:coverage] || 1
-      @weights = options[:weights] || getEqualWeights
+      @weights = options[:weights] || equal_weights
       @force = options.key?(:force) ? options[:force] : nil
       @anon = options.key?(:anon) ? options[:anon] : false
       @targeting = options[:targeting] || []
       @data = options[:data] || {}
     end
 
-    def getScaledWeights
+    def scaled_weights
       @weights.map do |n|
         n * @coverage
       end
@@ -63,7 +63,7 @@ module Growthbook
 
     private
 
-    def getEqualWeights
+    def equal_weights
       weights = []
       n = @variations
       (1..n).each do |_i|
