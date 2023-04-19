@@ -272,7 +272,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(_user = nil, experiment = nil, variation = -1,, forced = false)  &#x21d2; ExperimentResult </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(_user = nil, experiment = nil, variation = -1,, forced: false)  &#x21d2; ExperimentResult </a>
     
 
     
@@ -298,7 +298,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#shouldTrack%3F-instance_method" title="#shouldTrack? (instance method)">#<strong>shouldTrack?</strong>  &#x21d2; Boolean </a>
+      <a href="#should_track%3F-instance_method" title="#should_track? (instance method)">#<strong>should_track?</strong>  &#x21d2; Boolean </a>
     
 
     
@@ -326,7 +326,7 @@
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(_user = nil, experiment = nil, variation = -1,, forced = false)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::ExperimentResult (class)">ExperimentResult</a></span></tt> 
+    #<strong>initialize</strong>(_user = nil, experiment = nil, variation = -1,, forced: false)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::ExperimentResult (class)">ExperimentResult</a></span></tt> 
   
 
   
@@ -366,7 +366,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 33</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid__user'>_user</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span><span class='comma'>,</span> <span class='id identifier rubyid_forced'>forced</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid__user'>_user</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span><span class='comma'>,</span> <span class='label'>forced:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='ivar'>@experiment</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span>
   <span class='ivar'>@variation</span> <span class='op'>=</span> <span class='id identifier rubyid_variation'>variation</span>
   <span class='ivar'>@forced</span> <span class='op'>=</span> <span class='id identifier rubyid_forced'>forced</span>
@@ -678,9 +678,9 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="shouldTrack?-instance_method">
+  <h3 class="signature " id="should_track?-instance_method">
   
-    #<strong>shouldTrack?</strong>  &#x21d2; <tt>Boolean</tt> 
+    #<strong>should_track?</strong>  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -721,7 +721,7 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/experiment_result.rb', line 29</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_should_track?'>should_track?</span>
   <span class='op'>!</span><span class='ivar'>@forced</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@variation</span> <span class='op'>&gt;=</span> <span class='int'>0</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -734,7 +734,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:49:47 2023 by
+  Generated on Wed Apr 19 01:04:52 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

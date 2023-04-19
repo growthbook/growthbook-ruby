@@ -705,10 +705,10 @@
   <span class='comment'># Make sure experiment is always an object (or nil)
 </span>  <span class='kw'>if</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>String</span>
     <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span>
-    <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_getExperiment'>getExperiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_get_experiment'>get_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
     <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
-    <span class='id identifier rubyid_override'>override</span> <span class='op'>=</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_getExperiment'>getExperiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_override'>override</span> <span class='op'>=</span> <span class='ivar'>@client</span><span class='period'>.</span><span class='id identifier rubyid_get_experiment'>get_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_experiment'>experiment</span> <span class='op'>=</span> <span class='id identifier rubyid_override'>override</span> <span class='kw'>if</span> <span class='id identifier rubyid_override'>override</span>
   <span class='kw'>end</span>
 
@@ -730,7 +730,7 @@
   <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_get_experiment_result'>get_experiment_result</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='comma'>,</span> <span class='id identifier rubyid_variation'>variation</span><span class='rparen'>)</span>
 
   <span class='comment'># Add to the list of experiments that should be tracked in analytics
-</span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_shouldTrack?'>shouldTrack?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@experiments_tracked</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_should_track?'>should_track?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@experiments_tracked</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
     <span class='ivar'>@experiments_tracked</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_experiment'>experiment</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
     <span class='ivar'>@results_to_track</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_result'>result</span>
   <span class='kw'>end</span>
@@ -840,7 +840,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:49:46 2023 by
+  Generated on Wed Apr 19 01:04:52 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

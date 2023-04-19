@@ -1071,7 +1071,7 @@
 </span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_condition_passes'>condition_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span>
 
     <span class='comment'># Rollout or forced value rule
-</span>    <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_is_force?'>is_force?</span>
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force?'>force?</span>
       <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_coverage'>coverage</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
         <span class='id identifier rubyid_hash_value'>hash_value</span> <span class='op'>=</span> <span class='id identifier rubyid_get_attribute'>get_attribute</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_hash_attribute'>hash_attribute</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
         <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_hash_value'>hash_value</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -1082,7 +1082,7 @@
       <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>force</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
     <span class='kw'>end</span>
     <span class='comment'># Experiment rule
-</span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_is_experiment?'>is_experiment?</span>
+</span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_experiment?'>experiment?</span>
 
     <span class='id identifier rubyid_exp'>exp</span> <span class='op'>=</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_to_experiment'>to_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
@@ -1271,7 +1271,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 19 00:49:46 2023 by
+  Generated on Wed Apr 19 01:04:52 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
