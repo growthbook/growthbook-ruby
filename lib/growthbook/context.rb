@@ -3,8 +3,28 @@
 module Growthbook
   # Context object passed into the GrowthBook constructor.
   class Context
-    attr_accessor :enabled, :url, :qa_mode, :listener
-    attr_reader :attributes, :features, :impressions, :forced_variations, :forced_features
+    # @return [true, false] Switch to globally disable all experiments. Default true.
+    attr_accessor :enabled
+
+    # @return [String] The URL of the current page
+    attr_accessor :url
+
+    # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
+    attr_accessor :qa_mode
+
+    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
+    attr_accessor :listener
+
+    # @return [Hash] Map of user attributes that are used to assign variations
+    attr_reader :attributes
+
+    # @return [Hash] Feature definitions (usually pulled from an API or cache)
+    attr_reader :features
+
+    # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
+    attr_reader :forced_variations
+
+    attr_reader :impressions, :forced_features
 
     def initialize(options = {})
       @features = {}
@@ -73,15 +93,19 @@ module Growthbook
         # Targeting condition
         next if rule.condition && !condition_passes(rule.condition)
 
-        # Rollout or forced value rule
-        if rule.force?
-          unless rule.coverage.nil?
-            hash_value = get_attribute(rule.hash_attribute || 'id').to_s
-            next if hash_value.empty?
+        # If there are filters for who is included (e.g. namespaces)
+        next if rule.filters && filtered_out?(rule.filters)
 
-            n = Growthbook::Util.hash(hash_value + key)
-            next if n > rule.coverage
-          end
+        # If this is a percentage rollout, skip if not included
+        if rule.force?
+          seed = rule.seed || key
+          hash_attribute = rule.hash_attribute || 'id'
+          included_in_rollout = included_in_rollout?(
+            seed: seed, hash_attribute: hash_attribute, range: rule.range,
+            coverage: rule.coverage, hash_version: rule.hash_version
+          )
+          next unless included_in_rollout
+
           return get_feature_result(rule.force, 'force')
         end
         # Experiment rule
@@ -90,7 +114,7 @@ module Growthbook
         exp = rule.to_experiment(key)
         result = _run(exp, key)
 
-        next unless result.in_experiment?
+        next unless result.in_experiment && !result.passthrough
 
         return get_feature_result(result.value, 'experiment', exp, result)
       end
@@ -151,14 +175,11 @@ module Growthbook
       hash_value = get_attribute(hash_attribute).to_s
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if hash_value.empty?
 
-      # 7. Exclude if user not in namespace
-      if exp.namespace && !Growthbook::Util.in_namespace(
-        hash_value, exp.namespace
-      )
-        return get_experiment_result(
-          exp, -1, hash_used: false,
-                   feature_id: feature_id
-        )
+      # 7. Exclude if user is filtered out (used to be called "namespace")
+      if exp.filters
+        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters)
+      elsif exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
+        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id)
       end
 
       # 8. Exclude if condition is false
@@ -169,13 +190,13 @@ module Growthbook
         )
       end
 
-      # 9. Calculate bucket ranges and choose one
-      ranges = Growthbook::Util.get_bucket_ranges(
+      # 9. Get bucket ranges and choose variation
+      ranges = exp.ranges || Growthbook::Util.get_bucket_ranges(
         exp.variations.length,
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.hash(hash_value + key)
+      n = Growthbook::Util.hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
       assigned = Growthbook::Util.choose_variation(n, ranges)
 
       # 10. Return if not in experiment
@@ -188,7 +209,7 @@ module Growthbook
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if @qa_mode
 
       # 13. Build the result object
-      result = get_experiment_result(exp, assigned, hash_used: true, feature_id: feature_id)
+      result = get_experiment_result(exp, assigned, hash_used: true, feature_id: feature_id, bucket: n)
 
       # 14. Fire tracking callback
       track_experiment(exp, result)
@@ -209,7 +230,7 @@ module Growthbook
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
-    def get_experiment_result(experiment, variation_index = -1, hash_used: false, feature_id: '')
+    def get_experiment_result(experiment, variation_index = -1, hash_used: false, feature_id: '', bucket: nil)
       in_experiment = true
       if variation_index.negative? || variation_index >= experiment.variations.length
         variation_index = 0
@@ -218,16 +239,17 @@ module Growthbook
 
       hash_attribute = experiment.hash_attribute || 'id'
       hash_value = get_attribute(hash_attribute)
+      meta = experiment.meta ? experiment.meta[variation_index] : {}
 
-      Growthbook::InlineExperimentResult.new(
-        hash_used: hash_used,
-        in_experiment: in_experiment,
-        variation_id: variation_index,
-        value: experiment.variations[variation_index],
-        hash_attribute: hash_attribute,
-        hash_value: hash_value,
-        feature_id: feature_id
+      result = Growthbook::InlineExperimentResult.new(
+        { key: meta['key'] || variation_index, in_experiment: in_experiment, variation_id: variation_index,
+          value: experiment.variations[variation_index], hash_used: hash_used, hash_attribute: hash_attribute,
+          hash_value: hash_value, feature_id: feature_id, bucket: bucket, name: meta['name'] }
       )
+
+      result.passthrough = true if meta['passthrough']
+
+      result
     end
 
     def get_feature_result(value, source, experiment = nil, experiment_result = nil)
@@ -251,6 +273,35 @@ module Growthbook
     def track_experiment(experiment, result)
       @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
       @impressions[experiment.key] = result
+    end
+
+    def included_in_rollout?(seed:, hash_attribute:, hash_version:, range:, coverage:)
+      return true if range.nil? && coverage.nil?
+
+      hash_value = get_attribute(hash_attribute)
+
+      return false if hash_value.empty?
+
+      n = Growthbook::Util.hash(seed: seed, value: hash_value, version: hash_version || 1)
+
+      return Growthbook::Util.in_range?(n, range) if range
+      return n <= coverage if coverage
+
+      true
+    end
+
+    def filtered_out?(filters)
+      filters.any? do |filter|
+        hash_value = get_attribute(filter['attribute'] || 'id')
+
+        if hash_value.empty?
+          false
+        else
+          n = Growthbook::Util.hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+
+          filter['ranges'].none? { |range| Growthbook::Util.in_range?(n, range) }
+        end
+      end
     end
   end
 end

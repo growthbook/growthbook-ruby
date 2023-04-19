@@ -96,6 +96,8 @@ describe 'context' do
 
       expect(gb.impressions['feature1'].to_json).to eq(
         {
+          'bucket'        => 0.154,
+          'key'           => '0',
           'featureId'     => 'feature1',
           'hashAttribute' => 'id',
           'hashValue'     => '123',
@@ -112,6 +114,8 @@ describe 'context' do
         expect(exp.to_json).to eq({ 'key' => 'feature1', 'variations' => [2, 3] })
         expect(res.to_json).to eq(
           {
+            'bucket'        => 0.154,
+            'key'           => '0',
             'featureId'     => 'feature1',
             'hashAttribute' => 'id',
             'hashValue'     => '123',
