@@ -42,7 +42,7 @@ describe 'client' do
       }'
 
       parsed = JSON.parse(json)
-      client.importExperimentsHash(parsed['experiments'])
+      client.import_experiments_hash(parsed['experiments'])
 
       expect(client.experiments.length).to eq(2)
 

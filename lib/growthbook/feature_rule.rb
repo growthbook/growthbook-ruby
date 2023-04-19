@@ -46,12 +46,12 @@ module Growthbook
       )
     end
 
-    def is_experiment?
+    def experiment?
       !!@variations
     end
 
-    def is_force?
-      !is_experiment? && !@force.nil?
+    def force?
+      !experiment? && !@force.nil?
     end
 
     def to_json(*_args)

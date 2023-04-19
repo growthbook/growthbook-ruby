@@ -52,10 +52,10 @@ module Growthbook
       # Make sure experiment is always an object (or nil)
       if experiment.is_a? String
         id = experiment
-        experiment = @client.getExperiment(id)
+        experiment = @client.get_experiment(id)
       else
         id = experiment.id
-        override = @client.getExperiment(id)
+        override = @client.get_experiment(id)
         experiment = override if override
       end
 

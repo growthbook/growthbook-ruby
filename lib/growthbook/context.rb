@@ -73,7 +73,7 @@ module Growthbook
         next if rule.condition && !condition_passes(rule.condition)
 
         # Rollout or forced value rule
-        if rule.is_force?
+        if rule.force?
           unless rule.coverage.nil?
             hash_value = get_attribute(rule.hash_attribute || 'id').to_s
             next if hash_value.empty?
@@ -84,7 +84,7 @@ module Growthbook
           return get_feature_result(rule.force, 'force')
         end
         # Experiment rule
-        next unless rule.is_experiment?
+        next unless rule.experiment?
 
         exp = rule.to_experiment(key)
         result = _run(exp, key)

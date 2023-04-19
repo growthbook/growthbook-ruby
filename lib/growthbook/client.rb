@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # @deprecated
   # internal use only
   class Client
     # @return [Boolean]
@@ -15,14 +16,14 @@ module Growthbook
     def initialize(config = {})
       @enabled = config.key?(:enabled) ? config[:enabled] : true
       @experiments = config[:experiments] || []
-      @resultsToTrack = []
+      @results_to_track = []
     end
 
     # Look up a pre-configured experiment by id
     #
     # @param id [String] The experiment id to look up
     # @return [Growthbook::Experiment, nil] the experiment object or nil if not found
-    def getExperiment(id)
+    def get_experiment(id)
       match = nil
       @experiments.each do |exp|
         if exp.id == id
@@ -50,9 +51,9 @@ module Growthbook
       )
     end
 
-    def importExperimentsHash(experimentsHash = {})
+    def import_experiments_hash(experiments_hash = {})
       @experiments = []
-      experimentsHash.each do |id, data|
+      experiments_hash.each do |id, data|
         variations = data['variations']
 
         options = {}
