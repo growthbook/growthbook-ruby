@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Result of running an experiment.
   class InlineExperimentResult
     # @return [Boolean] Whether or not the user is part of the experiment
     attr_reader :in_experiment
@@ -49,19 +50,31 @@ module Growthbook
       @passthrough = options[:passthrough]
     end
 
+    # If the variation was randomly assigned based on user attribute hashes
+    # @return [Bool]
+    def hash_used?
+      @hash_used
+    end
+
+    # Whether or not the user is in the experiment
+    # @return [Bool]
+    def in_experiment?
+      @in_experiment
+    end
+
     def to_json(*_args)
       {
-        'inExperiment' => @in_experiment,
-        'variationId' => @variation_id,
-        'value' => @value,
-        'hashUsed' => @hash_used,
+        'inExperiment'  => @in_experiment,
+        'variationId'   => @variation_id,
+        'value'         => @value,
+        'hashUsed'      => @hash_used,
         'hashAttribute' => @hash_attribute,
-        'hashValue' => @hash_value,
-        'featureId' => @feature_id.to_s,
-        'key' => @key.to_s,
-        'bucket' => @bucket,
-        'name' => @name,
-        'passthrough' => @passthrough
+        'hashValue'     => @hash_value,
+        'featureId'     => @feature_id.to_s,
+        'key'           => @key.to_s,
+        'bucket'        => @bucket,
+        'name'          => @name,
+        'passthrough'   => @passthrough
       }.compact
     end
   end

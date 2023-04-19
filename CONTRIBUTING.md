@@ -6,6 +6,29 @@ We welcome all contributions!
 
 Run unit tests with `bundler exec rspec`
 
+## Linting
+
+To use the linter, install it:
+
+    gem install rubocop -v 1.50.2
+    gem install rubocop-rspec -v 2.20.0
+    gem install rubocop-performance -v 1.15
+
+To auto-fix formatting, run the following:
+
+    rubocop -x
+
+To auto-fix correctable linting errors, run the following:
+
+    rubocop -A
+
+To run it as CI would, run:
+
+    rubocop
+
+If you use Visual Studio Code, you can use the extension [ruby-rubocop](https://marketplace.visualstudio.com/items?itemName=misogi.ruby-rubocop) to see editor hints.
+
+
 ## Releasing
 
 1. Bump version in `Gemfile.lock` and `growthbook.gemspec`

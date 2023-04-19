@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Result of a feature evaluation
   class FeatureResult
     # The assigned value of the feature
     # @return [Any, nil]
@@ -19,11 +20,11 @@ module Growthbook
     attr_reader :source
 
     # The experiment used to decide the feature value
-    # @return [Growthbook.Experiment, nil]
+    # @return [Growthbook::InlineExperiment, nil]
     attr_reader :experiment
 
     # The result of the experiment
-    # @return [Growthbook.ExperimentResult, nil]
+    # @return [Growthbook::InlineExperimentResult, nil]
     attr_reader :experiment_result
 
     def initialize(

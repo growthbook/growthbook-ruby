@@ -1,14 +1,35 @@
 name: Build
-on: [push]
+on:
+  - push
 jobs:
-  build-test:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5
+          ruby-version: 3.2.2
+          bundler-cache: true
+      - name: Lint
+        run: |
+          gem install rubocop -v 1.50.2
+          gem install rubocop-rspec -v 2.20.0
+          gem install rubocop-performance -v 1.15
+          rubocop
+
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          - '2.5'
+          - '3.2.2'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Test
         run: bundle exec rspec
