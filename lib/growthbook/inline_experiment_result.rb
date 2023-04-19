@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # Result of running an experiment.
   class InlineExperimentResult
     # Whether or not the user is in the experiment
     # @return [Bool]
@@ -29,15 +30,14 @@ module Growthbook
     attr_reader :feature_id
 
     def initialize(
-      hash_used,
-      in_experiment,
-      variation_id,
-      value,
-      hash_attribute,
-      hash_value,
-      feature_id
+      hash_used:,
+      in_experiment:,
+      variation_id:,
+      value:,
+      hash_attribute:,
+      hash_value:,
+      feature_id:
     )
-
       @hash_used = hash_used
       @in_experiment = in_experiment
       @variation_id = variation_id

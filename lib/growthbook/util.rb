@@ -111,9 +111,9 @@ module Growthbook
     end
 
     # Chose a variation based on a hash and range
-    def self.choose_variation(n, ranges)
+    def self.choose_variation(num, ranges)
       ranges.each_with_index do |range, i|
-        return i if n >= range[0] && n < range[1]
+        return i if num >= range[0] && num < range[1]
       end
       -1
     end

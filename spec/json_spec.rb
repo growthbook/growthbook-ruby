@@ -6,9 +6,9 @@ require 'json'
 file = File.read(File.join(File.dirname(__FILE__), 'cases.json'))
 test_cases = JSON.parse(file)
 
-def roundArray(arr)
+def round_array(arr)
   arr.map do |v|
-    v.is_a?(Float) || v.is_a?(Integer) ? v.round(5) : roundArray(v)
+    v.is_a?(Float) || v.is_a?(Integer) ? v.round(5) : round_array(v)
   end
 end
 
@@ -39,7 +39,7 @@ describe 'test suite' do
           weights
         )
 
-        expect(roundArray(result)).to eq(roundArray(expected))
+        expect(round_array(result)).to eq(round_array(expected))
       end
     end
   end
@@ -104,7 +104,7 @@ describe 'test suite' do
         result = Growthbook::Util.get_equal_weights(
           num_variations
         )
-        expect(roundArray(result)).to eq(roundArray(expected))
+        expect(round_array(result)).to eq(round_array(expected))
       end
     end
   end

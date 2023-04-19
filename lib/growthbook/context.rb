@@ -207,8 +207,13 @@ module Growthbook
       hash_value = get_attribute(hash_attribute)
 
       Growthbook::InlineExperimentResult.new(
-        hash_used, in_experiment, variation_index,
-        experiment.variations[variation_index], hash_attribute, hash_value, feature_id
+        hash_used: hash_used,
+        in_experiment: in_experiment,
+        variation_id: variation_index,
+        value: experiment.variations[variation_index],
+        hash_attribute: hash_attribute,
+        hash_value: hash_value,
+        feature_id: feature_id
       )
     end
 
