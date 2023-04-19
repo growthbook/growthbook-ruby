@@ -12,6 +12,7 @@ To use the linter, install it:
 
     gem install rubocop -v 1.50.2
     gem install rubocop-rspec -v 2.20.0
+    gem install rubocop-performance -v 1.15
 
 To auto-fix formatting, run the following:
 
