@@ -7,7 +7,7 @@ require 'bigdecimal/util'
 module Growthbook
   # internal use only
   class Util
-    def self.checkRule(actual, op, desired)
+    def self.check_rule(actual, op, desired)
       # Check if both strings are numeric so we can do natural ordering
       # for greater than / less than operators
       numeric = begin
@@ -42,20 +42,20 @@ module Growthbook
       end
     end
 
-    def self.chooseVariation(userId, experiment)
-      testId = experiment.id
+    def self.choose_variation_for_user(user_id, experiment)
+      test_id = experiment.id
       weights = experiment.getScaledWeights
 
       # Hash the user id and testName to a number from 0 to 1
-      n = (FNV.new.fnv1a_32(userId + testId) % 1000) / 1000.0
+      n = (FNV.new.fnv1a_32(user_id + test_id) % 1000) / 1000.0
 
-      cumulativeWeight = 0
+      cumulative_weight = 0
 
       match = -1
       i = 0
       weights.each do |weight|
-        cumulativeWeight += weight
-        if n < cumulativeWeight
+        cumulative_weight += weight
+        if n < cumulative_weight
           match = i
           break
         end
@@ -69,34 +69,34 @@ module Growthbook
       (FNV.new.fnv1a_32(str) % 1000) / 1000.0
     end
 
-    def self.in_namespace(userId, namespace)
-      n = hash("#{userId}__#{namespace[0]}")
+    def self.in_namespace(user_id, namespace)
+      n = hash("#{user_id}__#{namespace[0]}")
       n >= namespace[1] && n < namespace[2]
     end
 
-    def self.get_equal_weights(numVariations)
-      return [] if numVariations < 1
+    def self.get_equal_weights(num_variations)
+      return [] if num_variations < 1
 
       weights = []
-      (1..numVariations).each do |_i|
-        weights << (1.0 / numVariations)
+      (1..num_variations).each do |_i|
+        weights << (1.0 / num_variations)
       end
       weights
     end
 
     # Determine bucket ranges for experiment variations
-    def self.get_bucket_ranges(numVariations, coverage = 1, weights = [])
+    def self.get_bucket_ranges(num_variations, coverage = 1, weights = [])
       # Make sure coverage is within bounds
       coverage = 1 if coverage.nil?
       coverage = 0 if coverage.negative?
       coverage = 1 if coverage > 1
 
       # Default to equal weights
-      weights = get_equal_weights(numVariations) if !weights || weights.length != numVariations
+      weights = get_equal_weights(num_variations) if !weights || weights.length != num_variations
 
       # If weights don't add up to 1 (or close to it), default to equal weights
       total = weights.sum
-      weights = get_equal_weights(numVariations) if total < 0.99 || total > 1.01
+      weights = get_equal_weights(num_variations) if total < 0.99 || total > 1.01
 
       # Convert weights to ranges
       cumulative = 0
@@ -120,7 +120,7 @@ module Growthbook
 
     # Get an override variation from a url querystring
     # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
-    def self.get_query_string_override(id, url, numVariations)
+    def self.get_query_string_override(id, url, num_variations)
       # Skip if url is empty
       return nil if url == ''
 
@@ -135,7 +135,7 @@ module Growthbook
       return nil unless vals
 
       val = vals.last
-      return nill unless val
+      return nil unless val
 
       # Parse the value as an integer
       n = begin
@@ -147,7 +147,7 @@ module Growthbook
       # Make sure the integer is within range
       return nil if n.nil?
       return nil if n.negative?
-      return nil if n >= numVariations
+      return nil if n >= num_variations
 
       n
     end

@@ -73,7 +73,7 @@ module Growthbook
       return get_experiment_result(experiment, experiment.force, forced: true) unless experiment.force.nil?
 
       # Choose a variation for the user
-      variation = Growthbook::Util.chooseVariation(user_id, experiment)
+      variation = Growthbook::Util.choose_variation_for_user(user_id, experiment)
       result = get_experiment_result(experiment, variation)
 
       # Add to the list of experiments that should be tracked in analytics
@@ -146,7 +146,7 @@ module Growthbook
 
         key = parts[0].strip
         actual = @attribute_map[key] || ''
-        unless Growthbook::Util.checkRule(actual, parts[1].strip, parts[2].strip)
+        unless Growthbook::Util.check_rule(actual, parts[1].strip, parts[2].strip)
           pass = false
           break
         end
