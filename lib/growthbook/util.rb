@@ -42,29 +42,6 @@ module Growthbook
       end
     end
 
-    def self.choose_variation_for_user(user_id, experiment)
-      test_id = experiment.id
-      weights = experiment.scaled_weights
-
-      # Hash the user id and testName to a number from 0 to 1
-      n = (FNV.new.fnv1a_32(user_id + test_id) % 1000) / 1000.0
-
-      cumulative_weight = 0
-
-      match = -1
-      i = 0
-      weights.each do |weight|
-        cumulative_weight += weight
-        if n < cumulative_weight
-          match = i
-          break
-        end
-        i += 1
-      end
-
-      match
-    end
-
     def self.hash(seed:, value:, version:)
       return (FNV.new.fnv1a_32(value + seed) % 1000) / 1000.0 if version == 1
       return (FNV.new.fnv1a_32(FNV.new.fnv1a_32(seed + value).to_s) % 10_000) / 10_000.0 if version == 2
