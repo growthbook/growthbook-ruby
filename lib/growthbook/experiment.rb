@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # @deprecated
+  # Internal use only
   class Experiment
     # @return [String]
     attr_accessor :id
@@ -26,7 +28,7 @@ module Growthbook
     # @return [Hash]
     attr_accessor :data
 
-    # Constructor for an Experiment
+    # @deprecated Constructor for an Experiment
     #
     # @param id [String] The unique id for this experiment
     # @param variations [Integer] The number of variations in this experiment (including the Control)
@@ -41,6 +43,7 @@ module Growthbook
     #    where op is one of: =, !=, <, >, ~, !~
     # @option options [Integer, nil] :force If an integer, force all users to get this variation
     # @option options [Hash] :data Data to attach to the variations
+    # @deprecated
     def initialize(id, variations, options = {})
       @id = id
       @variations = variations

@@ -43,7 +43,7 @@ module Growthbook
     # @return [Growthbook::User] the User object
     def user(params = {})
       Growthbook::User.new(
-        params[:anonId] || nil,
+        params[:anon_id] || nil,
         params[:id] || nil,
         params[:attributes] || nil,
         self

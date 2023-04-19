@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # @deprecated
+  # Internal use only
   class ExperimentResult
     # The experiment that was performed
     # @return [Growthbook::Experiment, nil] If nil, then the experiment with the required id could not be found

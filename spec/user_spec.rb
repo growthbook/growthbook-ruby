@@ -19,8 +19,8 @@ describe 'user' do
     it 'assigns properly with both user id and anonymous ids' do
       client = Growthbook::Client.new
       user_only = client.user(id: '1')
-      anon_only = client.user(anonId: '2')
-      both = client.user(id: '1', anonId: '2')
+      anon_only = client.user(anon_id: '2')
+      both = client.user(id: '1', anon_id: '2')
 
       experiment_anon = Growthbook::Experiment.new('my-test', 2, anon: true)
       experiment_user = Growthbook::Experiment.new('my-test', 2, anon: false)
@@ -88,22 +88,22 @@ describe 'user' do
       # Normal
       expect(user.experiment('my-test').shouldTrack?).to be(true)
       expect(user.experiment('my-test').forced?).to be(false)
-      expect(user.lookupByDataKey('color').should_track?).to be(true)
-      expect(user.lookupByDataKey('color').forced?).to be(false)
+      expect(user.look_up_by_data_key('color').should_track?).to be(true)
+      expect(user.look_up_by_data_key('color').forced?).to be(false)
 
       # Failed coverage
       experiment.coverage = 0.01
       expect(user.experiment('my-test').shouldTrack?).to be(false)
       expect(user.experiment('my-test').forced?).to be(false)
-      expect(user.lookupByDataKey('color')).to be_nil
+      expect(user.look_up_by_data_key('color')).to be_nil
 
       # Forced variation
       experiment.coverage = 1.0
       experiment.force = 1
       expect(user.experiment('my-test').shouldTrack?).to be(false)
       expect(user.experiment('my-test').forced?).to be(true)
-      expect(user.lookupByDataKey('color').should_track?).to be(false)
-      expect(user.lookupByDataKey('color').forced?).to be(true)
+      expect(user.look_up_by_data_key('color').should_track?).to be(false)
+      expect(user.look_up_by_data_key('color').forced?).to be(true)
     end
 
     it 'can target an experiment given rules and attributes' do
@@ -157,7 +157,7 @@ describe 'user' do
       user.experiment(Growthbook::Experiment.new('my-test2', 2))
       user.experiment(Growthbook::Experiment.new('my-test3', 2))
 
-      expect(user.resultsToTrack.length).to eq(3)
+      expect(user.results_to_track.length).to eq(3)
     end
 
     it 'ignores duplicates' do
@@ -166,7 +166,7 @@ describe 'user' do
       user.experiment(Growthbook::Experiment.new('my-test', 2))
       user.experiment(Growthbook::Experiment.new('my-test', 2))
 
-      expect(user.resultsToTrack.length).to eq(1)
+      expect(user.results_to_track.length).to eq(1)
     end
   end
 
@@ -197,17 +197,17 @@ describe 'user' do
       user = client.user(id: '1')
 
       # No matches
-      expect(user.lookupByDataKey('button.unknown')).to be_nil
+      expect(user.look_up_by_data_key('button.unknown')).to be_nil
     end
 
     it 'returns the first matching experiment' do
       user = client.user(id: '1', attributes: { browser: 'chrome' })
 
-      color = user.lookupByDataKey('button.color')
+      color = user.look_up_by_data_key('button.color')
       expect(color.value).to eq('blue')
       expect(color.experiment.id).to eq('button-color-size-chrome')
 
-      size = user.lookupByDataKey('button.size')
+      size = user.look_up_by_data_key('button.size')
       expect(size.value).to eq('small')
       expect(size.experiment.id).to eq('button-color-size-chrome')
     end
@@ -215,11 +215,11 @@ describe 'user' do
     it 'skips experiments that fail targeting rules' do
       user = client.user(id: '1', attributes: { browser: 'safari' })
 
-      color = user.lookupByDataKey('button.color')
+      color = user.look_up_by_data_key('button.color')
       expect(color.value).to eq('blue')
       expect(color.experiment.id).to eq('button-color-safari')
 
-      size = user.lookupByDataKey('button.size')
+      size = user.look_up_by_data_key('button.size')
       expect(size).to be_nil
     end
   end

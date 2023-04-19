@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Growthbook
+  # @deprecated
+  # Internal use only
   class LookupResult
     # The first matching experiment
     # @return [Growthbook::Experiment]

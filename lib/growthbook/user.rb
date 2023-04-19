@@ -3,33 +3,34 @@
 require 'set'
 
 module Growthbook
-  # internal use only
+  # @deprecated
+  # Internal use only
   class User
     # @return [String, nil]
     attr_accessor :id
 
     # @return [String, nil]
-    attr_accessor :anonId
+    attr_accessor :anon_id
 
     # @return [Hash, nil]
     attr_reader :attributes
 
     # @return [Array<Growthbook::ExperimentResult>]
-    attr_reader :resultsToTrack
+    attr_reader :results_to_track
 
-    @client
-    @attributeMap = {}
-    @experimentsTracked
+    @client = nil
+    @attribute_map = {}
+    @experiments_tracked = Set[]
 
-    def initialize(anonId, id, attributes, client)
-      @anonId = anonId
+    def initialize(anon_id, id, attributes, client)
+      @anon_id = anon_id
       @id = id
       @attributes = attributes
       @client = client
-      updateAttributeMap
+      update_attribute_map
 
-      @resultsToTrack = []
-      @experimentsTracked = Set[]
+      @results_to_track = []
+      @experiments_tracked = Set[]
     end
 
     # Set the user attributes
@@ -38,7 +39,7 @@ module Growthbook
     #    Values can be any type, even nested arrays and hashes
     def attributes=(attributes)
       @attributes = attributes
-      updateAttributeMap
+      update_attribute_map
     end
 
     # Run an experiment on this user
@@ -49,7 +50,6 @@ module Growthbook
       return get_experiment_result unless @client.enabled
 
       # Make sure experiment is always an object (or nil)
-      id = ''
       if experiment.is_a? String
         id = experiment
         experiment = @client.getExperiment(id)
@@ -63,11 +63,11 @@ module Growthbook
       return get_experiment_result unless experiment
 
       # User missing required user id type
-      user_id = experiment.anon ? @anonId : @id
+      user_id = experiment.anon ? @anon_id : @id
       return get_experiment_result(experiment) unless user_id
 
       # Experiment has targeting rules, check if user passes
-      return get_experiment_result(experiment) if experiment.targeting && !isTargeted(experiment.targeting)
+      return get_experiment_result(experiment) if experiment.targeting && !targeted?(experiment.targeting)
 
       # Experiment has a specific variation forced
       return get_experiment_result(experiment, experiment.force, forced: true) unless experiment.force.nil?
@@ -77,9 +77,9 @@ module Growthbook
       result = get_experiment_result(experiment, variation)
 
       # Add to the list of experiments that should be tracked in analytics
-      if result.shouldTrack? && !@experimentsTracked.include?(experiment.id)
-        @experimentsTracked << experiment.id
-        @resultsToTrack << result
+      if result.shouldTrack? && !@experiments_tracked.include?(experiment.id)
+        @experiments_tracked << experiment.id
+        @results_to_track << result
       end
 
       result
@@ -88,7 +88,7 @@ module Growthbook
     # Run the first matching experiment that defines variation data for the requested key
     # @param key [String, Symbol] The key to look up
     # @return [Growthbook::LookupResult, nil] If nil, no matching experiments found
-    def lookupByDataKey(key)
+    def look_up_by_data_key(key)
       @client.experiments.each do |exp|
         next unless exp.data&.key?(key)
 
@@ -130,22 +130,22 @@ module Growthbook
       ]
     end
 
-    def updateAttributeMap
-      @attributeMap = {}
+    def update_attribute_map
+      @attribute_map = {}
       flat = flatten_user_values('', @attributes)
       flat.each do |item|
-        @attributeMap[item['k']] = item['v']
+        @attribute_map[item['k']] = item['v']
       end
     end
 
-    def isTargeted(rules)
+    def targeted?(rules)
       pass = true
       rules.each do |rule|
         parts = rule.split(' ', 3)
         next unless parts.length == 3
 
         key = parts[0].strip
-        actual = @attributeMap[key] || ''
+        actual = @attribute_map[key] || ''
         unless Growthbook::Util.checkRule(actual, parts[1].strip, parts[2].strip)
           pass = false
           break
