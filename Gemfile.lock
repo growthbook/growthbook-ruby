@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    growthbook (0.3.0)
+    growthbook (1.0.0)
       fnv (~> 0.2.0)
 
 GEM
