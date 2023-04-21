@@ -159,4 +159,15 @@ describe 'test suite' do
       end
     end
   end
+
+  describe 'decrypt' do
+    test_cases['decrypt'].each do |test_case|
+      test_name, encrypted_payload, decryption_key, expected_features = test_case
+
+      it test_name do
+        result = Growthbook::Util.decrypt_payload(encrypted_payload, key: decryption_key)
+        expect(result).to eq(expected_features)
+      end
+    end
+  end
 end
