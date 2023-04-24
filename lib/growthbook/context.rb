@@ -183,7 +183,7 @@ module Growthbook
       # 7. Exclude if user is filtered out (used to be called "namespace")
       if exp.filters
         return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters)
-      elsif exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
+      elsif exp.namespace && !Growthbook::Util.in_namespace?(hash_value, exp.namespace)
         return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id)
       end
 
