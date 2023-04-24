@@ -8,7 +8,7 @@ module Growthbook
       return nil unless payload.include?('.')
 
       parts = payload.split('.')
-      return nil if parts.empty? && parts.length != 2
+      return nil if parts.length != 2
 
       iv = parts[0]
       decoded_iv = Base64.strict_decode64(iv)
