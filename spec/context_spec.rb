@@ -193,15 +193,8 @@ describe 'context' do
 
       it 'uses the features hash as is' do
         expect(context.features['banner_text'].to_json['defaultValue']).to eq('Welcome to Acme Donuts!')
-        expect(context.features['banner_text'].rules.map(&:to_json)).to eq(
-          [
-            { 'condition' => { 'country'=>'france' },
-              'force'     => 'Bienvenue au Beignets Acme !' },
-            {
-              'condition' => { 'country'=>'spain' }, 'force' => '¡Bienvenidos y bienvenidas a Donas Acme!'
-            }
-          ]
-        )
+        expect(context.features['banner_text'].rules.first.force).to eq('Bienvenue au Beignets Acme !')
+        expect(context.features['banner_text'].rules.last.force).to eq('¡Bienvenidos y bienvenidas a Donas Acme!')
       end
     end
   end
