@@ -198,7 +198,7 @@ module Growthbook
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
+      n = Growthbook::Util.get_hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if n.nil?
 
       assigned = Growthbook::Util.choose_variation(n, ranges)
@@ -286,7 +286,7 @@ module Growthbook
 
       return false if hash_value.empty?
 
-      n = Growthbook::Util.hash(seed: seed, value: hash_value, version: hash_version || 1)
+      n = Growthbook::Util.get_hash(seed: seed, value: hash_value, version: hash_version || 1)
       return false if n.nil?
 
       return Growthbook::Util.in_range?(n, range) if range
@@ -302,7 +302,7 @@ module Growthbook
         if hash_value.empty?
           false
         else
-          n = Growthbook::Util.hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+          n = Growthbook::Util.get_hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
 
           return true if n.nil?
 
