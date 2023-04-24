@@ -28,10 +28,12 @@ module Growthbook
         return condition.map { |v| parse_condition(v) }
       when Hash
         return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+      else
+        condition
       end
-
-      condition
     end
+
+    private
 
     def self.eval_or(attributes, conditions)
       return true if conditions.length <= 0
@@ -72,7 +74,7 @@ module Growthbook
       current = attributes
 
       parts.each do |value|
-        return nil unless current.is_a?(Hash) && current&.key?(value)
+        return nil unless current&.is_a?(Hash) && current.key?(value)
 
         current = current[value]
       end
