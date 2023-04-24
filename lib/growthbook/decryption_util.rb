@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Growthbook
-  # internal use only. Utils for working with encrypted feature payloads.
+  # Utils for working with encrypted feature payloads.
   class DecryptionUtil
     # @return [String, nil] The decrypted payload, or nil if it fails to decrypt
     def self.decrypt(payload = '', key:)
