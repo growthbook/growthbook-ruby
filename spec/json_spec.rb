@@ -20,7 +20,7 @@ describe 'test suite' do
 
       it value do
         result = Growthbook::Util.hash(seed: seed, value: value, version: version)
-        expect(result.round(5)).to eq expected.round(5)
+        expect(result&.round(5)).to eq expected&.round(5)
       end
     end
   end
