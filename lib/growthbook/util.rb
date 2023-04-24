@@ -138,9 +138,5 @@ module Growthbook
     def self.in_range?(num, range)
       num >= range[0] && num < range[1]
     end
-
-    def self.decrypt_payload(payload = '', key:)
-      DecryptionUtil.decrypt(payload, key: key)
-    end
   end
 end

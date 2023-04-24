@@ -165,7 +165,7 @@ describe 'test suite' do
       test_name, encrypted_payload, decryption_key, expected_features = test_case
 
       it test_name do
-        result = Growthbook::Util.decrypt_payload(encrypted_payload, key: decryption_key)
+        result = Growthbook::DecryptionUtil.decrypt(encrypted_payload, key: decryption_key)
         expect(result).to eq(expected_features)
       end
     end

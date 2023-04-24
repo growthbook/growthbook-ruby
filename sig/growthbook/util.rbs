@@ -1,5 +1,0 @@
-module Growthbook
-  class Util
-    def self.decrypt_payload: (String payload, key: String) -> String?
-  end
-end

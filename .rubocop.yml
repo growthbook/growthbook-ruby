@@ -23,10 +23,13 @@ Metrics/AbcSize:
   Max: 70
 
 Metrics/ClassLength:
-  Max: 210
+  Max: 250
 
 Metrics/MethodLength:
   Max: 60
+
+Layout/LineLength:
+  Max: 150
 
 Naming/MethodParameterName:
   MinNameLength: 2
@@ -66,3 +69,6 @@ RSpec/ExampleLength:
 
 RSpec/DescribeClass:
   Enabled: false
+
+RSpec/NestedGroups:
+  Max: 4

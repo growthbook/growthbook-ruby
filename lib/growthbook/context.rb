@@ -34,14 +34,19 @@ module Growthbook
       @enabled = true
       @impressions = {}
 
-      options.each do |key, value|
-        case key.to_sym
+      options.transform_keys(&:to_sym).each do |key, value|
+        case key
         when :enabled
           @enabled = value
         when :attributes
           self.attributes = value
         when :url
           @url = value
+        when :encryption_key
+          break
+        when :encrypted_features
+          decrypted = decrypted_features_from_options(options)
+          self.features = decrypted unless decrypted.nil?
         when :features
           self.features = value
         when :forced_variations, :forcedVariations
@@ -309,6 +314,14 @@ module Growthbook
           filter['ranges'].none? { |range| Growthbook::Util.in_range?(n, range) }
         end
       end
+    end
+
+    def decrypted_features_from_options(options)
+      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:encryption_key])
+
+      JSON.parse(decrypted_features)
+    rescue StandardError
+      nil
     end
   end
 end
