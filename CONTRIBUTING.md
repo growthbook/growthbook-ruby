@@ -48,6 +48,10 @@ The project uses RBS for type definitions and Steep for type checking.
 
 RBS comes preinstalled with Ruby version 3+.
 
+Install the required gem:
+
+    gem install steep -v 1.4.0
+
 You may find the following tools helpful:
 
 - [Steep VSCode plugin](https://github.com/soutaro/steep-vscode) provides inline type validation
