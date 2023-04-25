@@ -11,7 +11,7 @@ target :lib do
 
   # ignore "spec/**/*.rb"
 
-  library 'uri', 'json', 'openssl', 'bigdecimal'
+  library 'base64', 'uri', 'json', 'openssl', 'bigdecimal'
   # library "pathname", "set"       # Standard libraries
   # library "strong_json"           # Gems
 

@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'base64'
+
 module Growthbook
   # Utils for working with encrypted feature payloads.
   class DecryptionUtil
     # @return [String, nil] The decrypted payload, or nil if it fails to decrypt
-    def self.decrypt(payload = '', key:)
+    def self.decrypt(payload, key:)
+      return nil if payload.nil?
       return nil unless payload.include?('.')
 
       parts = payload.split('.')

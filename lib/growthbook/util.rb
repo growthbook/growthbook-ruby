@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'fnv'
 require 'bigdecimal'
 require 'bigdecimal/util'
 require 'openssl'
@@ -56,6 +55,8 @@ module Growthbook
       return false if namespace.nil?
 
       n = get_hash(seed: "__#{namespace[0]}", value: hash_value, version: 1)
+      return false if n.nil?
+
       n >= namespace[1] && n < namespace[2]
     end
 
@@ -70,11 +71,11 @@ module Growthbook
     end
 
     # Determine bucket ranges for experiment variations
-    def self.get_bucket_ranges(num_variations, coverage = 1.0, weights = [])
+    def self.get_bucket_ranges(num_variations, coverage, weights)
       # Make sure coverage is within bounds
-      coverage = 1 if coverage.nil?
-      coverage = 0 if coverage.negative?
-      coverage = 1 if coverage > 1
+      coverage = 1.0 if coverage.nil?
+      coverage = 0.0 if coverage.negative?
+      coverage = 1.0 if coverage > 1
 
       # Default to equal weights
       weights = get_equal_weights(num_variations) if !weights || weights.length != num_variations
@@ -84,7 +85,7 @@ module Growthbook
       weights = get_equal_weights(num_variations) if total < 0.99 || total > 1.01
 
       # Convert weights to ranges
-      cumulative = 0
+      cumulative = 0.0
       ranges = []
       weights.each do |w|
         start = cumulative
