@@ -23,12 +23,9 @@ module Growthbook
 
     # Helper function to ensure conditions only have string keys (no symbols)
     def self.parse_condition(condition)
-      case condition
-      when Hash
-        condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
-      else
-        condition
-      end
+      return condition unless condition.is_a?(Hash)
+
+      condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
     end
 
     def self.eval_or(attributes, conditions)

@@ -47,7 +47,7 @@ module Growthbook
         when :url
           @url = value
         when :encryption_key
-          break
+          nil
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
           self.features = decrypted unless decrypted.nil?
@@ -121,7 +121,7 @@ module Growthbook
           return get_feature_result(rule.force, 'force')
         end
         # Experiment rule
-        next unless rule.experiment?
+        next unless rule.has_experiment?
 
         exp = rule.to_experiment(key)
         next if exp.nil? # TODO: Is this correct? exp is nillable

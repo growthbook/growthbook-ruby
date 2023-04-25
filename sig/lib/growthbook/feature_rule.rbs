@@ -59,7 +59,7 @@ module Growthbook
     # @return [Growthbook::InlineExperiment, nil]
     def to_experiment: (String | Symbol feature_key) -> (nil | InlineExperiment)
 
-    def experiment?: () -> (nil | InlineExperiment)
+    def has_experiment?: () -> bool
 
     def force?: () -> bool
 
