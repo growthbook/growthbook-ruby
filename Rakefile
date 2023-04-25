@@ -17,3 +17,7 @@ end
 task :lint_fix do
   sh 'rubocop', '-A'
 end
+
+task :doc do
+  sh 'yard', 'doc', 'lib/**/*.rb'
+end
