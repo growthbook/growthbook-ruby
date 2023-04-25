@@ -8,6 +8,13 @@ We welcome all contributions!
 - Ruby version 3.1.1+
 
 
+## Rake tasks
+
+There are numerous tasks available to help with development in the Rakefile.
+
+You can also run any of those tasks manually. See each section below.
+
+
 ## Testing
 
 Run unit tests with `bundler exec rspec`
