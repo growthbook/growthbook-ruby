@@ -1,0 +1,5 @@
+module GrowthBook
+  class TrackingCallback
+    def on_experiment_viewed: (Growthbook::InlineExperiment experiment, Growthbook::InlineExperimentResult result) -> void
+  end
+end

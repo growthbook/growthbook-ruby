@@ -53,6 +53,8 @@ module Growthbook
     end
 
     def self.in_namespace?(hash_value, namespace)
+      return false if namespace.nil?
+
       n = get_hash(seed: "__#{namespace[0]}", value: hash_value, version: 1)
       n >= namespace[1] && n < namespace[2]
     end
@@ -105,7 +107,7 @@ module Growthbook
     # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
     def self.get_query_string_override(id, url, num_variations)
       # Skip if url is empty
-      return nil if url == ''
+      return nil if url == '' || id.nil?
 
       # Parse out the query string
       parsed = URI(url)

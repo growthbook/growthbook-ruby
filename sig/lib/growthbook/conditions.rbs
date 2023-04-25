@@ -7,7 +7,7 @@ module Growthbook
     def self.eval_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition) -> bool
 
     # Helper function to ensure conditions only have string keys (no symbols)
-    def self.parse_condition: (Hash[untyped, untyped] | Array[untyped] condition) -> (Hash[String, untyped] | Array[untyped])
+    def self.parse_condition: (Hash[untyped, untyped] condition) -> (Hash[String, untyped])
 
     def self.eval_or: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions) -> (bool)
 

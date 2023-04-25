@@ -24,7 +24,11 @@ module Growthbook
     # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
     attr_reader :forced_variations
 
-    attr_reader :impressions, :forced_features
+    # @return Hash[String, Growthbook::InlineExperimentResult] Tracked impressions
+    attr_reader :impressions
+
+    # @return Hash[String, Any] Forced feature values
+    attr_reader :forced_features
 
     def initialize(options = {})
       @features = {}
@@ -96,7 +100,7 @@ module Growthbook
 
       feature.rules.each do |rule|
         # Targeting condition
-        next if rule.condition && !condition_passes(rule.condition)
+        next if rule.condition && !condition_passes?(rule.condition)
 
         # If there are filters for who is included (e.g. namespaces)
         next if rule.filters && filtered_out?(rule.filters)
@@ -106,8 +110,11 @@ module Growthbook
           seed = rule.seed || key
           hash_attribute = rule.hash_attribute || 'id'
           included_in_rollout = included_in_rollout?(
-            seed: seed, hash_attribute: hash_attribute, range: rule.range,
-            coverage: rule.coverage, hash_version: rule.hash_version
+            seed: seed.to_s,
+            hash_attribute: hash_attribute,
+            range: rule.range,
+            coverage: rule.coverage,
+            hash_version: rule.hash_version
           )
           next unless included_in_rollout
 
@@ -117,6 +124,8 @@ module Growthbook
         next unless rule.experiment?
 
         exp = rule.to_experiment(key)
+        next if exp.nil? # TODO: Is this correct? exp is nillable
+
         result = _run(exp, key)
 
         next unless result.in_experiment && !result.passthrough
@@ -188,7 +197,7 @@ module Growthbook
       end
 
       # 8. Exclude if condition is false
-      if exp.condition && !condition_passes(exp.condition)
+      if exp.condition && !condition_passes?(exp.condition)
         return get_experiment_result(
           exp,
           -1,
@@ -235,7 +244,9 @@ module Growthbook
       new_hash
     end
 
-    def condition_passes(condition)
+    def condition_passes?(condition)
+      return false if condition.nil?
+
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
@@ -310,7 +321,7 @@ module Growthbook
     end
 
     def filtered_out?(filters)
-      filters.any? do |filter|
+      (filters || []).any? do |filter|
         hash_value = get_attribute(filter['attribute'] || 'id')
 
         if hash_value.empty?

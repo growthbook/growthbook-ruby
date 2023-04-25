@@ -25,7 +25,7 @@ module Growthbook
     # @return [Growthbook::InlineExperimentResult, nil]
     attr_reader experiment_result: InlineExperimentResult?
 
-    def initialize: (untyped value, String source, InlineExperiment? experiment, InlineExperimentResult? experiment_result) -> void
+    def initialize: (untyped value, String source, (InlineExperiment | nil) experiment, (InlineExperimentResult | nil) experiment_result) -> void
 
     def to_json: (*untyped _args) -> Hash[String, untyped]
   end

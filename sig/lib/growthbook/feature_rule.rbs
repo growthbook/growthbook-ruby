@@ -2,7 +2,8 @@ module Growthbook
   # Internal class that overrides the default value of a Feature based on a set of requirements.
   class FeatureRule
     # @return [Hash , nil] Optional targeting condition
-    attr_reader condition: (Hash[String, untyped] | Array[untyped])
+    attr_reader condition: (Hash[String, untyped])
+    # attr_reader condition: (Hash[String, untyped] | Array[untyped])
 
     # @return [Float , nil] What percent of users should be included in the experiment (between 0 and 1, inclusive)
     attr_reader coverage: Float?
@@ -56,7 +57,7 @@ module Growthbook
     def initialize: (untyped rule) -> void
 
     # @return [Growthbook::InlineExperiment, nil]
-    def to_experiment: (String feature_key) -> (nil | InlineExperiment)
+    def to_experiment: (String | Symbol feature_key) -> (nil | InlineExperiment)
 
     def experiment?: () -> (nil | InlineExperiment)
 

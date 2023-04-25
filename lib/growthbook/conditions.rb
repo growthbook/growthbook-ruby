@@ -25,6 +25,7 @@ module Growthbook
     def self.parse_condition(condition)
       case condition
       when Array
+        # TODO: Fix types here. Why are we handling an array?
         condition.map { |v| parse_condition(v) }
       when Hash
         condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
