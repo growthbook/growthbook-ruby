@@ -62,7 +62,7 @@ module Growthbook
 
     def force?: () -> bool
 
-    def to_json: (*String _args) -> Hash[String, untyped]
+    def to_json: (*untyped _args) -> Hash[String, untyped]
 
     private
 

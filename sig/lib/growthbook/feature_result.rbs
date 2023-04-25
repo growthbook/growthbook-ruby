@@ -1,0 +1,32 @@
+module Growthbook
+  # Result of a feature evaluation
+  class FeatureResult
+    # The assigned value of the feature
+    # @return [Any, nil]
+    attr_reader value: untyped
+
+    # Whether or not the feature is ON
+    # @return [Bool]
+    attr_reader on: bool
+
+    # Whether or not the feature is OFF
+    # @return [Bool]
+    attr_reader off: bool
+
+    # The reason the feature was assigned this value
+    # @return [String]
+    attr_reader source: String
+
+    # The experiment used to decide the feature value
+    # @return [Growthbook::InlineExperiment, nil]
+    attr_reader experiment: InlineExperiment?
+
+    # The result of the experiment
+    # @return [Growthbook::InlineExperimentResult, nil]
+    attr_reader experiment_result: InlineExperimentResult?
+
+    def initialize: (untyped value, String source, InlineExperiment? experiment, InlineExperimentResult? experiment_result) -> void
+
+    def to_json: (*untyped _args) -> Hash[String, untyped]
+  end
+end

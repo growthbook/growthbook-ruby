@@ -251,9 +251,18 @@ module Growthbook
       meta = experiment.meta ? experiment.meta[variation_index] : {}
 
       result = Growthbook::InlineExperimentResult.new(
-        { key: meta['key'] || variation_index, in_experiment: in_experiment, variation_id: variation_index,
-          value: experiment.variations[variation_index], hash_used: hash_used, hash_attribute: hash_attribute,
-          hash_value: hash_value, feature_id: feature_id, bucket: bucket, name: meta['name'] }
+        {
+          key: meta['key'] || variation_index,
+          in_experiment: in_experiment,
+          variation_id: variation_index,
+          value: experiment.variations[variation_index],
+          hash_used: hash_used,
+          hash_attribute: hash_attribute,
+          hash_value: hash_value,
+          feature_id: feature_id,
+          bucket: bucket,
+          name: meta['name']
+        }
       )
 
       result.passthrough = true if meta['passthrough']
