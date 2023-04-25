@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require 'base64'
 require 'fnv'
 require 'bigdecimal'
 require 'bigdecimal/util'
-require 'openssl'
 
 module Growthbook
   # internal use only
