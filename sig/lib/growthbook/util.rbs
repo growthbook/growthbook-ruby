@@ -11,7 +11,7 @@ module Growthbook
     def self.get_equal_weights: (Integer num_variations) -> Array[Float]
 
     # Determine bucket ranges for experiment variations
-    def self.get_bucket_ranges: (Integer num_variations, Float? coverage, Array[Float] weights) -> Array[Float]
+    def self.get_bucket_ranges: (Integer num_variations, Float? coverage, Array[Float]? weights) -> Array[[Float, Float]]
 
     # Chose a variation based on a hash and range
     def self.choose_variation: (Float num, Array[[Float, Float]] ranges) -> Integer

@@ -17,7 +17,7 @@ module Growthbook
     attr_accessor coverage: Float?
 
     # @return [Array<Hash>] Array of ranges, one per variation
-    attr_accessor ranges: Array[Float]?
+    attr_accessor ranges: Array[[Float, Float]]?
 
     # @return [Hash] Optional targeting condition
     attr_accessor condition: Hash[String, untyped]?
@@ -38,7 +38,7 @@ module Growthbook
     attr_accessor meta: Array[{ passthrough: bool, key: String?, name: String? }]?
 
     # @return [Array<Hash>] Array of filters to apply
-    attr_accessor filters: Array[{ attribute: String?, seed: String?, hashVersion: Integer, ranges: [Float, Float] }]?
+    attr_accessor filters: Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]?
 
     # @return [String, nil] The hash seed to use
     attr_accessor seed: String?

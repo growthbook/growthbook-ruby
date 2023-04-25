@@ -64,9 +64,9 @@ module Growthbook
 
     def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void
 
-    def included_in_rollout?: (seed: String, hash_attribute: String, hash_version: Integer, range: Array[Float], coverage: Float?) -> bool
+    def included_in_rollout?: (seed: String, hash_attribute: String, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
 
-    def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
+    def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
 
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
   end

@@ -166,8 +166,9 @@ module Growthbook
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) unless @enabled
 
       # 3. If forced via URL querystring
-      if @url
-        qs_override = Util.get_query_string_override(key, @url, exp.variations.length)
+      override_url = @url
+      unless override_url.nil?
+        qs_override = Util.get_query_string_override(key, override_url, exp.variations.length)
         return get_experiment_result(exp, qs_override, hash_used: false, feature_id: feature_id) unless qs_override.nil?
       end
 
@@ -212,7 +213,8 @@ module Growthbook
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.get_hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
+      seed = exp.seed || key || ''
+      n = Growthbook::Util.get_hash(seed: seed, value: hash_value, version: exp.hash_version || 1)
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if n.nil?
 
       assigned = Growthbook::Util.choose_variation(n, ranges)
@@ -329,7 +331,7 @@ module Growthbook
         if hash_value.empty?
           false
         else
-          n = Growthbook::Util.get_hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+          n = Growthbook::Util.get_hash(seed: filter['seed'] || '', value: hash_value, version: filter['hashVersion'] || 2)
 
           return true if n.nil?
 
