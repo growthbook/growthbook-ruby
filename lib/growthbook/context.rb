@@ -103,7 +103,7 @@ module Growthbook
         next if rule.condition && !condition_passes?(rule.condition)
 
         # If there are filters for who is included (e.g. namespaces)
-        next if rule.filters && filtered_out?(rule.filters)
+        next if rule.filters && filtered_out?(rule.filters || [])
 
         # If this is a percentage rollout, skip if not included
         if rule.force?
@@ -191,7 +191,7 @@ module Growthbook
 
       # 7. Exclude if user is filtered out (used to be called "namespace")
       if exp.filters
-        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters)
+        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters || [])
       elsif exp.namespace && !Growthbook::Util.in_namespace?(hash_value, exp.namespace)
         return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id)
       end
@@ -321,7 +321,7 @@ module Growthbook
     end
 
     def filtered_out?(filters)
-      (filters || []).any? do |filter|
+      filters.any? do |filter|
         hash_value = get_attribute(filter['attribute'] || 'id')
 
         if hash_value.empty?
@@ -338,6 +338,8 @@ module Growthbook
 
     def decrypted_features_from_options(options)
       decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:encryption_key])
+
+      return nil if decrypted_features.nil?
 
       JSON.parse(decrypted_features)
     rescue StandardError
