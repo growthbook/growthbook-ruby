@@ -31,6 +31,9 @@ Metrics/MethodLength:
 Layout/LineLength:
   Max: 150
 
+Naming/VariableNumber:
+  Enabled: false
+
 Naming/MethodParameterName:
   MinNameLength: 2
 

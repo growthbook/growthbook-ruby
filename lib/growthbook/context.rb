@@ -24,10 +24,10 @@ module Growthbook
     # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
     attr_reader :forced_variations
 
-    # @return Hash[String, Growthbook::InlineExperimentResult] Tracked impressions
+    # @return [Hash[String, Growthbook::InlineExperimentResult]] Tracked impressions
     attr_reader :impressions
 
-    # @return Hash[String, Any] Forced feature values
+    # @return [Hash[String, Any]] Forced feature values
     attr_reader :forced_features
 
     def initialize(options = {})
