@@ -97,14 +97,14 @@ module Growthbook
       )
     end
 
-    def has_experiment?
+    def experiment?
       return false if @variations.nil?
 
       !@variations&.empty?
     end
 
     def force?
-      !has_experiment? && !@force.nil?
+      !experiment? && !@force.nil?
     end
 
     def to_json(*_args)

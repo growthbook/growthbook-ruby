@@ -39,7 +39,7 @@ module Growthbook
     attr_reader meta: { passthrough: bool, key: String?, name: String? }
 
     # @return [Filter[] , nil] Array of filters to apply to the rule
-    attr_reader filters: Array[{ attribute: String?, seed: String, hashVersion: Integer, variationRange: [Float, Float] }]?
+    attr_reader filters: Array[{ 'attribute' => String?, 'seed' => String, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]?
 
     # @return [String , nil]  Seed to use for hashing
     attr_reader seed: String?
@@ -59,7 +59,7 @@ module Growthbook
     # @return [Growthbook::InlineExperiment, nil]
     def to_experiment: (String | Symbol feature_key) -> (nil | InlineExperiment)
 
-    def has_experiment?: () -> bool
+    def experiment?: () -> bool
 
     def force?: () -> bool
 

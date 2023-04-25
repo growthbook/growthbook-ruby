@@ -121,7 +121,7 @@ module Growthbook
           return get_feature_result(rule.force, 'force', nil, nil)
         end
         # Experiment rule
-        next unless rule.has_experiment?
+        next unless rule.experiment?
 
         exp = rule.to_experiment(key)
         next if exp.nil? # TODO: Is this correct? exp is nillable

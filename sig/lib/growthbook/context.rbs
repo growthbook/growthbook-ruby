@@ -50,7 +50,7 @@ module Growthbook
 
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
 
-    def stringify_keys: (Hash[String, Symbol | untyped] hash) -> Hash[String, untyped]
+    def stringify_keys: (Hash[String | Symbol, untyped] hash) -> Hash[String, untyped]
 
     def condition_passes?: (Hash[String, untyped]? condition) -> bool
 
