@@ -12,7 +12,7 @@ module Growthbook
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor :qa_mode
 
-    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
+    # @return [Growthbook::TrackingCallback] An object that responds to `on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`
     attr_accessor :listener
 
     # @return [Hash] Map of user attributes that are used to assign variations
@@ -300,8 +300,10 @@ module Growthbook
     end
 
     def track_experiment(experiment, result)
+      return if listener.nil?
+
       @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
-      @impressions[experiment.key] = result
+      @impressions[experiment.key] = result unless experiment.key.nil?
     end
 
     def included_in_rollout?(seed:, hash_attribute:, hash_version:, range:, coverage:)

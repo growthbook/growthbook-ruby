@@ -7,8 +7,8 @@ class FNV
   INIT64  = 0xcbf29ce484222325
   PRIME32 = 0x01000193
   PRIME64 = 0x100000001b3
-  MOD32   = 2**32
-  MOD64   = 2**64
+  MOD32   = 4294967296
+  MOD64   = 18446744073709551616
 
   def fnv1a_32(data)
     hash = INIT32

@@ -11,7 +11,7 @@ module Growthbook
     attr_accessor qa_mode: bool?
 
     # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
-    attr_accessor listener: GrowthBook::TrackingCallback?
+    attr_accessor listener: GrowthBook::TrackingCallback
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader attributes: Hash[untyped, untyped]

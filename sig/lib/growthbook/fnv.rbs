@@ -1,15 +1,15 @@
 class FNV
-  INIT32: 2166136261
+  INIT32: Integer
 
-  INIT64: 14695981039346656037
+  INIT64: Integer
 
-  PRIME32: 16777619
+  PRIME32: Integer
 
-  PRIME64: 1099511628211
+  PRIME64: Integer
 
   MOD32: Integer
 
   MOD64: Integer
 
-  def fnv1a_32: (String data) -> Float
+  def fnv1a_32: (String data) -> Integer
 end
