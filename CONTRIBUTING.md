@@ -2,6 +2,12 @@
 
 We welcome all contributions!
 
+
+## Requirements
+
+- Ruby version 3.1.1+
+
+
 ## Testing
 
 Run unit tests with `bundler exec rspec`
@@ -27,6 +33,18 @@ To run it as CI would, run:
     rubocop
 
 If you use Visual Studio Code, you can use the extension [ruby-rubocop](https://marketplace.visualstudio.com/items?itemName=misogi.ruby-rubocop) to see editor hints.
+
+
+## Type checking
+
+The project uses RBS for type definitions and Steep for type checking.
+
+RBS comes preinstalled with Ruby version 3+.
+
+You may find the following tools helpful:
+
+- [Steep VSCode plugin](https://github.com/soutaro/steep-vscode) provides inline type validation
+- RubyMine IDE makes it easier to edit type definitions
 
 
 ## Releasing
