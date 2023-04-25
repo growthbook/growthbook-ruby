@@ -17,6 +17,19 @@ jobs:
           gem install rubocop-performance -v 1.15
           rubocop
 
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.1
+          bundler-cache: true
+      - name: RBS type checking with Steep
+        run: |
+          gem install steep -v 1.4.0
+          steep check --log-level=fatal
+
   build-test:
     runs-on: ubuntu-latest
     strategy:
