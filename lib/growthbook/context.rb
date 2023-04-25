@@ -92,11 +92,11 @@ module Growthbook
 
     def eval_feature(key)
       # Forced in the context
-      return get_feature_result(@forced_features[key.to_s], 'override') if @forced_features.key?(key.to_s)
+      return get_feature_result(@forced_features[key.to_s], 'override', nil, nil) if @forced_features.key?(key.to_s)
 
       # Return if we can't find the feature definition
       feature = get_feature(key)
-      return get_feature_result(nil, 'unknownFeature') unless feature
+      return get_feature_result(nil, 'unknownFeature', nil, nil) unless feature
 
       feature.rules.each do |rule|
         # Targeting condition
@@ -118,7 +118,7 @@ module Growthbook
           )
           next unless included_in_rollout
 
-          return get_feature_result(rule.force, 'force')
+          return get_feature_result(rule.force, 'force', nil, nil)
         end
         # Experiment rule
         next unless rule.has_experiment?
@@ -134,7 +134,7 @@ module Growthbook
       end
 
       # Fallback
-      get_feature_result(feature.default_value || nil, 'defaultValue')
+      get_feature_result(feature.default_value || nil, 'defaultValue', nil, nil)
     end
 
     def run(exp)
@@ -281,7 +281,7 @@ module Growthbook
       result
     end
 
-    def get_feature_result(value, source, experiment = nil, experiment_result = nil)
+    def get_feature_result(value, source, experiment, experiment_result)
       Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
     end
 

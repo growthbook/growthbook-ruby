@@ -56,7 +56,7 @@ module Growthbook
 
     def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult
 
-    def get_feature_result: (untyped value, String source, (InlineExperiment | nil) experiment, (InlineExperimentResult | nil) experiment_result) -> FeatureResult
+    def get_feature_result: (untyped, ::String, InlineExperiment?, InlineExperimentResult?) -> FeatureResult
 
     def get_feature: (String | Symbol key) -> (Feature | nil)
 
