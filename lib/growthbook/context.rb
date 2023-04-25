@@ -42,7 +42,7 @@ module Growthbook
           self.attributes = value
         when :url
           @url = value
-        when :encryption_key
+        when :decryption_key
           break
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
@@ -317,7 +317,7 @@ module Growthbook
     end
 
     def decrypted_features_from_options(options)
-      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:encryption_key])
+      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:decryption_key])
 
       JSON.parse(decrypted_features)
     rescue StandardError

@@ -136,7 +136,7 @@ describe 'context' do
       subject(:context) do
         Growthbook::Context.new(
           encrypted_features: 'm5ylFM6ndyOJA2OPadubkw==.Uu7ViqgKEt/dWvCyhI46q088PkAEJbnXKf3KPZjf9IEQQ+A8fojNoxw4wIbPX3aj',
-          encryption_key: 'Zvwv/+uhpFDznZ6SX28Yjg==',
+          decryption_key: 'Zvwv/+uhpFDznZ6SX28Yjg==',
           attributes: {}
         )
       end
@@ -150,7 +150,7 @@ describe 'context' do
         subject(:context) do
           Growthbook::Context.new(
             encrypted_features: 'SVZIM2oKD1JoHNIeeoW3Uw==.AGbRiGAHf2f6/ziVr9UTIy+bVFmVli6+bHZ2jnCm9N991ITv1ROvOEjxjLSmgEpv',
-            encryption_key: 'UQD0Qqw7fM1bhfKKPH8TGw==',
+            decryption_key: 'UQD0Qqw7fM1bhfKKPH8TGw==',
             attributes: {}
           )
         end
