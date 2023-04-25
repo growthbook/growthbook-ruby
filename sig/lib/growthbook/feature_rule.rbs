@@ -1,0 +1,71 @@
+module Growthbook
+  # Internal class that overrides the default value of a Feature based on a set of requirements.
+  class FeatureRule
+    # @return [Hash , nil] Optional targeting condition
+    attr_reader condition: (Hash[String, untyped] | Array[untyped])
+
+    # @return [Float , nil] What percent of users should be included in the experiment (between 0 and 1, inclusive)
+    attr_reader coverage: Float?
+
+    # @return [T , nil] Immediately force a specific value (ignore every other option besides condition and coverage)
+    attr_reader force: untyped?
+
+    # @return [T[] , nil] Run an experiment (A/B test) and randomly choose between these variations
+    attr_reader variations: Array[untyped]?
+
+    # @return [String , nil] The globally unique tracking key for the experiment (default to the feature key)
+    attr_reader key: String?
+
+    # @return [Float[] , nil] How to weight traffic between variations. Must add to 1.
+    attr_reader weights: Array[Float]?
+
+    # @return [String , nil] Adds the experiment to a namespace
+    attr_reader namespace: [String, Float, Float]?
+
+    # @return [String , nil] What user attribute should be used to assign variations (defaults to id)
+    attr_reader hash_attribute: String?
+
+    # @return [Integer , nil] The hash version to use (default to 1)
+    attr_reader hash_version: Integer?
+
+    # @return [BucketRange , nil] A more precise version of coverage
+    attr_reader range: [Float, Float]?
+
+    # @return [BucketRanges[] , nil] Ranges for experiment variations
+    attr_reader ranges: Array[[Float, Float]]?
+
+    # @return [VariationMeta[] , nil] Meta info about the experiment variations
+    attr_reader meta: { passthrough: bool, key: String?, name: String? }
+
+    # @return [Filter[] , nil] Array of filters to apply to the rule
+    attr_reader filters: Array[{ attribute: String?, seed: String, hashVersion: Integer, variationRange: [Float, Float] }]?
+
+    # @return [String , nil]  Seed to use for hashing
+    attr_reader seed: String?
+
+    # @return [String , nil] Human-readable name for the experiment
+    attr_reader name: String?
+
+    # @return [String , nil] The phase id of the experiment
+    attr_reader phase: String?
+
+    # TODO: Type
+    # @return [TrackData[] , nil] Array of tracking calls to fire
+    attr_reader tracks: Array[{ experiment: untyped, result: untyped }]?
+
+    def initialize: (untyped rule) -> void
+
+    # @return [Growthbook::InlineExperiment, nil]
+    def to_experiment: (String feature_key) -> (nil | InlineExperiment)
+
+    def experiment?: () -> (nil | InlineExperiment)
+
+    def force?: () -> bool
+
+    def to_json: (*String _args) -> Hash[String, untyped]
+
+    private
+
+    def get_option: (untyped hash, untyped key) -> (untyped | nil)
+  end
+end

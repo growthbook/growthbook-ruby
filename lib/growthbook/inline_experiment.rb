@@ -56,7 +56,7 @@ module Growthbook
       @variations = get_option(options, :variations, [])
       @weights = get_option(options, :weights)
       @active = get_option(options, :active, true)
-      @coverage = get_option(options, :coverage, 1)
+      @coverage = get_option(options, :coverage, 1.0)
       @ranges = get_option(options, :ranges)
       @condition = get_option(options, :condition)
       @namespace = get_option(options, :namespace)
