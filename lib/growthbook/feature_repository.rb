@@ -41,8 +41,8 @@ module Growthbook
     def fetch!
       fetch
 
-      raise FeatureFetchError if @response.nil?
-      raise FeatureParseError if @response.empty?
+      raise FeatureFetchError if response.nil?
+      raise FeatureParseError if features_json.nil? || features_json.empty?
 
       features_json
     end
@@ -56,7 +56,7 @@ module Growthbook
     end
 
     def parsed_plain_text_response
-      @features_json = parsed_response['features'] unless @response.nil?
+      @features_json = parsed_response['features'] unless parsed_response.nil?
     rescue StandardError
       nil
     end
