@@ -220,6 +220,30 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#get_hash-class_method" title="get_hash (class method)">.<strong>get_hash</strong>(seed:, value:, version:)  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Hash, or nil if the hash version is invalid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#get_query_string_override-class_method" title="get_query_string_override (class method)">.<strong>get_query_string_override</strong>(id, url, num_variations)  &#x21d2; Object </a>
     
 
@@ -237,28 +261,6 @@
     <span class="summary_desc"><div class='inline'>
 <p>Get an override variation from a url querystring e.g.</p>
 </div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#hash-class_method" title="hash (class method)">.<strong>hash</strong>(seed:, value:, version:)  &#x21d2; Object </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -434,15 +436,15 @@
       <pre class="lines">
 
 
-94
 95
 96
 97
 98
-99</pre>
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 94</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_choose_variation'>choose_variation</span><span class='lparen'>(</span><span class='id identifier rubyid_num'>num</span><span class='comma'>,</span> <span class='id identifier rubyid_ranges'>ranges</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ranges'>ranges</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
@@ -481,7 +483,6 @@
       <pre class="lines">
 
 
-68
 69
 70
 71
@@ -504,10 +505,11 @@
 88
 89
 90
-91</pre>
+91
+92</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_bucket_ranges'>get_bucket_ranges</span><span class='lparen'>(</span><span class='id identifier rubyid_num_variations'>num_variations</span><span class='comma'>,</span> <span class='id identifier rubyid_coverage'>coverage</span> <span class='op'>=</span> <span class='int'>1</span><span class='comma'>,</span> <span class='id identifier rubyid_weights'>weights</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='comment'># Make sure coverage is within bounds
@@ -553,7 +555,6 @@
       <pre class="lines">
 
 
-57
 58
 59
 60
@@ -561,10 +562,11 @@
 62
 63
 64
-65</pre>
+65
+66</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_equal_weights'>get_equal_weights</span><span class='lparen'>(</span><span class='id identifier rubyid_num_variations'>num_variations</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_num_variations'>num_variations</span> <span class='op'>&lt;</span> <span class='int'>1</span>
@@ -574,6 +576,71 @@
     <span class='id identifier rubyid_weights'>weights</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='float'>1.0</span> <span class='op'>/</span> <span class='id identifier rubyid_num_variations'>num_variations</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_weights'>weights</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_hash-class_method">
+  
+    .<strong>get_hash</strong>(seed:, value:, version:)  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns Hash, or nil if the hash version is invalid.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Hash, or nil if the hash version is invalid</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46
+47
+48
+49
+50
+51</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_hash'>get_hash</span><span class='lparen'>(</span><span class='label'>seed:</span><span class='comma'>,</span> <span class='label'>value:</span><span class='comma'>,</span> <span class='label'>version:</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>+</span> <span class='id identifier rubyid_seed'>seed</span><span class='rparen'>)</span> <span class='op'>%</span> <span class='int'>1000</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='float'>1000.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>==</span> <span class='int'>1</span>
+  <span class='kw'>return</span> <span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_seed'>seed</span> <span class='op'>+</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='op'>%</span> <span class='int'>10_000</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='float'>10_000.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>==</span> <span class='int'>2</span>
+
+  <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -606,7 +673,6 @@
       <pre class="lines">
 
 
-103
 104
 105
 106
@@ -636,10 +702,11 @@
 130
 131
 132
-133</pre>
+133
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 103</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 104</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_query_string_override'>get_query_string_override</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_url'>url</span><span class='comma'>,</span> <span class='id identifier rubyid_num_variations'>num_variations</span><span class='rparen'>)</span>
   <span class='comment'># Skip if url is empty
@@ -678,42 +745,6 @@
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="hash-class_method">
-  
-    .<strong>hash</strong>(seed:, value:, version:)  &#x21d2; <tt>Object</tt> 
-  
-
-  
-
-  
-</h3><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-45
-46
-47
-48
-49
-50</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 45</span>
-
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='lparen'>(</span><span class='label'>seed:</span><span class='comma'>,</span> <span class='label'>value:</span><span class='comma'>,</span> <span class='label'>version:</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>+</span> <span class='id identifier rubyid_seed'>seed</span><span class='rparen'>)</span> <span class='op'>%</span> <span class='int'>1000</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='float'>1000.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>==</span> <span class='int'>1</span>
-  <span class='kw'>return</span> <span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='const'>FNV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='period'>.</span><span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_seed'>seed</span> <span class='op'>+</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='op'>%</span> <span class='int'>10_000</span><span class='rparen'>)</span> <span class='op'>/</span> <span class='float'>10_000.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span> <span class='op'>==</span> <span class='int'>2</span>
-
-  <span class='op'>-</span><span class='int'>1</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
   <h3 class="signature " id="in_namespace-class_method">
   
     .<strong>in_namespace</strong>(hash_value, namespace)  &#x21d2; <tt>Object</tt> 
@@ -728,16 +759,16 @@
       <pre class="lines">
 
 
-52
 53
 54
-55</pre>
+55
+56</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_in_namespace'>in_namespace</span><span class='lparen'>(</span><span class='id identifier rubyid_hash_value'>hash_value</span><span class='comma'>,</span> <span class='id identifier rubyid_namespace'>namespace</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='id identifier rubyid_hash'>hash</span><span class='lparen'>(</span><span class='label'>seed:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_namespace'>namespace</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_hash_value'>hash_value</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_n'>n</span> <span class='op'>=</span> <span class='id identifier rubyid_get_hash'>get_hash</span><span class='lparen'>(</span><span class='label'>seed:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>__</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_namespace'>namespace</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_hash_value'>hash_value</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='int'>1</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_n'>n</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_namespace'>namespace</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_n'>n</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_namespace'>namespace</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -782,12 +813,12 @@
       <pre class="lines">
 
 
-135
 136
-137</pre>
+137
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/util.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_in_range?'>in_range?</span><span class='lparen'>(</span><span class='id identifier rubyid_num'>num</span><span class='comma'>,</span> <span class='id identifier rubyid_range'>range</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_num'>num</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_num'>num</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_range'>range</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
@@ -802,7 +833,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Apr 20 01:38:41 2023 by
+  Generated on Wed Apr 26 16:54:40 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
