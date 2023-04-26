@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require_relative '../spec_helper'
 require 'growthbook'
 require 'json'
 
-describe 'context' do
+describe Growthbook::Context do
   describe 'feature helper methods' do
-    gb = Growthbook::Context.new(
+    gb = described_class.new(
       features: {
         feature1: {
           defaultValue: 1
@@ -35,7 +35,7 @@ describe 'context' do
 
   describe 'forced feature values' do
     it 'uses forced values' do
-      gb = Growthbook::Context.new(
+      gb = described_class.new(
         features: {
           feature: {
             defaultValue: 'a'
@@ -66,7 +66,7 @@ describe 'context' do
     end
 
     it 'queues up impressions' do
-      gb = Growthbook::Context.new(
+      gb = described_class.new(
         attributes: {
           id: '123'
         },
@@ -134,7 +134,7 @@ describe 'context' do
     context 'when provided an encryption key' do
       # uses "Valid feature" test
       subject(:context) do
-        Growthbook::Context.new(
+        described_class.new(
           encrypted_features: 'm5ylFM6ndyOJA2OPadubkw==.Uu7ViqgKEt/dWvCyhI46q088PkAEJbnXKf3KPZjf9IEQQ+A8fojNoxw4wIbPX3aj',
           decryption_key: 'Zvwv/+uhpFDznZ6SX28Yjg==',
           attributes: {}
@@ -148,7 +148,7 @@ describe 'context' do
       context 'when decryption fails' do
         # uses "Broken JSON" test
         subject(:context) do
-          Growthbook::Context.new(
+          described_class.new(
             encrypted_features: 'SVZIM2oKD1JoHNIeeoW3Uw==.AGbRiGAHf2f6/ziVr9UTIy+bVFmVli6+bHZ2jnCm9N991ITv1ROvOEjxjLSmgEpv',
             decryption_key: 'UQD0Qqw7fM1bhfKKPH8TGw==',
             attributes: {}
@@ -163,7 +163,7 @@ describe 'context' do
 
     context 'when not provided an encryption key' do
       subject(:context) do
-        Growthbook::Context.new(
+        described_class.new(
           features: payload,
           attributes: {}
         )

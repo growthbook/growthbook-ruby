@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.5.0'
 
   s.add_development_dependency 'rspec', '~> 3.2'
+  s.add_development_dependency 'rspec-its', '~> 1.3'
   s.add_development_dependency 'simplecov', '~> 0.21'
   s.add_development_dependency 'simplecov-shields-badge', '~> 0.1.0'
 
