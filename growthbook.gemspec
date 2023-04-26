@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-its', '~> 1.3'
   s.add_development_dependency 'simplecov', '~> 0.21'
   s.add_development_dependency 'simplecov-shields-badge', '~> 0.1.0'
+  s.add_development_dependency 'webmock', '~> 3.18'
 
   s.metadata['rubygems_mfa_required'] = 'true'
 end

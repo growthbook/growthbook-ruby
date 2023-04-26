@@ -1,0 +1,32 @@
+module Growthbook
+  # Optional class for fetching features from the GrowthBook API
+  class FeatureRepository
+    def initialize: (endpoint: String, decryption_key: String?) -> void
+
+    attr_reader endpoint: String
+    attr_reader decryption_key: String?
+    attr_reader features_json: Hash[String, untyped]
+
+    def fetch: () -> (nil | Hash[String, untyped])
+
+    def fetch!: () -> (nil | Hash[String, untyped])
+
+    private
+
+    attr_reader response: String?
+
+    def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
+
+    def parsed_decrypted_response: () -> (nil | Hash[String, untyped])
+
+    def parsed_response: () -> (nil | Hash[String, untyped])
+
+    def use_decryption?: -> bool
+
+    class FeatureFetchError < StandardError
+    end
+
+    class FeatureParseError < StandardError
+    end
+  end
+end
