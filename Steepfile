@@ -6,7 +6,7 @@ target :lib do
   signature 'sig'
 
   check 'lib'
-  check "Gemfile"
+  check 'Gemfile'
 
   library 'base64', 'uri', 'json', 'openssl', 'bigdecimal'
 
