@@ -6,6 +6,7 @@ end
 
 require 'growthbook/conditions'
 require 'growthbook/context'
+require 'growthbook/decryption_util'
 require 'growthbook/feature'
 require 'growthbook/feature_result'
 require 'growthbook/feature_rule'

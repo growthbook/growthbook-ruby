@@ -129,4 +129,73 @@ describe 'context' do
       end
     end
   end
+
+  describe 'encrypted features' do
+    context 'when provided an encryption key' do
+      # uses "Valid feature" test
+      subject(:context) do
+        Growthbook::Context.new(
+          encrypted_features: 'm5ylFM6ndyOJA2OPadubkw==.Uu7ViqgKEt/dWvCyhI46q088PkAEJbnXKf3KPZjf9IEQQ+A8fojNoxw4wIbPX3aj',
+          decryption_key: 'Zvwv/+uhpFDznZ6SX28Yjg==',
+          attributes: {}
+        )
+      end
+
+      it 'decrypts the payload' do
+        expect(context.features['feature'].to_json['defaultValue']).to be(true)
+      end
+
+      context 'when decryption fails' do
+        # uses "Broken JSON" test
+        subject(:context) do
+          Growthbook::Context.new(
+            encrypted_features: 'SVZIM2oKD1JoHNIeeoW3Uw==.AGbRiGAHf2f6/ziVr9UTIy+bVFmVli6+bHZ2jnCm9N991ITv1ROvOEjxjLSmgEpv',
+            decryption_key: 'UQD0Qqw7fM1bhfKKPH8TGw==',
+            attributes: {}
+          )
+        end
+
+        it 'ignores setting the features' do
+          expect(context.features).to eq({})
+        end
+      end
+    end
+
+    context 'when not provided an encryption key' do
+      subject(:context) do
+        Growthbook::Context.new(
+          features: payload,
+          attributes: {}
+        )
+      end
+
+      let(:payload) do
+        {
+          banner_text: {
+            defaultValue: 'Welcome to Acme Donuts!',
+            rules: [
+              {
+                condition: {
+                  country: 'france'
+                },
+                force: 'Bienvenue au Beignets Acme !'
+              },
+              {
+                condition: {
+                  country: 'spain'
+                },
+                force: '¡Bienvenidos y bienvenidas a Donas Acme!'
+              }
+            ]
+          }
+        }
+      end
+
+      it 'uses the features hash as is' do
+        expect(context.features['banner_text'].to_json['defaultValue']).to eq('Welcome to Acme Donuts!')
+        expect(context.features['banner_text'].rules.first.force).to eq('Bienvenue au Beignets Acme !')
+        expect(context.features['banner_text'].rules.last.force).to eq('¡Bienvenidos y bienvenidas a Donas Acme!')
+      end
+    end
+  end
 end

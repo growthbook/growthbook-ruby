@@ -42,15 +42,16 @@ module Growthbook
       end
     end
 
-    def self.hash(seed:, value:, version:)
+    # @return [String, nil] Hash, or nil if the hash version is invalid
+    def self.get_hash(seed:, value:, version:)
       return (FNV.new.fnv1a_32(value + seed) % 1000) / 1000.0 if version == 1
       return (FNV.new.fnv1a_32(FNV.new.fnv1a_32(seed + value).to_s) % 10_000) / 10_000.0 if version == 2
 
-      -1
+      nil
     end
 
     def self.in_namespace(hash_value, namespace)
-      n = hash(seed: "__#{namespace[0]}", value: hash_value, version: 1)
+      n = get_hash(seed: "__#{namespace[0]}", value: hash_value, version: 1)
       n >= namespace[1] && n < namespace[2]
     end
 

@@ -19,8 +19,8 @@ describe 'test suite' do
       seed, value, version, expected = test_case
 
       it value do
-        result = Growthbook::Util.hash(seed: seed, value: value, version: version)
-        expect(result.round(5)).to eq expected.round(5)
+        result = Growthbook::Util.get_hash(seed: seed, value: value, version: version)
+        expect(result&.round(5)).to eq expected&.round(5)
       end
     end
   end
@@ -156,6 +156,17 @@ describe 'test suite' do
         expect(result.value).to eq(value)
         expect(result.in_experiment?).to eq(in_experiment)
         expect(result.hash_used?).to eq(hash_used)
+      end
+    end
+  end
+
+  describe 'decrypt' do
+    test_cases['decrypt'].each do |test_case|
+      test_name, encrypted_payload, decryption_key, expected_features = test_case
+
+      it test_name do
+        result = Growthbook::DecryptionUtil.decrypt(encrypted_payload, key: decryption_key)
+        expect(result).to eq(expected_features)
       end
     end
   end

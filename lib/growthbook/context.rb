@@ -34,14 +34,19 @@ module Growthbook
       @enabled = true
       @impressions = {}
 
-      options.each do |key, value|
-        case key.to_sym
+      options.transform_keys(&:to_sym).each do |key, value|
+        case key
         when :enabled
           @enabled = value
         when :attributes
           self.attributes = value
         when :url
           @url = value
+        when :decryption_key
+          break
+        when :encrypted_features
+          decrypted = decrypted_features_from_options(options)
+          self.features = decrypted unless decrypted.nil?
         when :features
           self.features = value
         when :forced_variations, :forcedVariations
@@ -198,7 +203,9 @@ module Growthbook
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
+      n = Growthbook::Util.get_hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
+      return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if n.nil?
+
       assigned = Growthbook::Util.choose_variation(n, ranges)
 
       # 10. Return if not in experiment
@@ -284,7 +291,8 @@ module Growthbook
 
       return false if hash_value.empty?
 
-      n = Growthbook::Util.hash(seed: seed, value: hash_value, version: hash_version || 1)
+      n = Growthbook::Util.get_hash(seed: seed, value: hash_value, version: hash_version || 1)
+      return false if n.nil?
 
       return Growthbook::Util.in_range?(n, range) if range
       return n <= coverage if coverage
@@ -299,11 +307,21 @@ module Growthbook
         if hash_value.empty?
           false
         else
-          n = Growthbook::Util.hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+          n = Growthbook::Util.get_hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+
+          return true if n.nil?
 
           filter['ranges'].none? { |range| Growthbook::Util.in_range?(n, range) }
         end
       end
+    end
+
+    def decrypted_features_from_options(options)
+      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:decryption_key])
+
+      JSON.parse(decrypted_features)
+    rescue StandardError
+      nil
     end
   end
 end
