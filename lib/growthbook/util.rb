@@ -3,7 +3,6 @@
 require 'base64'
 require 'bigdecimal'
 require 'bigdecimal/util'
-require 'openssl'
 
 module Growthbook
   # internal use only

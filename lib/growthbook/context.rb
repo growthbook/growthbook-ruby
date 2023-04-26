@@ -46,7 +46,7 @@ module Growthbook
           self.attributes = value
         when :url
           @url = value
-        when :encryption_key
+        when :decryption_key
           nil
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
@@ -341,7 +341,7 @@ module Growthbook
     end
 
     def decrypted_features_from_options(options)
-      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:encryption_key])
+      decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:decryption_key])
 
       return nil if decrypted_features.nil?
 

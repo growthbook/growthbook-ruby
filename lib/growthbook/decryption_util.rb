@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64'
+require 'openssl'
 
 module Growthbook
   # Utils for working with encrypted feature payloads.
