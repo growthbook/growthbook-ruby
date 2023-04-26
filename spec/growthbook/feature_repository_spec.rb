@@ -101,6 +101,19 @@ RSpec.describe Growthbook::FeatureRepository do
         expect(fetch_response['banner_text']['defaultValue']).to eq('Welcome to Acme Donuts!')
       end
 
+      context 'when provided a misconfigured URL' do
+        subject(:fetch_response) do
+          described_class.new(
+            endpoint: endpoint,
+            decryption_key: nil
+          ).fetch
+        end
+
+        let(:endpoint) { 'hello! this is not a URL' }
+
+        it { is_expected.to be_nil }
+      end
+
       context 'when the network request fails' do
         before do
           stub_request(:get, endpoint)
@@ -190,6 +203,21 @@ RSpec.describe Growthbook::FeatureRepository do
   end
 
   describe '#fetch!' do
+    context 'when provided a misconfigured URL' do
+      subject(:fetch_response) do
+        described_class.new(
+          endpoint: endpoint,
+          decryption_key: nil
+        ).fetch!
+      end
+
+      let(:endpoint) { 'hello! this is not a URL' }
+
+      it 'raises a FeatureFetchError' do
+        expect { fetch_response }.to raise_error Growthbook::FeatureRepository::FeatureFetchError
+      end
+    end
+
     context 'when not using a decryption key' do
       subject(:fetch_response) do
         described_class.new(
