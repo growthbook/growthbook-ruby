@@ -33,11 +33,12 @@ RSpec.describe Growthbook::FeatureRepository do
     context 'when not using a decryption key' do
       subject(:fetch_response) do
         described_class.new(
-          endpoint: 'https://cdn.growthbook.io/api/features/sdk-acme-donuts',
+          endpoint: endpoint,
           decryption_key: nil
         ).fetch
       end
 
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-acme-donuts' }
       let(:json_response) do
         <<~JSON
           {
@@ -92,7 +93,7 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       before do
-        stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+        stub_request(:get, endpoint)
           .to_return(status: 200, body: json_response, headers: {})
       end
 
@@ -102,7 +103,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the network request fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+          stub_request(:get, endpoint)
             .to_return(status: 500, body: '💥 Boom!', headers: {})
         end
 
@@ -111,7 +112,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the parsing fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+          stub_request(:get, endpoint)
             .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
         end
 
@@ -122,11 +123,12 @@ RSpec.describe Growthbook::FeatureRepository do
     context 'when provided a decryption key' do
       subject(:fetch_response) do
         described_class.new(
-          endpoint: 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD',
+          endpoint: endpoint,
           decryption_key: 'BhB1wORFmZLTDjbvstvS8w=='
         ).fetch
       end
 
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD' }
       let(:json_response) do
         <<~JSON
           {
@@ -139,7 +141,7 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       before do
-        stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+        stub_request(:get, endpoint)
           .to_return(status: 200, body: json_response, headers: {})
       end
 
@@ -154,7 +156,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the network request fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+          stub_request(:get, endpoint)
             .to_return(status: 500, body: '💥 Boom!', headers: {})
         end
 
@@ -163,7 +165,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the parsing fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+          stub_request(:get, endpoint)
             .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
         end
 
@@ -191,11 +193,12 @@ RSpec.describe Growthbook::FeatureRepository do
     context 'when not using a decryption key' do
       subject(:fetch_response) do
         described_class.new(
-          endpoint: 'https://cdn.growthbook.io/api/features/sdk-acme-donuts',
+          endpoint: endpoint,
           decryption_key: nil
         ).fetch!
       end
 
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-acme-donuts' }
       let(:json_response) do
         <<~JSON
           {
@@ -250,7 +253,7 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       before do
-        stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+        stub_request(:get, endpoint)
           .to_return(status: 200, body: json_response, headers: {})
       end
 
@@ -260,7 +263,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the network request fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+          stub_request(:get, endpoint)
             .to_return(status: 500, body: '💥 Boom!', headers: {})
         end
 
@@ -271,7 +274,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the parsing fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+          stub_request(:get, endpoint)
             .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
         end
 
@@ -284,11 +287,12 @@ RSpec.describe Growthbook::FeatureRepository do
     context 'when provided a decryption key' do
       subject(:fetch_response) do
         described_class.new(
-          endpoint: 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD',
+          endpoint: endpoint,
           decryption_key: 'BhB1wORFmZLTDjbvstvS8w=='
         ).fetch!
       end
 
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD' }
       let(:json_response) do
         <<~JSON
           {
@@ -301,7 +305,7 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       before do
-        stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+        stub_request(:get, endpoint)
           .to_return(status: 200, body: json_response, headers: {})
       end
 
@@ -316,7 +320,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the network request fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+          stub_request(:get, endpoint)
             .to_return(status: 500, body: '💥 Boom!', headers: {})
         end
 
@@ -327,7 +331,7 @@ RSpec.describe Growthbook::FeatureRepository do
 
       context 'when the parsing fails' do
         before do
-          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+          stub_request(:get, endpoint)
             .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
         end
 
