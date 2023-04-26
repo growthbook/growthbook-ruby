@@ -20,15 +20,4 @@ class FNV
 
     hash
   end
-
-  def fnv1a_64(data)
-    hash = INIT64
-
-    data.bytes.each do |byte|
-      hash = hash ^ byte
-      hash = (hash * PRIME64) % MOD64
-    end
-
-    hash
-  end
 end
