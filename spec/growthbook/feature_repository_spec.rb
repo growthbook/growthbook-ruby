@@ -101,11 +101,21 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       context 'when the network request fails' do
-        pending 'it returns nil'
+        before do
+          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+            .to_return(status: 500, body: '💥 Boom!', headers: {})
+        end
+
+        it { is_expected.to be_nil }
       end
 
       context 'when the parsing fails' do
-        pending 'it returns nil'
+        before do
+          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-acme-donuts')
+            .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
+        end
+
+        it { is_expected.to be_nil }
       end
     end
 
@@ -143,15 +153,36 @@ RSpec.describe Growthbook::FeatureRepository do
       end
 
       context 'when the network request fails' do
-        pending 'it returns nil'
-      end
+        before do
+          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+            .to_return(status: 500, body: '💥 Boom!', headers: {})
+        end
 
-      context 'when the decryption fails' do
-        pending 'it returns nil'
+        it { is_expected.to be_nil }
       end
 
       context 'when the parsing fails' do
-        pending 'it returns nil'
+        before do
+          stub_request(:get, 'https://cdn.growthbook.io/api/features/sdk-862b5mHcP9XPugqD')
+            .to_return(status: 200, body: '🤨 some unparsable response', headers: {})
+        end
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'when the decryption fails' do
+        let(:json_response) do
+          <<~JSON
+            {
+              "status": 200,
+              "features": {},
+              "dateUpdated": "2023-04-03T16:09:00.800Z",
+              "encryptedFeatures": "Utj/Xwn7YaTXX8vHosRFQg==.yYuNdFoTv1aebOyh_NOPE_NOPE_NOPE_4nSTMATKaT3mGwrzUUMrGg/3uJ0edpxRdoZcAD778+eDBlT9+i/wc+eMzBTK9KkEWSZG/hljlZjRP8zVbfggm/yy1E87xsGl1JnSkQ+iRyMTsrdEvvo2AkoQqFbmEOvOklcYAIZTMaYsgCOi+9BRbI1s6HLpI/kCE4kcuhePY0b20oWrpDL++wDQ=="
+            }
+          JSON
+        end
+
+        it { is_expected.to be_nil }
       end
     end
   end
