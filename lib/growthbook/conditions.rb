@@ -67,6 +67,8 @@ module Growthbook
     end
 
     def self.get_path(attributes, path)
+      path = path.to_s if path.is_a?(Symbol)
+
       parts = path.split('.')
       current = attributes
 
