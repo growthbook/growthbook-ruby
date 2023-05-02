@@ -124,7 +124,7 @@ module Growthbook
         next unless rule.experiment?
 
         exp = rule.to_experiment(key)
-        next if exp.nil? # TODO: Is this correct? exp is nillable
+        next if exp.nil?
 
         result = _run(exp, key)
 
