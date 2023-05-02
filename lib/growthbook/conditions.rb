@@ -23,9 +23,13 @@ module Growthbook
 
     # Helper function to ensure conditions only have string keys (no symbols)
     def self.parse_condition(condition)
-      return condition unless condition.is_a?(Hash)
-
-      condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+      case condition
+      when Array
+        return condition.map { |v| parse_condition(v) }
+      when Hash
+        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+      end
+      condition
     end
 
     def self.eval_or(attributes, conditions)
@@ -63,6 +67,8 @@ module Growthbook
     end
 
     def self.get_path(attributes, path)
+      path = path.to_s if path.is_a?(Symbol)
+
       parts = path.split('.')
       current = attributes
 
