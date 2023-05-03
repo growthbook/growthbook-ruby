@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fnv'
+require 'base64'
 require 'bigdecimal'
 require 'bigdecimal/util'
 
@@ -42,7 +42,7 @@ module Growthbook
       end
     end
 
-    # @return [String, nil] Hash, or nil if the hash version is invalid
+    # @return [Float, nil] Hash, or nil if the hash version is invalid
     def self.get_hash(seed:, value:, version:)
       return (FNV.new.fnv1a_32(value + seed) % 1000) / 1000.0 if version == 1
       return (FNV.new.fnv1a_32(FNV.new.fnv1a_32(seed + value).to_s) % 10_000) / 10_000.0 if version == 2
@@ -50,8 +50,12 @@ module Growthbook
       nil
     end
 
-    def self.in_namespace(hash_value, namespace)
+    def self.in_namespace?(hash_value, namespace)
+      return false if namespace.nil?
+
       n = get_hash(seed: "__#{namespace[0]}", value: hash_value, version: 1)
+      return false if n.nil?
+
       n >= namespace[1] && n < namespace[2]
     end
 
@@ -66,11 +70,11 @@ module Growthbook
     end
 
     # Determine bucket ranges for experiment variations
-    def self.get_bucket_ranges(num_variations, coverage = 1, weights = [])
+    def self.get_bucket_ranges(num_variations, coverage, weights)
       # Make sure coverage is within bounds
-      coverage = 1 if coverage.nil?
-      coverage = 0 if coverage.negative?
-      coverage = 1 if coverage > 1
+      coverage = 1.0 if coverage.nil?
+      coverage = 0.0 if coverage.negative?
+      coverage = 1.0 if coverage > 1
 
       # Default to equal weights
       weights = get_equal_weights(num_variations) if !weights || weights.length != num_variations
@@ -80,7 +84,7 @@ module Growthbook
       weights = get_equal_weights(num_variations) if total < 0.99 || total > 1.01
 
       # Convert weights to ranges
-      cumulative = 0
+      cumulative = 0.0
       ranges = []
       weights.each do |w|
         start = cumulative
@@ -103,13 +107,14 @@ module Growthbook
     # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
     def self.get_query_string_override(id, url, num_variations)
       # Skip if url is empty
-      return nil if url == ''
+      return nil if url == '' || id.nil?
 
       # Parse out the query string
       parsed = URI(url)
-      return nil unless parsed.query
+      parsed_query = parsed.query
+      return nil if parsed_query.nil?
 
-      qs = URI.decode_www_form(parsed.query)
+      qs = URI.decode_www_form(parsed_query)
 
       # Look for `id` in the querystring and get the value
       vals = qs.assoc(id)

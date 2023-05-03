@@ -85,7 +85,7 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        result = Growthbook::Util.in_namespace(
+        result = Growthbook::Util.in_namespace?(
           id,
           namespace
         )

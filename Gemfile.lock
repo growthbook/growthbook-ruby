@@ -2,14 +2,12 @@ PATH
   remote: .
   specs:
     growthbook (1.0.0)
-      fnv (~> 0.2.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.4.4)
     docile (1.4.0)
-    fnv (0.2.0)
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
@@ -34,6 +32,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-20
+  x86_64-darwin-21
   x86_64-linux
 
 DEPENDENCIES

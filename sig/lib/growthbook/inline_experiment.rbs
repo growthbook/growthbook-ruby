@@ -1,0 +1,60 @@
+module Growthbook
+  # Class for creating an inline experiment for evaluating
+  class InlineExperiment
+    # @return [String] The globally unique identifier for the experiment
+    attr_accessor key: String?
+
+    # @return [Array<String, Integer, Hash>] The different variations to choose between
+    attr_accessor variations: Array[untyped]
+
+    # @return [Array<Float>] How to weight traffic between variations. Must add to 1.
+    attr_accessor weights: Array[Float]?
+
+    # @return [true, false] If set to false, always return the control (first variation)
+    attr_accessor active: bool
+
+    # @return [Float] What percent of users should be included in the experiment (between 0 and 1, inclusive)
+    attr_accessor coverage: Float?
+
+    # @return [Array<Hash>] Array of ranges, one per variation
+    attr_accessor ranges: Array[[Float, Float]]?
+
+    # @return [Hash] Optional targeting condition
+    attr_accessor condition: Hash[String, untyped]?
+
+    # @return [String, Float, Float] Adds the experiment to a namespace
+    attr_accessor namespace: [String, Float, Float]?
+
+    # @return [integer, nil] All users included in the experiment will be forced into the specific variation index
+    attr_accessor force: untyped?
+
+    # @return [String] What user attribute should be used to assign variations (defaults to id)
+    attr_accessor hash_attribute: String?
+
+    # @return [Integer] The hash version to use (default to 1)
+    attr_accessor hash_version: Integer?
+
+    # @return [Array<Hash>] Meta info about the variations
+    attr_accessor meta: Array[{ passthrough: bool, key: String?, name: String? }]?
+
+    # @return [Array<Hash>] Array of filters to apply
+    attr_accessor filters: Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]?
+
+    # @return [String, nil] The hash seed to use
+    attr_accessor seed: String?
+
+    # @return [String] Human-readable name for the experiment
+    attr_accessor name: String?
+
+    # @return [String, nil] Id of the current experiment phase
+    attr_accessor phase: String?
+
+    def initialize: (?::Hash[untyped, untyped] options) -> void
+
+    def to_json: (*untyped _args) -> Hash[String, untyped]
+
+    private
+
+    def get_option: (untyped hash, untyped key, ?untyped? default) -> untyped
+  end
+end

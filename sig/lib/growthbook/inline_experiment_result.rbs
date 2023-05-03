@@ -1,0 +1,49 @@
+module Growthbook
+  # Result of running an experiment.
+  class InlineExperimentResult
+    # @return [Boolean] Whether or not the user is part of the experiment
+    attr_reader in_experiment: bool
+
+    # @return [Integer] The array index of the assigned variation
+    attr_reader variation_id: Integer
+
+    # @return [Any] The array value of the assigned variation
+    attr_reader value: untyped
+
+    # @return [Bool] If a hash was used to assign a variation
+    attr_reader hash_used: bool
+
+    # @return [String] The user attribute used to assign a variation
+    attr_reader hash_attribute: String
+
+    # @return [String] The value of that attribute
+    attr_reader hash_value: untyped
+
+    # @return [String, nil] The id of the feature (if any) that the experiment came from
+    attr_reader feature_id: String?
+
+    # @return [String] The unique key for the assigned variation
+    attr_reader key: String?
+
+    # @return [Float] The hash value used to assign a variation (float from 0 to 1)
+    attr_reader bucket: Float
+
+    # @return [String , nil] Human-readable name for the experiment
+    attr_reader name: String?
+
+    # @return [Boolean]  Used for holdout groups
+    attr_accessor passthrough: bool?
+
+    def initialize: (?::Hash[untyped, untyped] options) -> void
+
+    # If the variation was randomly assigned based on user attribute hashes
+    # @return [Bool]
+    def hash_used?: () -> bool
+
+    # Whether or not the user is in the experiment
+    # @return [Bool]
+    def in_experiment?: () -> bool
+
+    def to_json: (*untyped _args) -> Hash[String, untyped]
+  end
+end

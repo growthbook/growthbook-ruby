@@ -1,0 +1,73 @@
+module Growthbook
+  # Context object passed into the GrowthBook constructor.
+  class Context
+    # @return [true, false] Switch to globally disable all experiments. Default true.
+    attr_accessor enabled: bool
+
+    # @return [String] The URL of the current page
+    attr_accessor url: String?
+
+    # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
+    attr_accessor qa_mode: bool?
+
+    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
+    attr_accessor listener: Growthbook::TrackingCallback
+
+    # @return [Hash] Map of user attributes that are used to assign variations
+    attr_reader attributes: Hash[untyped, untyped]
+
+    # @return [Hash] Feature definitions (usually pulled from an API or cache)
+    attr_reader features: Hash[untyped, untyped]
+
+    # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
+    attr_reader forced_variations: Hash[String | Symbol, Integer]
+
+    attr_reader impressions: Hash[String, InlineExperimentResult]
+
+    attr_reader forced_features: Hash[String | Symbol, untyped]
+
+    def initialize: (?::Hash[untyped, untyped] options) -> void
+
+    def features=: (Hash[String | Symbol, untyped] features) -> void
+
+    def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
+
+    def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
+
+    def forced_features=: (Hash[String | Symbol, untyped] forced_features) -> Hash[String, untyped]
+
+    def eval_feature: (String | Symbol key) -> FeatureResult
+
+    def run: (InlineExperiment exp) -> InlineExperimentResult
+
+    def on?: (String | Symbol key) -> bool
+
+    def off?: (String | Symbol key) -> bool
+
+    def feature_value: (String | Symbol key, ?untyped? fallback) -> untyped
+
+    private
+
+    def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
+
+    def stringify_keys: (Hash[String | Symbol, untyped] hash) -> Hash[String, untyped]
+
+    def condition_passes?: (Hash[String, untyped]? condition) -> bool
+
+    def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult
+
+    def get_feature_result: (untyped, ::String, InlineExperiment?, InlineExperimentResult?) -> FeatureResult
+
+    def get_feature: (String | Symbol key) -> (Feature | nil)
+
+    def get_attribute: (String | Symbol key) -> (untyped | "")
+
+    def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void
+
+    def included_in_rollout?: (seed: String, hash_attribute: String, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
+
+    def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
+
+    def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
+  end
+end

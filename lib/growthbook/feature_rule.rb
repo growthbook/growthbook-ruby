@@ -98,7 +98,9 @@ module Growthbook
     end
 
     def experiment?
-      !!@variations
+      return false if @variations.nil?
+
+      !@variations&.empty?
     end
 
     def force?

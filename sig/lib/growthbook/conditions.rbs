@@ -1,0 +1,32 @@
+module Growthbook
+  # internal use only
+  # Utils for condition evaluation
+  class Conditions
+    # Evaluate a targeting conditions hash against an attributes hash
+    # Both attributes and conditions only have string keys (no symbols)
+    def self.eval_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition) -> bool
+
+    # Helper function to ensure conditions only have string keys (no symbols)
+    def self.parse_condition: (Hash[untyped, untyped] condition) -> (Hash[String, untyped])
+
+    def self.eval_or: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions) -> (bool)
+
+    def self.eval_and: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions) -> (bool)
+
+    def self.operator_object?: (Hash[String, untyped] obj) -> bool
+
+    def self.get_type: (untyped attribute_value) -> ("string" | "number" | "boolean" | "array" | "null" | "object")
+
+    def self.get_path: (Hash[String, untyped]? attributes, String path) -> (nil | untyped)
+
+    def self.eval_condition_value: (untyped condition_value, untyped attribute_value) -> bool
+
+    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value) -> bool
+
+    def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value) -> bool
+
+    # Sets $VERBOSE for the duration of the block and back to its original
+    # value afterwards. Used for testing invalid regexes.
+    def self.silence_warnings: () { () -> untyped } -> untyped
+  end
+end

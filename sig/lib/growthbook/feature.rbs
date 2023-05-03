@@ -1,0 +1,18 @@
+module Growthbook
+  # The feature with a generic value type.
+  class Feature
+    # @return [Any , nil]
+    attr_reader default_value: untyped
+
+    # @return [Array<Growthbook::FeatureRule>]
+    attr_reader rules: Array[FeatureRule]
+
+    def initialize: (Hash[untyped, untyped] feature) -> void
+
+    def to_json: (*untyped _args) -> Hash[String, untyped]
+
+    private
+
+    def get_option: (untyped hash, untyped key) -> (untyped | nil)
+  end
+end

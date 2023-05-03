@@ -29,7 +29,6 @@ module Growthbook
       when Hash
         return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
       end
-
       condition
     end
 
@@ -68,6 +67,8 @@ module Growthbook
     end
 
     def self.get_path(attributes, path)
+      path = path.to_s if path.is_a?(Symbol)
+
       parts = path.split('.')
       current = attributes
 

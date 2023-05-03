@@ -29,7 +29,10 @@ Metrics/MethodLength:
   Max: 60
 
 Layout/LineLength:
-  Max: 150
+  Max: 200
+
+Naming/VariableNumber:
+  Enabled: false
 
 Naming/MethodParameterName:
   MinNameLength: 2

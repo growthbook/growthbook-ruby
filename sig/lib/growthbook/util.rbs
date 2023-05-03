@@ -1,0 +1,25 @@
+module Growthbook
+  # internal use only
+  class Util
+    def self.check_rule: (String actual, String op, String desired) -> bool
+
+    # @return [Float, nil] Hash, or nil if the hash version is invalid
+    def self.get_hash: (seed: String, value: String, version: Integer) -> Float?
+
+    def self.in_namespace?: (String hash_value, ([String, Float, Float] | nil) namespace) -> bool
+
+    def self.get_equal_weights: (Integer num_variations) -> Array[Float]
+
+    # Determine bucket ranges for experiment variations
+    def self.get_bucket_ranges: (Integer num_variations, Float? coverage, Array[Float]? weights) -> Array[[Float, Float]]
+
+    # Chose a variation based on a hash and range
+    def self.choose_variation: (Float num, Array[[Float, Float]] ranges) -> Integer
+
+    # Get an override variation from a url querystring
+    # e.g. http://localhost?my-test=1 will return `1` for id `my-test`
+    def self.get_query_string_override: (String? id, String url, Integer num_variations) -> (nil | Integer)
+
+    def self.in_range?: (Float num, Array[Float] range) -> bool
+  end
+end

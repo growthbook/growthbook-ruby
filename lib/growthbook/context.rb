@@ -12,7 +12,7 @@ module Growthbook
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor :qa_mode
 
-    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
+    # @return [Growthbook::TrackingCallback] An object that responds to `on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`
     attr_accessor :listener
 
     # @return [Hash] Map of user attributes that are used to assign variations
@@ -24,7 +24,11 @@ module Growthbook
     # @return [Hash] Force specific experiments to always assign a specific variation (used for QA)
     attr_reader :forced_variations
 
-    attr_reader :impressions, :forced_features
+    # @return [Hash[String, Growthbook::InlineExperimentResult]] Tracked impressions
+    attr_reader :impressions
+
+    # @return [Hash[String, Any]] Forced feature values
+    attr_reader :forced_features
 
     def initialize(options = {})
       @features = {}
@@ -43,7 +47,7 @@ module Growthbook
         when :url
           @url = value
         when :decryption_key
-          break
+          nil
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
           self.features = decrypted unless decrypted.nil?
@@ -88,35 +92,40 @@ module Growthbook
 
     def eval_feature(key)
       # Forced in the context
-      return get_feature_result(@forced_features[key.to_s], 'override') if @forced_features.key?(key.to_s)
+      return get_feature_result(@forced_features[key.to_s], 'override', nil, nil) if @forced_features.key?(key.to_s)
 
       # Return if we can't find the feature definition
       feature = get_feature(key)
-      return get_feature_result(nil, 'unknownFeature') unless feature
+      return get_feature_result(nil, 'unknownFeature', nil, nil) unless feature
 
       feature.rules.each do |rule|
         # Targeting condition
-        next if rule.condition && !condition_passes(rule.condition)
+        next if rule.condition && !condition_passes?(rule.condition)
 
         # If there are filters for who is included (e.g. namespaces)
-        next if rule.filters && filtered_out?(rule.filters)
+        next if rule.filters && filtered_out?(rule.filters || [])
 
         # If this is a percentage rollout, skip if not included
         if rule.force?
           seed = rule.seed || key
           hash_attribute = rule.hash_attribute || 'id'
           included_in_rollout = included_in_rollout?(
-            seed: seed, hash_attribute: hash_attribute, range: rule.range,
-            coverage: rule.coverage, hash_version: rule.hash_version
+            seed: seed.to_s,
+            hash_attribute: hash_attribute,
+            range: rule.range,
+            coverage: rule.coverage,
+            hash_version: rule.hash_version
           )
           next unless included_in_rollout
 
-          return get_feature_result(rule.force, 'force')
+          return get_feature_result(rule.force, 'force', nil, nil)
         end
         # Experiment rule
         next unless rule.experiment?
 
         exp = rule.to_experiment(key)
+        next if exp.nil?
+
         result = _run(exp, key)
 
         next unless result.in_experiment && !result.passthrough
@@ -125,7 +134,7 @@ module Growthbook
       end
 
       # Fallback
-      get_feature_result(feature.default_value || nil, 'defaultValue')
+      get_feature_result(feature.default_value || nil, 'defaultValue', nil, nil)
     end
 
     def run(exp)
@@ -157,8 +166,9 @@ module Growthbook
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) unless @enabled
 
       # 3. If forced via URL querystring
-      if @url
-        qs_override = Util.get_query_string_override(key, @url, exp.variations.length)
+      override_url = @url
+      unless override_url.nil?
+        qs_override = Util.get_query_string_override(key, override_url, exp.variations.length)
         return get_experiment_result(exp, qs_override, hash_used: false, feature_id: feature_id) unless qs_override.nil?
       end
 
@@ -182,13 +192,13 @@ module Growthbook
 
       # 7. Exclude if user is filtered out (used to be called "namespace")
       if exp.filters
-        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters)
-      elsif exp.namespace && !Growthbook::Util.in_namespace(hash_value, exp.namespace)
+        return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters || [])
+      elsif exp.namespace && !Growthbook::Util.in_namespace?(hash_value, exp.namespace)
         return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id)
       end
 
       # 8. Exclude if condition is false
-      if exp.condition && !condition_passes(exp.condition)
+      if exp.condition && !condition_passes?(exp.condition)
         return get_experiment_result(
           exp,
           -1,
@@ -203,7 +213,8 @@ module Growthbook
         exp.coverage,
         exp.weights
       )
-      n = Growthbook::Util.get_hash(seed: exp.seed || key, value: hash_value, version: exp.hash_version || 1)
+      seed = exp.seed || key || ''
+      n = Growthbook::Util.get_hash(seed: seed, value: hash_value, version: exp.hash_version || 1)
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if n.nil?
 
       assigned = Growthbook::Util.choose_variation(n, ranges)
@@ -235,7 +246,9 @@ module Growthbook
       new_hash
     end
 
-    def condition_passes(condition)
+    def condition_passes?(condition)
+      return false if condition.nil?
+
       Growthbook::Conditions.eval_condition(@attributes, condition)
     end
 
@@ -251,9 +264,18 @@ module Growthbook
       meta = experiment.meta ? experiment.meta[variation_index] : {}
 
       result = Growthbook::InlineExperimentResult.new(
-        { key: meta['key'] || variation_index, in_experiment: in_experiment, variation_id: variation_index,
-          value: experiment.variations[variation_index], hash_used: hash_used, hash_attribute: hash_attribute,
-          hash_value: hash_value, feature_id: feature_id, bucket: bucket, name: meta['name'] }
+        {
+          key: meta['key'] || variation_index,
+          in_experiment: in_experiment,
+          variation_id: variation_index,
+          value: experiment.variations[variation_index],
+          hash_used: hash_used,
+          hash_attribute: hash_attribute,
+          hash_value: hash_value,
+          feature_id: feature_id,
+          bucket: bucket,
+          name: meta['name']
+        }
       )
 
       result.passthrough = true if meta['passthrough']
@@ -261,7 +283,7 @@ module Growthbook
       result
     end
 
-    def get_feature_result(value, source, experiment = nil, experiment_result = nil)
+    def get_feature_result(value, source, experiment, experiment_result)
       Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
     end
 
@@ -280,8 +302,10 @@ module Growthbook
     end
 
     def track_experiment(experiment, result)
+      return if listener.nil?
+
       @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
-      @impressions[experiment.key] = result
+      @impressions[experiment.key] = result unless experiment.key.nil?
     end
 
     def included_in_rollout?(seed:, hash_attribute:, hash_version:, range:, coverage:)
@@ -307,7 +331,7 @@ module Growthbook
         if hash_value.empty?
           false
         else
-          n = Growthbook::Util.get_hash(seed: filter['seed'], value: hash_value, version: filter['hashVersion'] || 2)
+          n = Growthbook::Util.get_hash(seed: filter['seed'] || '', value: hash_value, version: filter['hashVersion'] || 2)
 
           return true if n.nil?
 
@@ -318,6 +342,8 @@ module Growthbook
 
     def decrypted_features_from_options(options)
       decrypted_features = DecryptionUtil.decrypt(options[:encrypted_features], key: options[:decryption_key])
+
+      return nil if decrypted_features.nil?
 
       JSON.parse(decrypted_features)
     rescue StandardError
