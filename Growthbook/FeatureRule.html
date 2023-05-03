@@ -1908,13 +1908,17 @@
 
 100
 101
-102</pre>
+102
+103
+104</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiment?'>experiment?</span>
-  <span class='op'>!</span><span class='op'>!</span><span class='ivar'>@variations</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='ivar'>@variations</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='op'>!</span><span class='ivar'>@variations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_empty?'>empty?</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1958,12 +1962,12 @@
       <pre class="lines">
 
 
-104
-105
-106</pre>
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_force?'>force?</span>
   <span class='op'>!</span><span class='id identifier rubyid_experiment?'>experiment?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2072,8 +2076,6 @@
       <pre class="lines">
 
 
-108
-109
 110
 111
 112
@@ -2091,10 +2093,12 @@
 124
 125
 126
-127</pre>
+127
+128
+129</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_json'>to_json</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid__args'>_args</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -2126,7 +2130,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 26 16:54:40 2023 by
+  Generated on Wed May  3 19:45:30 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>

@@ -201,7 +201,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#forced_features-instance_method" title="#forced_features (instance method)">#<strong>forced_features</strong>  &#x21d2; Object </a>
+      <a href="#forced_features-instance_method" title="#forced_features (instance method)">#<strong>forced_features</strong>  &#x21d2; Hash[String, Any] </a>
     
 
     
@@ -219,7 +219,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute forced_features.</p>
+<p>Forced feature values.</p>
 </div></span>
   
 </li>
@@ -255,7 +255,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#impressions-instance_method" title="#impressions (instance method)">#<strong>impressions</strong>  &#x21d2; Object </a>
+      <a href="#impressions-instance_method" title="#impressions (instance method)">#<strong>impressions</strong>  &#x21d2; Hash[String, Growthbook::InlineExperimentResult] </a>
     
 
     
@@ -275,7 +275,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Returns the value of attribute impressions.</p>
+<p>Tracked impressions.</p>
 </div></span>
   
 </li>
@@ -284,7 +284,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#listener-instance_method" title="#listener (instance method)">#<strong>listener</strong>  &#x21d2; Listener </a>
+      <a href="#listener-instance_method" title="#listener (instance method)">#<strong>listener</strong>  &#x21d2; Growthbook::TrackingCallback </a>
     
 
     
@@ -302,7 +302,7 @@
 
   
     <span class="summary_desc"><div class='inline'>
-<p>An object that responds to some tracking methods that take experiment and result as arguments.</p>
+<p>An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`.</p>
 </div></span>
   
 </li>
@@ -543,10 +543,6 @@
       <pre class="lines">
 
 
-29
-30
-31
-32
 33
 34
 35
@@ -578,10 +574,14 @@
 61
 62
 63
-64</pre>
+64
+65
+66
+67
+68</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -600,7 +600,7 @@
     <span class='kw'>when</span> <span class='symbol'>:url</span>
       <span class='ivar'>@url</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
     <span class='kw'>when</span> <span class='symbol'>:decryption_key</span>
-      <span class='kw'>break</span>
+      <span class='kw'>nil</span>
     <span class='kw'>when</span> <span class='symbol'>:encrypted_features</span>
       <span class='id identifier rubyid_decrypted'>decrypted</span> <span class='op'>=</span> <span class='id identifier rubyid_decrypted_features_from_options'>decrypted_features_from_options</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
       <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_features'>features</span> <span class='op'>=</span> <span class='id identifier rubyid_decrypted'>decrypted</span> <span class='kw'>unless</span> <span class='id identifier rubyid_decrypted'>decrypted</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -817,7 +817,7 @@
       <div class="method_details ">
   <h3 class="signature " id="forced_features-instance_method">
   
-    #<strong>forced_features</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>forced_features</strong>  &#x21d2; <tt>Hash[String, Any]</tt> 
   
 
   
@@ -826,13 +826,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute forced_features.</p>
+<p>Returns Forced feature values.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash[String, Any]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Forced feature values</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -840,12 +858,12 @@
       <pre class="lines">
 
 
-27
-28
-29</pre>
+31
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_forced_features'>forced_features</span>
   <span class='ivar'>@forced_features</span>
@@ -921,7 +939,7 @@
       <div class="method_details ">
   <h3 class="signature " id="impressions-instance_method">
   
-    #<strong>impressions</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>impressions</strong>  &#x21d2; <tt>Hash[String, <span class='object_link'><a href="InlineExperimentResult.html" title="Growthbook::InlineExperimentResult (class)">Growthbook::InlineExperimentResult</a></span>]</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -930,13 +948,31 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns the value of attribute impressions.</p>
+<p>Returns Tracked impressions.</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash[String, <span class='object_link'><a href="InlineExperimentResult.html" title="Growthbook::InlineExperimentResult (class)">Growthbook::InlineExperimentResult</a></span>]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Tracked impressions</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -944,12 +980,12 @@
       <pre class="lines">
 
 
-27
 28
-29</pre>
+29
+30</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 27</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_impressions'>impressions</span>
   <span class='ivar'>@impressions</span>
@@ -964,7 +1000,7 @@
       <div class="method_details ">
   <h3 class="signature " id="listener-instance_method">
   
-    #<strong>listener</strong>  &#x21d2; <tt>Listener</tt> 
+    #<strong>listener</strong>  &#x21d2; <tt><span class='object_link'><a href="TrackingCallback.html" title="Growthbook::TrackingCallback (class)">Growthbook::TrackingCallback</a></span></tt> 
   
 
   
@@ -973,7 +1009,7 @@
 </h3><div class="docstring">
   <div class="discussion">
     
-<p>Returns An object that responds to some tracking methods that take experiment and result as arguments.</p>
+<p>Returns An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`.</p>
 
 
   </div>
@@ -986,13 +1022,13 @@
     <li>
       
       
-        <span class='type'>(<tt>Listener</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="TrackingCallback.html" title="Growthbook::TrackingCallback (class)">Growthbook::TrackingCallback</a></span></tt>)</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>An object that responds to some tracking methods that take experiment and result as arguments.</p>
+<p>An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`</p>
 </div>
       
     </li>
@@ -1164,10 +1200,6 @@
       <pre class="lines">
 
 
-89
-90
-91
-92
 93
 94
 95
@@ -1204,42 +1236,56 @@
 126
 127
 128
-129</pre>
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 93</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='comment'># Forced in the context
-</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='ivar'>@forced_features</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>override</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@forced_features</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+</span>  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='ivar'>@forced_features</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>override</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@forced_features</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
 
   <span class='comment'># Return if we can&#39;t find the feature definition
 </span>  <span class='id identifier rubyid_feature'>feature</span> <span class='op'>=</span> <span class='id identifier rubyid_get_feature'>get_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unknownFeature</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_feature'>feature</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unknownFeature</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_feature'>feature</span>
 
   <span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_rules'>rules</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_rule'>rule</span><span class='op'>|</span>
     <span class='comment'># Targeting condition
-</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_condition_passes'>condition_passes</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span>
+</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_condition_passes?'>condition_passes?</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span>
 
     <span class='comment'># If there are filters for who is included (e.g. namespaces)
-</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_filters'>filters</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_filtered_out?'>filtered_out?</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_filters'>filters</span><span class='rparen'>)</span>
+</span>    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_filters'>filters</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_filtered_out?'>filtered_out?</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_filters'>filters</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 
     <span class='comment'># If this is a percentage rollout, skip if not included
 </span>    <span class='kw'>if</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force?'>force?</span>
       <span class='id identifier rubyid_seed'>seed</span> <span class='op'>=</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_seed'>seed</span> <span class='op'>||</span> <span class='id identifier rubyid_key'>key</span>
       <span class='id identifier rubyid_hash_attribute'>hash_attribute</span> <span class='op'>=</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_hash_attribute'>hash_attribute</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>id</span><span class='tstring_end'>&#39;</span></span>
       <span class='id identifier rubyid_included_in_rollout'>included_in_rollout</span> <span class='op'>=</span> <span class='id identifier rubyid_included_in_rollout?'>included_in_rollout?</span><span class='lparen'>(</span>
-        <span class='label'>seed:</span> <span class='id identifier rubyid_seed'>seed</span><span class='comma'>,</span> <span class='label'>hash_attribute:</span> <span class='id identifier rubyid_hash_attribute'>hash_attribute</span><span class='comma'>,</span> <span class='label'>range:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
-        <span class='label'>coverage:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_coverage'>coverage</span><span class='comma'>,</span> <span class='label'>hash_version:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_hash_version'>hash_version</span>
+        <span class='label'>seed:</span> <span class='id identifier rubyid_seed'>seed</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+        <span class='label'>hash_attribute:</span> <span class='id identifier rubyid_hash_attribute'>hash_attribute</span><span class='comma'>,</span>
+        <span class='label'>range:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
+        <span class='label'>coverage:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_coverage'>coverage</span><span class='comma'>,</span>
+        <span class='label'>hash_version:</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_hash_version'>hash_version</span>
       <span class='rparen'>)</span>
       <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_included_in_rollout'>included_in_rollout</span>
 
-      <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>force</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+      <span class='kw'>return</span> <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_force'>force</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>force</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
     <span class='kw'>end</span>
     <span class='comment'># Experiment rule
 </span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_experiment?'>experiment?</span>
 
     <span class='id identifier rubyid_exp'>exp</span> <span class='op'>=</span> <span class='id identifier rubyid_rule'>rule</span><span class='period'>.</span><span class='id identifier rubyid_to_experiment'>to_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_exp'>exp</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
     <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
 
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_in_experiment'>in_experiment</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_passthrough'>passthrough</span>
@@ -1248,7 +1294,7 @@
   <span class='kw'>end</span>
 
   <span class='comment'># Fallback
-</span>  <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span> <span class='op'>||</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defaultValue</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span> <span class='op'>||</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defaultValue</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1270,13 +1316,13 @@
       <pre class="lines">
 
 
-143
-144
-145
-146</pre>
+152
+153
+154
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 143</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 152</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_feature_value'>feature_value</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback'>fallback</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
@@ -1324,12 +1370,12 @@
       <pre class="lines">
 
 
-139
-140
-141</pre>
+148
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_off?'>off?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_off'>off</span>
@@ -1376,12 +1422,12 @@
       <pre class="lines">
 
 
-135
-136
-137</pre>
+144
+145
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 135</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 144</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on?'>on?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span>
@@ -1406,12 +1452,12 @@
       <pre class="lines">
 
 
-131
-132
-133</pre>
+140
+141
+142</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 131</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 140</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
@@ -1426,7 +1472,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed Apr 26 16:54:40 2023 by
+  Generated on Wed May  3 19:45:29 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
