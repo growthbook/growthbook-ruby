@@ -70,6 +70,8 @@ module Growthbook
     def features=(features)
       @features = {}
 
+      return if features.nil?
+
       features.each do |k, v|
         # Convert to a Feature object if it's not already
         v = Growthbook::Feature.new(v) unless v.is_a? Growthbook::Feature

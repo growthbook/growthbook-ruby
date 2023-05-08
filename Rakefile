@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Running `rake` runs all specified tasks in the list
+task default: %i[test type_check lint_fix doc]
+
 task :test do
   sh 'bundle', 'exec', 'rspec'
 end
