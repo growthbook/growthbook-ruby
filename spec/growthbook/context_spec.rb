@@ -43,9 +43,9 @@ describe Growthbook::Context do
     it '.feature_value' do
       expect(gb.feature_value(:feature1)).to eq(1)
       expect(gb.feature_value(:feature2)).to eq(0)
-      expect(gb.feature_value(:feature3)).to eq(true)
-      expect(gb.feature_value(:feature4)).to eq(false)
-      expect(gb.feature_value(:feature5)).to eq(nil)
+      expect(gb.feature_value(:feature3)).to be(true)
+      expect(gb.feature_value(:feature4)).to be(false)
+      expect(gb.feature_value(:feature5)).to be_nil
     end
   end
 
