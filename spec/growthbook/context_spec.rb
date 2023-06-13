@@ -13,23 +13,39 @@ describe Growthbook::Context do
         },
         feature2: {
           defaultValue: 0
-        }
+        },
+        feature3: {
+          defaultValue: true
+        },
+        feature4: {
+          defaultValue: false
+        },
+        feature5: {}
       }
     )
 
     it '.on?' do
       expect(gb.on?(:feature1)).to be(true)
       expect(gb.on?(:feature2)).to be(false)
+      expect(gb.on?(:feature3)).to be(true)
+      expect(gb.on?(:feature4)).to be(false)
+      expect(gb.on?(:feature5)).to be(false)
     end
 
     it '.off?' do
       expect(gb.off?(:feature1)).to be(false)
       expect(gb.off?(:feature2)).to be(true)
+      expect(gb.off?(:feature3)).to be(false)
+      expect(gb.off?(:feature4)).to be(true)
+      expect(gb.off?(:feature5)).to be(true)
     end
 
     it '.feature_value' do
       expect(gb.feature_value(:feature1)).to eq(1)
       expect(gb.feature_value(:feature2)).to eq(0)
+      expect(gb.feature_value(:feature3)).to eq(true)
+      expect(gb.feature_value(:feature4)).to eq(false)
+      expect(gb.feature_value(:feature5)).to eq(nil)
     end
   end
 
