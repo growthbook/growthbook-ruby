@@ -136,7 +136,7 @@ module Growthbook
       end
 
       # Fallback
-      get_feature_result(feature.default_value || nil, 'defaultValue', nil, nil)
+      get_feature_result(feature.default_value.nil? ? nil : feature.default_value, 'defaultValue', nil, nil)
     end
 
     def run(exp)
