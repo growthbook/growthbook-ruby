@@ -1294,7 +1294,7 @@
   <span class='kw'>end</span>
 
   <span class='comment'># Fallback
-</span>  <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span> <span class='op'>||</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defaultValue</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+</span>  <span class='id identifier rubyid_get_feature_result'>get_feature_result</span><span class='lparen'>(</span><span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_feature'>feature</span><span class='period'>.</span><span class='id identifier rubyid_default_value'>default_value</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defaultValue</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1472,7 +1472,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon May  8 18:22:11 2023 by
+  Generated on Thu Jun 15 16:00:44 2023 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.34 (ruby-3.2.2).
 </div>
