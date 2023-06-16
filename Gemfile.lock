@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    growthbook (1.0.0)
+    growthbook (1.1.0)
 
 GEM
   remote: https://rubygems.org/
