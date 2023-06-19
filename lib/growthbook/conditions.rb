@@ -126,9 +126,11 @@ module Growthbook
           false
         end
       when '$in'
-        condition_value.include? attribute_value
+        return false unless condition_value.is_a?(Array)
+        is_in?(attribute_value, condition_value)
       when '$nin'
-        !(condition_value.include? attribute_value)
+        return false unless condition_value.is_a?(Array)
+        !is_in?(attribute_value, condition_value)
       when '$elemMatch'
         elem_match(condition_value, attribute_value)
       when '$size'
@@ -160,6 +162,12 @@ module Growthbook
       else
         false
       end
+    end
+
+    def self.is_in?(actual, expected)
+      return expected.include?(actual) unless actual.is_a? Array
+        
+      (actual & expected).any?
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original
