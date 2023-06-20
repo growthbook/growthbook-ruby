@@ -1,0 +1,20 @@
+name: Publish to RubyGems
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+      - name: Publish gem
+        uses: dawidd6/action-publish-gem@v1
+        with:
+          # Optional, will publish to RubyGems if specified
+          api_key: ${{secrets.RUBY_GEMS_KEY}}
+          # Optional, will publish to GitHub Packages if specified
+          github_token: ${{secrets.GITHUB_TOKEN}}
