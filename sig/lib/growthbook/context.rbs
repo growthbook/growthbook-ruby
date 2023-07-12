@@ -13,6 +13,9 @@ module Growthbook
     # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
     attr_accessor listener: Growthbook::TrackingCallback
 
+    # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
+    attr_accessor feature_usage_callback: FeatureUsageCallback
+
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader attributes: Hash[untyped, untyped]
 
@@ -56,7 +59,7 @@ module Growthbook
 
     def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult
 
-    def get_feature_result: (untyped, ::String, InlineExperiment?, InlineExperimentResult?) -> FeatureResult
+    def get_feature_result: (String, untyped, ::String, InlineExperiment?, InlineExperimentResult?) -> FeatureResult
 
     def get_feature: (String | Symbol key) -> (Feature | nil)
 
@@ -69,5 +72,7 @@ module Growthbook
     def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
 
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
+
+    def track_feature_usage: (String, FeatureResult) -> void
   end
 end
