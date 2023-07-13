@@ -16,7 +16,7 @@ module Growthbook
     attr_accessor :listener
 
     # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
-    attr_accessor :feature_usage_callback
+    attr_accessor :on_feature_usage
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader :attributes
@@ -64,8 +64,8 @@ module Growthbook
           @qa_mode = value
         when :listener
           @listener = value
-        when :feature_usage_callback
-          @feature_usage_callback = value
+        when :on_feature_usage
+          @on_feature_usage = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -301,7 +301,7 @@ module Growthbook
     def track_feature_usage(key, feature_result)
       return if feature_result.source == 'override'
 
-      feature_usage_callback.on_feature_usage(key, feature_result) if feature_usage_callback.respond_to?(:on_feature_usage)
+      on_feature_usage.on_feature_usage(key, feature_result) if on_feature_usage.respond_to?(:on_feature_usage)
     end
 
     def get_feature(key)

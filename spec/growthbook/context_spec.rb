@@ -75,10 +75,10 @@ describe Growthbook::Context do
   end
 
   describe 'feature usage callback' do
-    let(:feature_usage_callback) { double }
+    let(:on_feature_usage) { double }
 
     before do
-      allow(feature_usage_callback).to receive(:on_feature_usage)
+      allow(on_feature_usage).to receive(:on_feature_usage)
     end
 
     it 'is called when a feature value is evaluated' do
@@ -104,12 +104,12 @@ describe Growthbook::Context do
             ]
           }
         },
-        feature_usage_callback: feature_usage_callback
+        on_feature_usage: on_feature_usage
       )
 
       gb.on?(:feature1)
 
-      expect(feature_usage_callback).to have_received(:on_feature_usage).with(
+      expect(on_feature_usage).to have_received(:on_feature_usage).with(
         'feature1',
         an_instance_of(Growthbook::FeatureResult)
       ) do |_key, feature_result|

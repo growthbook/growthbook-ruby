@@ -14,7 +14,7 @@ module Growthbook
     attr_accessor listener: Growthbook::TrackingCallback
 
     # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
-    attr_accessor feature_usage_callback: FeatureUsageCallback
+    attr_accessor on_feature_usage: FeatureUsageCallback
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader attributes: Hash[untyped, untyped]
