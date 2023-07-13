@@ -299,9 +299,10 @@ module Growthbook
     end
 
     def track_feature_usage(key, feature_result)
+      return unless on_feature_usage.respond_to?(:on_feature_usage)
       return if feature_result.source == 'override'
 
-      on_feature_usage.on_feature_usage(key, feature_result) if on_feature_usage.respond_to?(:on_feature_usage)
+      on_feature_usage.on_feature_usage(key, feature_result)
     end
 
     def get_feature(key)

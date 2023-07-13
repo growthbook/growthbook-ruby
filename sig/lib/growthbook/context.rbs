@@ -10,11 +10,11 @@ module Growthbook
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor qa_mode: bool?
 
-    # @return [Listener] An object that responds to some tracking methods that take experiment and result as arguments.
-    attr_accessor listener: Growthbook::TrackingCallback
+    # @return [Growthbook::TrackingCallback?] An object that responds to some tracking methods that take experiment and result as arguments.
+    attr_accessor listener: Growthbook::TrackingCallback?
 
-    # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
-    attr_accessor on_feature_usage: FeatureUsageCallback
+    # @return [Growthbook::FeatureUsageCallback?] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
+    attr_accessor on_feature_usage: FeatureUsageCallback?
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader attributes: Hash[untyped, untyped]
