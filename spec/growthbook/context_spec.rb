@@ -81,7 +81,7 @@ describe Growthbook::Context do
       allow(feature_usage_callback).to receive(:on_feature_usage)
     end
 
-    it 'should be called when a feature value is evaluated' do
+    it 'is called when a feature value is evaluated' do
       gb = described_class.new(
         attributes: {
           id: '123'
@@ -104,7 +104,7 @@ describe Growthbook::Context do
             ]
           }
         },
-        feature_usage_callback: feature_usage_callback,
+        feature_usage_callback: feature_usage_callback
       )
 
       gb.on?(:feature1)
@@ -114,25 +114,25 @@ describe Growthbook::Context do
         an_instance_of(Growthbook::FeatureResult)
       ) do |_key, feature_result|
         expect(feature_result.to_json).to eq(
-          {"on"=>true,
-            "off"=>false,
-            "value"=>2,
-            "source"=>"experiment",
-            "experiment"=>{
-              "key"=>"feature1",
-              "variations"=>[2, 3]},
-            "experimentResult"=>{
-              "inExperiment"=>true,
-              "variationId"=>0,
-              "value"=>2,
-              "hashUsed"=>true,
-              "hashAttribute"=>"id",
-              "hashValue"=>"123",
-              "featureId"=>"feature1",
-              "key"=>"0",
-              "bucket"=>0.154
-            }
-          }
+          { 'on'               => true,
+            'off'              => false,
+            'value'            => 2,
+            'source'           => 'experiment',
+            'experiment'       => {
+              'key'        => 'feature1',
+              'variations' => [2, 3]
+            },
+            'experimentResult' => {
+              'inExperiment'  => true,
+              'variationId'   => 0,
+              'value'         => 2,
+              'hashUsed'      => true,
+              'hashAttribute' => 'id',
+              'hashValue'     => '123',
+              'featureId'     => 'feature1',
+              'key'           => '0',
+              'bucket'        => 0.154
+            } }
         )
       end
     end
