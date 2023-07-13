@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name          = 'growthbook'
-  s.version       = '1.1.1'
+  s.version       = '1.2.0'
   s.summary       = 'GrowthBook SDK for Ruby'
   s.description   = 'Official GrowthBook SDK for Ruby'
   s.authors       = ['GrowthBook']
