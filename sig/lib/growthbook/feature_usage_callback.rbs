@@ -1,0 +1,5 @@
+module Growthbook
+  class FeatureUsageCallback
+    def on_feature_usage: (String _feature_key, FeatureResult _result) -> void
+  end
+end

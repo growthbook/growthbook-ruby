@@ -15,6 +15,9 @@ module Growthbook
     # @return [Growthbook::TrackingCallback] An object that responds to `on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`
     attr_accessor :listener
 
+    # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
+    attr_accessor :on_feature_usage
+
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader :attributes
 
@@ -61,6 +64,8 @@ module Growthbook
           @qa_mode = value
         when :listener
           @listener = value
+        when :on_feature_usage
+          @on_feature_usage = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -94,11 +99,11 @@ module Growthbook
 
     def eval_feature(key)
       # Forced in the context
-      return get_feature_result(@forced_features[key.to_s], 'override', nil, nil) if @forced_features.key?(key.to_s)
+      return get_feature_result(key.to_s, @forced_features[key.to_s], 'override', nil, nil) if @forced_features.key?(key.to_s)
 
       # Return if we can't find the feature definition
       feature = get_feature(key)
-      return get_feature_result(nil, 'unknownFeature', nil, nil) unless feature
+      return get_feature_result(key.to_s, nil, 'unknownFeature', nil, nil) unless feature
 
       feature.rules.each do |rule|
         # Targeting condition
@@ -120,7 +125,7 @@ module Growthbook
           )
           next unless included_in_rollout
 
-          return get_feature_result(rule.force, 'force', nil, nil)
+          return get_feature_result(key.to_s, rule.force, 'force', nil, nil)
         end
         # Experiment rule
         next unless rule.experiment?
@@ -132,11 +137,11 @@ module Growthbook
 
         next unless result.in_experiment && !result.passthrough
 
-        return get_feature_result(result.value, 'experiment', exp, result)
+        return get_feature_result(key.to_s, result.value, 'experiment', exp, result)
       end
 
       # Fallback
-      get_feature_result(feature.default_value.nil? ? nil : feature.default_value, 'defaultValue', nil, nil)
+      get_feature_result(key.to_s, feature.default_value.nil? ? nil : feature.default_value, 'defaultValue', nil, nil)
     end
 
     def run(exp)
@@ -285,8 +290,19 @@ module Growthbook
       result
     end
 
-    def get_feature_result(value, source, experiment, experiment_result)
-      Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    def get_feature_result(key, value, source, experiment, experiment_result)
+      res = Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+
+      track_feature_usage(key, res)
+
+      res
+    end
+
+    def track_feature_usage(key, feature_result)
+      return unless on_feature_usage.respond_to?(:on_feature_usage)
+      return if feature_result.source == 'override'
+
+      on_feature_usage.on_feature_usage(key, feature_result)
     end
 
     def get_feature(key)

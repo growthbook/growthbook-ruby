@@ -9,6 +9,9 @@ AllCops:
 Lint:
   Severity: error
 
+Metrics/BlockLength:
+  Max: 40
+
 Metrics/CyclomaticComplexity:
   Max: 25
 
