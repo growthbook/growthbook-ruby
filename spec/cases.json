@@ -1,5 +1,5 @@
 {
-  "specVersion": "0.4.2",
+  "specVersion": "0.4.1",
   "evalCondition": [
     [
       "$not - pass",
@@ -312,78 +312,6 @@
       false
     ],
     [
-      "$in - not array",
-      {
-        "num": {
-          "$in": 1
-        }
-      },
-      {
-        "num": 1
-      },
-      false
-    ],
-    [
-      "$in - array pass 1",
-      {
-        "tags": {
-          "$in": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "e", "a"]
-      },
-      true
-    ],
-    [
-      "$in - array pass 2",
-      {
-        "tags": {
-          "$in": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "b", "f"]
-      },
-      true
-    ],
-    [
-      "$in - array pass 3",
-      {
-        "tags": {
-          "$in": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "b", "a"]
-      },
-      true
-    ],
-    [
-      "$in - array fail 1",
-      {
-        "tags": {
-          "$in": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "e", "f"]
-      },
-      false
-    ],
-    [
-      "$in - array fail 2",
-      {
-        "tags": {
-          "$in": ["a", "b"]
-        }
-      },
-      {
-        "tags": []
-      },
-      false
-    ],
-    [
       "$nin - pass",
       {
         "num": {
@@ -406,78 +334,6 @@
         "num": 2
       },
       false
-    ],
-    [
-      "$nin - not array",
-      {
-        "num": {
-          "$nin": 1
-        }
-      },
-      {
-        "num": 1
-      },
-      false
-    ],
-    [
-      "$nin - array fail 1",
-      {
-        "tags": {
-          "$nin": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "e", "a"]
-      },
-      false
-    ],
-    [
-      "$nin - array fail 2",
-      {
-        "tags": {
-          "$nin": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "b", "f"]
-      },
-      false
-    ],
-    [
-      "$nin - array fail 3",
-      {
-        "tags": {
-          "$nin": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "b", "a"]
-      },
-      false
-    ],
-    [
-      "$nin - array pass 1",
-      {
-        "tags": {
-          "$nin": ["a", "b"]
-        }
-      },
-      {
-        "tags": ["d", "e", "f"]
-      },
-      true
-    ],
-    [
-      "$nin - array pass 2",
-      {
-        "tags": {
-          "$nin": ["a", "b"]
-        }
-      },
-      {
-        "tags": []
-      },
-      true
     ],
     [
       "$elemMatch - pass - flat arrays",
@@ -1116,34 +972,6 @@
       false
     ],
     [
-      "$elemMatch intersection - pass",
-      {
-        "tags": {
-          "$elemMatch": {
-            "$in": ["a", "b"]
-          }
-        }
-      },
-      {
-        "tags": ["d", "e", "b"]
-      },
-      true
-    ],
-    [
-      "$elemMatch intersection - fail",
-      {
-        "tags": {
-          "$elemMatch": {
-            "$in": ["a", "b"]
-          }
-        }
-      },
-      {
-        "tags": ["d", "e", "f"]
-      },
-      false
-    ],
-    [
       "$elemMatch not contains - pass",
       {
         "tags": {
@@ -1484,54 +1312,6 @@
       },
       {
         "tags": "hello world"
-      },
-      false
-    ],
-    [
-      "null condition - null attribute",
-      {
-        "userId": null
-      },
-      {
-        "userId": null
-      },
-      true
-    ],
-    [
-      "null condition - missing attribute",
-      {
-        "userId": null
-      },
-      {},
-      true
-    ],
-    [
-      "null condition - string attribute",
-      {
-        "userId": null
-      },
-      {
-        "userId": "123"
-      },
-      false
-    ],
-    [
-      "null condition - zero attribute",
-      {
-        "userId": null
-      },
-      {
-        "userId": 0
-      },
-      false
-    ],
-    [
-      "null condition - empty string attribute",
-      {
-        "userId": null
-      },
-      {
-        "userId": ""
       },
       false
     ]
