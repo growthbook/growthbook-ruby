@@ -185,9 +185,9 @@ module Growthbook
       # "~" is the largest ASCII character, so this will make "1.0.0" greater than "1.0.0-beta" for example
       parts << "~" if(parts.length == 3)
 
-      # Left pad each numeric part with 0s so string comparisons will work ("9">"10", but "09"<"10")
+      # Left pad each numeric part with spaces so string comparisons will work ("9">"10", but " 9"<"10")
       parts.map do |part|
-        part.match(/^[0-9]+$/) ? part.rjust(5, "0") : part
+        part.match(/^[0-9]+$/) ? part.rjust(5, " ") : part
       end.join("-")
     end
 
