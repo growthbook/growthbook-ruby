@@ -104,6 +104,18 @@ module Growthbook
       false
     end
 
+    def self.compare(val1, val2)
+      if val1.is_a?(Numeric) || val2.is_a?(Numeric)
+        val1 = val1.is_a?(Numeric) ? val1 : val1.to_f
+        val2 = val2.is_a?(Numeric) ? val2 : val2.to_f
+      end
+
+      return 1 if val1 > val2
+      return -1 if val1 < val2
+
+      0
+    end
+
     def self.eval_operator_condition(operator, attribute_value, condition_value)
       case operator
       when '$veq'
@@ -119,17 +131,41 @@ module Growthbook
       when '$vlte'
         padded_version_string(attribute_value) <= padded_version_string(condition_value)
       when '$eq'
-        attribute_value == condition_value
+        begin
+          compare(attribute_value, condition_value).zero?
+        rescue StandardError
+          false
+        end
       when '$ne'
-        attribute_value != condition_value
+        begin
+          compare(attribute_value, condition_value) != 0
+        rescue StandardError
+          false
+        end
       when '$lt'
-        attribute_value < condition_value
+        begin
+          compare(attribute_value, condition_value).negative?
+        rescue StandardError
+          false
+        end
       when '$lte'
-        attribute_value <= condition_value
+        begin
+          compare(attribute_value, condition_value) <= 0
+        rescue StandardError
+          false
+        end
       when '$gt'
-        attribute_value > condition_value
+        begin
+          compare(attribute_value, condition_value).positive?
+        rescue StandardError
+          false
+        end
       when '$gte'
-        attribute_value >= condition_value
+        begin
+          compare(attribute_value, condition_value) >= 0
+        rescue StandardError
+          false
+        end
       when '$regex'
         silence_warnings do
           re = Regexp.new(condition_value)
@@ -138,8 +174,12 @@ module Growthbook
           false
         end
       when '$in'
+        return false unless condition_value.is_a?(Array)
+
         in?(attribute_value, condition_value)
       when '$nin'
+        return false unless condition_value.is_a?(Array)
+
         !in?(attribute_value, condition_value)
       when '$elemMatch'
         elem_match(condition_value, attribute_value)
@@ -178,21 +218,20 @@ module Growthbook
       # Remove build info and leading `v` if any
       # Split version into parts (both core version numbers and pre-release tags)
       # "v1.2.3-rc.1+build123" -> ["1","2","3","rc","1"]
-      parts = input.gsub(/(^v|\+.*$)/, "").split(/[-.]/)
+      parts = input.gsub(/(^v|\+.*$)/, '').split(/[-.]/)
 
       # If it's SemVer without a pre-release, add `~` to the end
       # ["1","0","0"] -> ["1","0","0","~"]
       # "~" is the largest ASCII character, so this will make "1.0.0" greater than "1.0.0-beta" for example
-      parts << "~" if(parts.length == 3)
+      parts << '~' if parts.length == 3
 
       # Left pad each numeric part with spaces so string comparisons will work ("9">"10", but " 9"<"10")
       parts.map do |part|
-        part.match(/^[0-9]+$/) ? part.rjust(5, " ") : part
-      end.join("-")
+        /^[0-9]+$/.match?(part) ? part.rjust(5, ' ') : part
+      end.join('-')
     end
 
     def self.in?(actual, expected)
-      return false unless expected.is_a?(Array)
       return expected.include?(actual) unless actual.is_a?(Array)
 
       (actual & expected).any?

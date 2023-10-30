@@ -329,7 +329,7 @@ module Growthbook
     def included_in_rollout?(seed:, hash_attribute:, hash_version:, range:, coverage:)
       return true if range.nil? && coverage.nil?
 
-      hash_value = get_attribute(hash_attribute)
+      hash_value = get_attribute(hash_attribute).to_s
 
       return false if hash_value.empty?
 
@@ -344,7 +344,7 @@ module Growthbook
 
     def filtered_out?(filters)
       filters.any? do |filter|
-        hash_value = get_attribute(filter['attribute'] || 'id')
+        hash_value = get_attribute(filter['attribute'] || 'id').to_s
 
         if hash_value.empty?
           false
