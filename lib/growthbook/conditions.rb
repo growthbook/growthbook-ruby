@@ -106,6 +106,18 @@ module Growthbook
 
     def self.eval_operator_condition(operator, attribute_value, condition_value)
       case operator
+      when '$veq'
+        padded_version_string(attribute_value) == padded_version_string(condition_value)
+      when '$vne'
+        padded_version_string(attribute_value) != padded_version_string(condition_value)
+      when '$vgt'
+        padded_version_string(attribute_value) > padded_version_string(condition_value)
+      when '$vgte'
+        padded_version_string(attribute_value) >= padded_version_string(condition_value)
+      when '$vlt'
+        padded_version_string(attribute_value) < padded_version_string(condition_value)
+      when '$vlte'
+        padded_version_string(attribute_value) <= padded_version_string(condition_value)
       when '$eq'
         attribute_value == condition_value
       when '$ne'
@@ -160,6 +172,23 @@ module Growthbook
       else
         false
       end
+    end
+
+    def self.padded_version_string(input)
+      # Remove build info and leading `v` if any
+      # Split version into parts (both core version numbers and pre-release tags)
+      # "v1.2.3-rc.1+build123" -> ["1","2","3","rc","1"]
+      parts = input.gsub(/(^v|\+.*$)/, "").split(/[-.]/)
+
+      # If it's SemVer without a pre-release, add `~` to the end
+      # ["1","0","0"] -> ["1","0","0","~"]
+      # "~" is the largest ASCII character, so this will make "1.0.0" greater than "1.0.0-beta" for example
+      parts << "~" if(parts.length == 3)
+
+      # Left pad each numeric part with spaces so string comparisons will work ("9">"10", but " 9"<"10")
+      parts.map do |part|
+        part.match(/^[0-9]+$/) ? part.rjust(5, " ") : part
+      end.join("-")
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original
