@@ -104,6 +104,17 @@ module Growthbook
       false
     end
 
+    def self.compare(val1, val2)
+      if val1.is_a?(Numeric) or val2.is_a?(Numeric)
+        val1 = val1.is_a?(Numeric) ? val1 : val1.to_f
+        val2 = val2.is_a?(Numeric) ? val2 : val2.to_f
+      end
+
+      return 1 if val1 > val2
+      return 0 if val1 == val2 
+      return -1 if val1 < val2
+    end
+
     def self.eval_operator_condition(operator, attribute_value, condition_value)
       case operator
       when '$veq'
@@ -119,17 +130,17 @@ module Growthbook
       when '$vlte'
         padded_version_string(attribute_value) <= padded_version_string(condition_value)
       when '$eq'
-        attribute_value == condition_value
+        compare(attribute_value, condition_value) == 0 rescue false
       when '$ne'
-        attribute_value != condition_value
+        compare(attribute_value, condition_value) != 0 rescue false
       when '$lt'
-        attribute_value < condition_value
+        compare(attribute_value, condition_value) < 0 rescue false
       when '$lte'
-        attribute_value <= condition_value
+        compare(attribute_value, condition_value) <= 0 rescue false
       when '$gt'
-        attribute_value > condition_value
+        compare(attribute_value, condition_value) > 0 rescue false
       when '$gte'
-        attribute_value >= condition_value
+        compare(attribute_value, condition_value) >= 0 rescue false
       when '$regex'
         silence_warnings do
           re = Regexp.new(condition_value)
@@ -138,8 +149,10 @@ module Growthbook
           false
         end
       when '$in'
+        return false unless condition_value.is_a?(Array)
         in?(attribute_value, condition_value)
       when '$nin'
+        return false unless condition_value.is_a?(Array)
         !in?(attribute_value, condition_value)
       when '$elemMatch'
         elem_match(condition_value, attribute_value)
@@ -192,7 +205,6 @@ module Growthbook
     end
 
     def self.in?(actual, expected)
-      return false unless expected.is_a?(Array)
       return expected.include?(actual) unless actual.is_a?(Array)
 
       (actual & expected).any?

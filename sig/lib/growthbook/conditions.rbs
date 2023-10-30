@@ -27,6 +27,8 @@ module Growthbook
 
     def self.in?: (untyped attribute_value, untyped condition_value) -> bool
 
+    def self.compare: (untyped val1, untyped val2) -> Integer
+
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.
     def self.silence_warnings: () { () -> untyped } -> untyped
