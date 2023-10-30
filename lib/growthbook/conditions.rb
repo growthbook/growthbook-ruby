@@ -126,11 +126,9 @@ module Growthbook
           false
         end
       when '$in'
-        return false unless condition_value.is_a?(Array)
-        is_in?(attribute_value, condition_value)
+        in?(attribute_value, condition_value)
       when '$nin'
-        return false unless condition_value.is_a?(Array)
-        !is_in?(attribute_value, condition_value)
+        !in?(attribute_value, condition_value)
       when '$elemMatch'
         elem_match(condition_value, attribute_value)
       when '$size'
@@ -164,9 +162,10 @@ module Growthbook
       end
     end
 
-    def self.is_in?(actual, expected)
-      return expected.include?(actual) unless actual.is_a? Array
-        
+    def self.in?(actual, expected)
+      return false unless expected.is_a?(Array)
+      return expected.include?(actual) unless actual.is_a?(Array)
+
       (actual & expected).any?
     end
 
