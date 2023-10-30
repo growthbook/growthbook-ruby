@@ -138,9 +138,9 @@ module Growthbook
           false
         end
       when '$in'
-        condition_value.include? attribute_value
+        in?(attribute_value, condition_value)
       when '$nin'
-        !(condition_value.include? attribute_value)
+        !in?(attribute_value, condition_value)
       when '$elemMatch'
         elem_match(condition_value, attribute_value)
       when '$size'
@@ -189,6 +189,13 @@ module Growthbook
       parts.map do |part|
         part.match(/^[0-9]+$/) ? part.rjust(5, " ") : part
       end.join("-")
+    end
+
+    def self.in?(actual, expected)
+      return false unless expected.is_a?(Array)
+      return expected.include?(actual) unless actual.is_a?(Array)
+
+      (actual & expected).any?
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original
