@@ -49,6 +49,8 @@ module Growthbook
 
     def feature_value: (String | Symbol key, ?untyped? fallback) -> untyped
 
+    
+
     private
 
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult

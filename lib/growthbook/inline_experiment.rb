@@ -51,6 +51,21 @@ module Growthbook
     # @return [String, nil] Id of the current experiment phase
     attr_accessor :phase
 
+    # @return [String, nil] The attribute to use when hash_attribute is missing (requires Sticky Bucketing)
+    attr_accessor :fallback_attribute
+
+    # @return [String, nil] When true, disables sticky bucketing
+    attr_accessor :disable_sticky_bucketing
+
+    # @return [integer] Appended to the experiment key for sticky bucketing
+    attr_accessor :bucket_version
+
+    # @return [integer] Minimum bucket version required for sticky bucketing
+    attr_accessor :min_bucket_version
+
+    # @return [Array<Hash>] Array of prerequisite flags
+    attr_accessor :parent_conditions
+
     def initialize(options = {})
       @key = get_option(options, :key, '').to_s
       @variations = get_option(options, :variations, [])
@@ -68,6 +83,15 @@ module Growthbook
       @seed = get_option(options, :seed)
       @name = get_option(options, :name)
       @phase = get_option(options, :phase)
+      @fallback_attribute = get_option(options, :fallback_attribute) || get_option(options, :fallbackAttribute)
+      @disable_sticky_bucketing = get_option(options, :disable_sticky_bucketing, false) || get_option(options, :disableStickyBucketing, false)
+      @bucket_version = get_option(options, :bucket_version, 0) || get_option(options, :bucketVersion, 0)
+      @min_bucket_version = get_option(options, :min_bucket_version, 0) || get_option(options, :minBucketVersion, 0)
+      @parent_conditions = get_option(options, :parent_conditions, []) || get_option(options, :parentConditions, [])
+
+      if @disable_sticky_bucketing
+        @fallback_attribute = nil
+      end
     end
 
     def to_json(*_args)
@@ -88,6 +112,12 @@ module Growthbook
       res['seed'] = @seed
       res['name'] = @name
       res['phase'] = @phase
+      res['fallbackAttribute'] = @fallback_attribute unless @fallback_attribute.nil?
+      res['disableStickyBucketing'] = @disable_sticky_bucketing if @disable_sticky_bucketing
+      res['bucketVersion'] = @bucket_version if @bucket_version != 0
+      res['minBucketVersion'] = @min_bucket_version if @min_bucket_version != 0
+      res['parentConditions'] = @parent_conditions unless @parent_conditions.empty?
+
       res.compact
     end
 

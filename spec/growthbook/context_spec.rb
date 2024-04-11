@@ -130,6 +130,7 @@ describe Growthbook::Context do
               'hashAttribute' => 'id',
               'hashValue'     => '123',
               'featureId'     => 'feature1',
+              'stickyBucketUsed' => false,
               'key'           => '0',
               'bucket'        => 0.154
             } }
@@ -184,6 +185,7 @@ describe Growthbook::Context do
           'hashValue'     => '123',
           'inExperiment'  => true,
           'hashUsed'      => true,
+          'stickyBucketUsed' => false,
           'value'         => 2,
           'variationId'   => 0
         }
@@ -202,6 +204,7 @@ describe Growthbook::Context do
             'hashValue'     => '123',
             'inExperiment'  => true,
             'hashUsed'      => true,
+            'stickyBucketUsed' => false,
             'value'         => 2,
             'variationId'   => 0
           }
