@@ -13,7 +13,7 @@ target :lib do
   configure_code_diagnostics(D::Ruby.strict)
 
   configure_code_diagnostics do |hash|
-     hash[D::Ruby::NoMethod] = :information
-     hash[D::Ruby::FallbackAny] = :information
+    hash[D::Ruby::NoMethod] = :information
+    hash[D::Ruby::FallbackAny] = :information
   end
 end
