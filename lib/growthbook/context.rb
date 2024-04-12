@@ -589,10 +589,7 @@ module Growthbook
       return unless @sticky_bucket_service
 
       attributes = _get_sticky_bucket_attributes
-      if !force && attributes == @sticky_bucket_attributes
-        logger.debug('Skipping refresh of sticky bucket assignments, no changes')
-        return
-      end
+      return if !force && attributes == @sticky_bucket_attributes
 
       @sticky_bucket_attributes = attributes
       @sticky_bucket_assignment_docs = @sticky_bucket_service.get_all_assignments(attributes)
