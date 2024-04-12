@@ -49,6 +49,21 @@ module Growthbook
     # @return [String, nil] Id of the current experiment phase
     attr_accessor phase: String?
 
+    # @return [String, nil] The attribute to use when hash_attribute is missing (requires Sticky Bucketing)
+    attr_accessor fallback_attribute: String?
+
+    # @return [bool, nil] When true, disables sticky bucketing
+    attr_accessor disable_sticky_bucketing: bool?
+
+    # @return [Integer] Appended to the experiment key for sticky bucketing
+    attr_accessor bucket_version: Integer?
+
+    # @return [Integer] Minimum bucket version required for sticky bucketing
+    attr_accessor min_bucket_version: Integer?
+
+    # @return [Array<Hash>] Array of prerequisite flags
+    attr_accessor parent_conditions: Array[{id: string, gate: bool?, condition: Hash[String, untyped]}]
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     def to_json: (*untyped _args) -> Hash[String, untyped]

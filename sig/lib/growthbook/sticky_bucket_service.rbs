@@ -1,0 +1,21 @@
+module Growthbook
+  class StickyBucketService
+    def get_assignments: (String attribute_name, String attribute_value) -> Hash[String, untyped]?
+
+    def save_assignments: (Hash[String, untyped] doc) -> void
+
+    def get_key: (String attribute_name, String attribute_value) -> String
+
+    def get_all_assignments: (Hash[String, untyped] attributes) -> Hash[String, untyped]
+  end
+
+  class InMemoryStickyBucketService < StickyBucketService
+    attr_accessor assignments: Hash[String, untyped]
+
+    def initialize: () -> void
+
+    def get_assignments: (String attribute_name, String attribute_value) -> Hash[String, untyped]?
+
+    def save_assignments: (Hash[String, untyped] doc) -> void
+  end
+end

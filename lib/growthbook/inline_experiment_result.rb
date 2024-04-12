@@ -36,6 +36,9 @@ module Growthbook
     # @return [Boolean]  Used for holdout groups
     attr_accessor :passthrough
 
+    # @return [Boolean]  When true, sticky bucketing was used to assign a variation
+    attr_accessor :sticky_bucket_used
+
     def initialize(options = {})
       @key = options[:key]
       @in_experiment = options[:in_experiment]
@@ -48,12 +51,17 @@ module Growthbook
       @bucket = options[:bucket]
       @name = options[:name]
       @passthrough = options[:passthrough]
+      @sticky_bucket_used = options[:sticky_bucket_used]
     end
 
     # If the variation was randomly assigned based on user attribute hashes
     # @return [Bool]
     def hash_used?
       @hash_used
+    end
+
+    def sticky_bucket_used?
+      @sticky_bucket_used || false
     end
 
     # Whether or not the user is in the experiment
@@ -64,17 +72,18 @@ module Growthbook
 
     def to_json(*_args)
       {
-        'inExperiment'  => @in_experiment,
-        'variationId'   => @variation_id,
-        'value'         => @value,
-        'hashUsed'      => @hash_used,
-        'hashAttribute' => @hash_attribute,
-        'hashValue'     => @hash_value,
-        'featureId'     => @feature_id.to_s,
-        'key'           => @key.to_s,
-        'bucket'        => @bucket,
-        'name'          => @name,
-        'passthrough'   => @passthrough
+        'inExperiment'     => @in_experiment,
+        'variationId'      => @variation_id,
+        'value'            => @value,
+        'hashUsed'         => @hash_used,
+        'hashAttribute'    => @hash_attribute,
+        'hashValue'        => @hash_value,
+        'featureId'        => @feature_id.to_s,
+        'key'              => @key.to_s,
+        'bucket'           => @bucket,
+        'name'             => @name,
+        'passthrough'      => @passthrough,
+        'stickyBucketUsed' => @sticky_bucket_used
       }.compact
     end
   end

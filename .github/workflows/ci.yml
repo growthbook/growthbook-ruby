@@ -27,7 +27,7 @@ jobs:
           bundler-cache: true
       - name: RBS type checking with Steep
         run: |
-          gem install steep -v 1.4.0
+          gem install steep -v 1.6.0
           steep check --log-level=fatal
 
   build-test:
@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          - '2.5'
-          - '3.2.2'
+          - "2.5"
+          - "3.2.2"
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1

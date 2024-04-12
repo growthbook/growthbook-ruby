@@ -34,11 +34,18 @@ module Growthbook
     # @return [Boolean]  Used for holdout groups
     attr_accessor passthrough: bool?
 
+    # @return [Boolean]  When true, sticky bucketing was used to assign a variation
+    attr_accessor sticky_bucket_used: bool?
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     # If the variation was randomly assigned based on user attribute hashes
     # @return [Bool]
     def hash_used?: () -> bool
+
+    # If sticky bucketing was used to determine the assigned variation
+    # @return [Bool]
+    def sticky_bucket_used?: () -> bool
 
     # Whether or not the user is in the experiment
     # @return [Bool]

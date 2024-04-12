@@ -123,15 +123,16 @@ describe Growthbook::Context do
               'variations' => [2, 3]
             },
             'experimentResult' => {
-              'inExperiment'  => true,
-              'variationId'   => 0,
-              'value'         => 2,
-              'hashUsed'      => true,
-              'hashAttribute' => 'id',
-              'hashValue'     => '123',
-              'featureId'     => 'feature1',
-              'key'           => '0',
-              'bucket'        => 0.154
+              'inExperiment'     => true,
+              'variationId'      => 0,
+              'value'            => 2,
+              'hashUsed'         => true,
+              'hashAttribute'    => 'id',
+              'hashValue'        => '123',
+              'featureId'        => 'feature1',
+              'stickyBucketUsed' => false,
+              'key'              => '0',
+              'bucket'           => 0.154
             } }
         )
       end
@@ -177,15 +178,16 @@ describe Growthbook::Context do
 
       expect(gb.impressions['feature1'].to_json).to eq(
         {
-          'bucket'        => 0.154,
-          'key'           => '0',
-          'featureId'     => 'feature1',
-          'hashAttribute' => 'id',
-          'hashValue'     => '123',
-          'inExperiment'  => true,
-          'hashUsed'      => true,
-          'value'         => 2,
-          'variationId'   => 0
+          'bucket'           => 0.154,
+          'key'              => '0',
+          'featureId'        => 'feature1',
+          'hashAttribute'    => 'id',
+          'hashValue'        => '123',
+          'inExperiment'     => true,
+          'hashUsed'         => true,
+          'stickyBucketUsed' => false,
+          'value'            => 2,
+          'variationId'      => 0
         }
       )
       expect(impression_listener).to have_received(:on_experiment_viewed).with(
@@ -195,15 +197,16 @@ describe Growthbook::Context do
         expect(exp.to_json).to eq({ 'key' => 'feature1', 'variations' => [2, 3] })
         expect(res.to_json).to eq(
           {
-            'bucket'        => 0.154,
-            'key'           => '0',
-            'featureId'     => 'feature1',
-            'hashAttribute' => 'id',
-            'hashValue'     => '123',
-            'inExperiment'  => true,
-            'hashUsed'      => true,
-            'value'         => 2,
-            'variationId'   => 0
+            'bucket'           => 0.154,
+            'key'              => '0',
+            'featureId'        => 'feature1',
+            'hashAttribute'    => 'id',
+            'hashValue'        => '123',
+            'inExperiment'     => true,
+            'hashUsed'         => true,
+            'stickyBucketUsed' => false,
+            'value'            => 2,
+            'variationId'      => 0
           }
         )
       end

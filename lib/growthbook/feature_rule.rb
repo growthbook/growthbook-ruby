@@ -54,6 +54,21 @@ module Growthbook
     # @return [TrackData[] , nil] Array of tracking calls to fire
     attr_reader :tracks
 
+    # @return [String, nil] The attribute to use when hash_attribute is missing (requires Sticky Bucketing)
+    attr_accessor :fallback_attribute
+
+    # @return [String, nil] When true, disables sticky bucketing
+    attr_accessor :disable_sticky_bucketing
+
+    # @return [integer] Appended to the experiment key for sticky bucketing
+    attr_accessor :bucket_version
+
+    # @return [integer] Minimum bucket version required for sticky bucketing
+    attr_accessor :min_bucket_version
+
+    # @return [Array<Hash>] Array of prerequisite flags
+    attr_accessor :parent_conditions
+
     def initialize(rule)
       @coverage = get_option(rule, :coverage)
       @force = get_option(rule, :force)
@@ -74,6 +89,16 @@ module Growthbook
 
       cond = get_option(rule, :condition)
       @condition = Growthbook::Conditions.parse_condition(cond) unless cond.nil?
+
+      @fallback_attribute = get_option(rule, :fallback_attribute) || get_option(rule, :fallbackAttribute)
+      @disable_sticky_bucketing = get_option(rule, :disable_sticky_bucketing, false) || get_option(rule, :disableStickyBucketing, false)
+      @bucket_version = get_option(rule, :bucket_version) || get_option(rule, :bucketVersion) || 0
+      @min_bucket_version = get_option(rule, :min_bucket_version) || get_option(rule, :minBucketVersion) || 0
+      @parent_conditions = get_option(rule, :parent_conditions) || get_option(rule, :parentConditions) || []
+
+      return unless @disable_sticky_bucketing
+
+      @fallback_attribute = nil
     end
 
     # @return [Growthbook::InlineExperiment, nil]
@@ -83,6 +108,7 @@ module Growthbook
       Growthbook::InlineExperiment.new(
         key: @key || feature_key,
         variations: @variations,
+        condition: @condition,
         coverage: @coverage,
         weights: @weights,
         hash_attribute: @hash_attribute,
@@ -93,7 +119,11 @@ module Growthbook
         filters: @filters,
         name: @name,
         phase: @phase,
-        seed: @seed
+        seed: @seed,
+        fallback_attribute: @fallback_attribute,
+        disable_sticky_bucketing: @disable_sticky_bucketing,
+        bucket_version: @bucket_version,
+        min_bucket_version: @min_bucket_version
       )
     end
 
@@ -109,32 +139,37 @@ module Growthbook
 
     def to_json(*_args)
       {
-        'condition'     => @condition,
-        'coverage'      => @coverage,
-        'force'         => @force,
-        'variations'    => @variations,
-        'key'           => @key,
-        'weights'       => @weights,
-        'namespace'     => @namespace,
-        'hashAttribute' => @hash_attribute,
-        'range'         => @range,
-        'ranges'        => @ranges,
-        'meta'          => @meta,
-        'filters'       => @filters,
-        'seed'          => @seed,
-        'name'          => @name,
-        'phase'         => @phase,
-        'tracks'        => @tracks
+        'condition'              => @condition,
+        'coverage'               => @coverage,
+        'force'                  => @force,
+        'variations'             => @variations,
+        'key'                    => @key,
+        'weights'                => @weights,
+        'namespace'              => @namespace,
+        'hashAttribute'          => @hash_attribute,
+        'range'                  => @range,
+        'ranges'                 => @ranges,
+        'meta'                   => @meta,
+        'filters'                => @filters,
+        'seed'                   => @seed,
+        'name'                   => @name,
+        'phase'                  => @phase,
+        'tracks'                 => @tracks,
+        'fallbackAttribute'      => @fallback_attribute,
+        'disableStickyBucketing' => @disable_sticky_bucketing,
+        'bucketVersion'          => @bucket_version,
+        'minBucketVersion'       => @min_bucket_version,
+        'parentConditions'       => @parent_conditions
       }.compact
     end
 
     private
 
-    def get_option(hash, key)
+    def get_option(hash, key, default = nil)
       return hash[key.to_sym] if hash.key?(key.to_sym)
       return hash[key.to_s] if hash.key?(key.to_s)
 
-      nil
+      default
     end
   end
 end

@@ -29,6 +29,16 @@ module Growthbook
 
     attr_reader forced_features: Hash[String | Symbol, untyped]
 
+    attr_reader sticky_bucket_service: Growthbook::StickyBucketService
+
+    attr_reader sticky_bucket_identifier_attributes: Array[String]
+
+    attr_reader sticky_bucket_assignment_docs: Hash[String, untyped]
+
+    attr_reader using_derived_sticky_bucket_attributes: bool
+    
+    attr_reader sticky_bucket_attributes: Hash[String, untyped]
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     def features=: (Hash[String | Symbol, untyped] features) -> void
@@ -49,6 +59,8 @@ module Growthbook
 
     def feature_value: (String | Symbol key, ?untyped? fallback) -> untyped
 
+
+
     private
 
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
@@ -57,7 +69,7 @@ module Growthbook
 
     def condition_passes?: (Hash[String, untyped]? condition) -> bool
 
-    def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult
+    def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?sticky_bucket_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult
 
     def get_feature_result: (String, untyped, ::String, InlineExperiment?, InlineExperimentResult?) -> FeatureResult
 
@@ -65,9 +77,13 @@ module Growthbook
 
     def get_attribute: (String | Symbol key) -> (untyped | "")
 
+    def get_hash_attribute: (String | Symbol | nil attribute, String | Symbol | nil fallback) -> [(String | Symbol), (untyped | "")]
+
+    def _eval_feature: (String | Symbol key, Set[String] stack) -> FeatureResult
+
     def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void
 
-    def included_in_rollout?: (seed: String, hash_attribute: String, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
+    def included_in_rollout?: (seed: String, hash_attribute: String, fallback_attribute: String?, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
 
     def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
 
