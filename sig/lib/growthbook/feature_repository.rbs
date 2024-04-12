@@ -30,3 +30,13 @@ module Growthbook
     end
   end
 end
+
+module Net
+  class HTTPSuccess
+    
+  end
+
+  class HTTP
+    def get_response: (String) -> untyped
+  end
+end
