@@ -2,7 +2,7 @@
 
 module Growthbook
   # Context object passed into the GrowthBook constructor.
-  class Context
+  class Context # rubocop:disable Metrics/ClassLength
     # @return [true, false] Switch to globally disable all experiments. Default true.
     attr_accessor :enabled
 
@@ -44,7 +44,7 @@ module Growthbook
 
     # @return [Boolean] If true, the context is using derived sticky bucket attributes
     attr_reader :using_derived_sticky_bucket_attributes
-    
+
     # @return [Hash[String, String]] The attributes that are used to assign sticky buckets
     attr_reader :sticky_bucket_attributes
 
@@ -154,16 +154,16 @@ module Growthbook
 
     def _eval_prereqs(parent_conditions, stack)
       parent_conditions.each do |parent_condition|
-        parent_res = _eval_feature(parent_condition["id"], stack)
+        parent_res = _eval_feature(parent_condition['id'], stack)
 
-        return "cyclic" if parent_res.source == "cyclicPrerequisite"
+        return 'cyclic' if parent_res.source == 'cyclicPrerequisite'
 
-        unless evalCondition({ "value" => parent_res.value }, parent_condition["condition"])
-          return "gate" if parent_condition["gate"]
-          return "fail"
-        end
+        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'])
+        return 'gate' if parent_condition['gate']
+
+        return 'fail'
       end
-      "pass"
+      'pass'
     end
 
     def _eval_feature(key, stack)
@@ -174,19 +174,20 @@ module Growthbook
       feature = get_feature(key)
       return get_feature_result(key.to_s, nil, 'unknownFeature', nil, nil) unless feature
 
-      return get_feature_result(key.to_s, nil, "cyclicPrerequisite", nil, nil) if stack.include?(key)
-      stack.add(key)
+      return get_feature_result(key.to_s, nil, 'cyclicPrerequisite', nil, nil) if stack.include?(key.to_s)
+
+      stack.add(key.to_s)
 
       feature.rules.each do |rule|
-        if rule.parent_conditions && rule.parent_conditions.length > 0
+        if rule.parent_conditions&.length&.positive?
           prereq_res = _eval_prereqs(rule.parent_conditions, stack)
           case prereq_res
-          when "gate"
-            return get_feature_result(key.to_s, nil, "prerequisite", nil, nil)
-          when "cyclic"
+          when 'gate'
+            return get_feature_result(key.to_s, nil, 'prerequisite', nil, nil)
+          when 'cyclic'
             # Warning already logged in this case
-            return get_feature_result(key.to_s, nil, "cyclicPrerequisite", nil, nil)
-          when "fail"
+            return get_feature_result(key.to_s, nil, 'cyclicPrerequisite', nil, nil)
+          when 'fail'
             next
           end
         end
@@ -230,7 +231,7 @@ module Growthbook
       get_feature_result(key.to_s, feature.default_value.nil? ? nil : feature.default_value, 'defaultValue', nil, nil)
     end
 
-    def _run(exp, feature_id = '')
+    def _run(exp, feature_id = '') # rubocop:disable Metrics/AbcSize
       key = exp.key
 
       # 1. If experiment doesn't have enough variations, return immediately
@@ -268,14 +269,14 @@ module Growthbook
 
       found_sticky_bucket = false
       sticky_bucket_version_is_blocked = false
-      if sticky_bucket_service && !experiment.disable_sticky_bucketing
+      if sticky_bucket_service && !exp.disable_sticky_bucketing
         sticky_bucket = _get_sticky_bucket_variation(
-          experiment.key,
-          experiment.bucket_version,
-          experiment.min_bucket_version,
-          experiment.meta,
-          hash_attribute: experiment.hash_attribute,
-          fallback_attribute: experiment.fallback_attribute
+          exp.key,
+          exp.bucket_version,
+          exp.min_bucket_version,
+          exp.meta,
+          exp.hash_attribute,
+          exp.fallback_attribute
         )
         found_sticky_bucket = sticky_bucket['variation'].to_i >= 0
         assigned = sticky_bucket['variation'].to_i
@@ -283,7 +284,7 @@ module Growthbook
       end
 
       # Some checks are not needed if we already have a sticky bucket
-      if !found_sticky_bucket
+      unless found_sticky_bucket
         # 7. Exclude if user is filtered out (used to be called "namespace")
         if exp.filters
           return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if filtered_out?(exp.filters || [])
@@ -304,9 +305,7 @@ module Growthbook
         # 8.01 Exclude if parent conditions are not met
         if exp.parent_conditions
           prereq_res = _eval_prereqs(exp.parent_conditions, Set.new)
-          if ["gate", "fail", "cyclic"].include?(prereq_res)
-            return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id)
-          end
+          return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if %w[gate fail cyclic].include?(prereq_res)
         end
       end
 
@@ -315,7 +314,7 @@ module Growthbook
       n = Growthbook::Util.get_hash(seed: seed, value: hash_value, version: exp.hash_version || 1)
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if n.nil?
 
-      if !found_sticky_bucket
+      unless found_sticky_bucket
         ranges = exp.ranges || Growthbook::Util.get_bucket_ranges(
           exp.variations.length,
           exp.coverage,
@@ -325,7 +324,7 @@ module Growthbook
       end
 
       # Unenroll if any prior sticky buckets are blocked by version
-      return get_experiment_result(exp, -1, hash_used: false, feature_id: featureId, sticky_bucket_used: true) if sticky_bucket_version_is_blocked
+      return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id, sticky_bucket_used: true) if sticky_bucket_version_is_blocked
 
       # 10. Return if not in experiment
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if assigned.negative?
@@ -339,11 +338,10 @@ module Growthbook
       # 13. Build the result object
       result = get_experiment_result(exp, assigned, hash_used: true, feature_id: feature_id, bucket: n, sticky_bucket_used: found_sticky_bucket)
 
-
       # 13.5 Persist sticky bucket
-      if sticky_bucket_service && !experiment.disable_sticky_bucketing
+      if sticky_bucket_service && !exp.disable_sticky_bucketing
         assignment = {
-          _get_sticky_bucket_experiment_key(experiment.key, experiment.bucket_version) => result.key
+          _get_sticky_bucket_experiment_key(exp.key, exp.bucket_version) => result.key.to_s
         }
 
         data = _generate_sticky_bucket_assignment_doc(hash_attribute, hash_value, assignment)
@@ -430,14 +428,14 @@ module Growthbook
     end
 
     def get_hash_attribute(attr, fallback_attr)
-      attr = attr || "id"
+      attr ||= 'id'
 
       val = get_attribute(attr)
 
       # If no match, try fallback
-      if val.nil? || val == "" && fallback_attr && @sticky_bucket_service
+      if (val.nil? || val == '') && fallback_attr && @sticky_bucket_service
         val = get_attribute(fallback_attr)
-        attr = fallback_attr unless val.nil? || val == ""
+        attr = fallback_attr unless val.nil? || val == ''
       end
 
       [attr, val]
@@ -505,11 +503,11 @@ module Growthbook
 
     def _derive_sticky_bucket_identifier_attributes
       attributes = Set.new
-      @features.each do |key, feature|
+      @features.each do |_key, feature|
         feature.rules.each do |rule|
           if rule.variations
-            attributes.add(rule.hashAttribute || "id")
-            attributes.add(rule.fallbackAttribute) if rule.fallbackAttribute
+            attributes.add(rule.hash_attribute || 'id')
+            attributes.add(rule.fallback_attribute) if rule.fallback_attribute
           end
         end
       end
@@ -518,14 +516,12 @@ module Growthbook
 
     def _get_sticky_bucket_attributes
       attributes = {}
-      if @using_derived_sticky_bucket_attributes
-        @sticky_bucket_identifier_attributes = _derive_sticky_bucket_identifier_attributes
-      end
+      @sticky_bucket_identifier_attributes = _derive_sticky_bucket_identifier_attributes if @using_derived_sticky_bucket_attributes
 
       return attributes unless @sticky_bucket_identifier_attributes
 
       @sticky_bucket_identifier_attributes.each do |attr|
-        _, hash_value = _getHashValue(attr)
+        _, hash_value = get_hash_attribute(attr, nil)
         attributes[attr] = hash_value if hash_value
       end
       attributes
@@ -534,17 +530,15 @@ module Growthbook
     def _get_sticky_bucket_assignments(attr = nil, fallback = nil)
       merged = {}
 
-      _, hash_value = _getHashValue(attr)
+      _, hash_value = get_hash_attribute(attr, nil)
       key = "#{attr}||#{hash_value}"
-      if @sticky_bucket_assignment_docs.key?(key)
-        merged = @sticky_bucket_assignment_docs[key]["assignments"]
-      end
+      merged = @sticky_bucket_assignment_docs[key]['assignments'] if @sticky_bucket_assignment_docs.key?(key)
 
       if fallback
-        _, hash_value = _getHashValue(fallback)
+        _, hash_value = get_hash_attribute(fallback, nil)
         key = "#{fallback}||#{hash_value}"
         if @sticky_bucket_assignment_docs.key?(key)
-          @sticky_bucket_assignment_docs[key]["assignments"].each do |k, v|
+          @sticky_bucket_assignment_docs[key]['assignments'].each do |k, v|
             merged[k] = v unless merged.key?(k)
           end
         end
@@ -573,7 +567,7 @@ module Growthbook
       assignments = _get_sticky_bucket_assignments(hash_attribute, fallback_attribute)
       if _is_blocked(assignments, experiment_key, min_bucket_version)
         return {
-          'variation' => -1,
+          'variation'        => -1,
           'versionIsBlocked' => true
         }
       end
@@ -581,8 +575,8 @@ module Growthbook
       variation_key = assignments[id]
       return { 'variation' => -1 } unless variation_key
 
-      variation = meta.find_index { |v| v["key"] == variation_key } || -1
-      return { 'variation' => -1 } if variation < 0
+      variation = meta.find_index { |v| v['key'] == variation_key } || -1
+      return { 'variation' => -1 } if variation.negative?
 
       { 'variation' => variation }
     end
@@ -591,12 +585,12 @@ module Growthbook
       "#{experiment_key}__#{bucket_version}"
     end
 
-    def refresh_sticky_buckets(force = false)
+    def refresh_sticky_buckets(force: false)
       return unless @sticky_bucket_service
 
       attributes = _get_sticky_bucket_attributes
       if !force && attributes == @sticky_bucket_attributes
-        logger.debug("Skipping refresh of sticky bucket assignments, no changes")
+        logger.debug('Skipping refresh of sticky bucket assignments, no changes')
         return
       end
 
@@ -606,20 +600,24 @@ module Growthbook
 
     def _generate_sticky_bucket_assignment_doc(attribute_name, attribute_value, assignments)
       key = "#{attribute_name}||#{attribute_value}"
-      existing_assignments = @sticky_bucket_assignment_docs[key]&.fetch("assignments", {})
+      existing_assignments = @sticky_bucket_assignment_docs[key]&.fetch('assignments', {})
 
-      new_assignments = existing_assignments.merge(assignments)
-
-      existing_json = JSON.dump(existing_assignments, sort_keys: true)
-      new_json = JSON.dump(new_assignments, sort_keys: true)
-      changed = existing_json != new_json
+      if existing_assignments
+        new_assignments = existing_assignments.merge(assignments)
+        existing_json = existing_assignments.to_json
+        new_json = new_assignments.to_json
+        changed = existing_json != new_json
+      else
+        changed = true
+        new_assignments = assignments
+      end
 
       {
-        'key' => key,
-        'doc' => {
-          'attributeName' => attribute_name,
+        'key'     => key,
+        'doc'     => {
+          'attributeName'  => attribute_name,
           'attributeValue' => attribute_value,
-          'assignments' => new_assignments
+          'assignments'    => new_assignments
         },
         'changed' => changed
       }

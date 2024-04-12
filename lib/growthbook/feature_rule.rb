@@ -92,13 +92,13 @@ module Growthbook
 
       @fallback_attribute = get_option(rule, :fallback_attribute) || get_option(rule, :fallbackAttribute)
       @disable_sticky_bucketing = get_option(rule, :disable_sticky_bucketing, false) || get_option(rule, :disableStickyBucketing, false)
-      @bucket_version = get_option(rule, :bucket_version, 0) || get_option(rule, :bucketVersion, 0)
-      @min_bucket_version = get_option(rule, :min_bucket_version, 0) || get_option(rule, :minBucketVersion, 0)
-      @parent_conditions = get_option(rule, :parent_conditions, []) || get_option(rule, :parentConditions, [])
+      @bucket_version = get_option(rule, :bucket_version) || get_option(rule, :bucketVersion) || 0
+      @min_bucket_version = get_option(rule, :min_bucket_version) || get_option(rule, :minBucketVersion) || 0
+      @parent_conditions = get_option(rule, :parent_conditions) || get_option(rule, :parentConditions) || []
 
-      if @disable_sticky_bucketing
-        @fallback_attribute = nil
-      end
+      return unless @disable_sticky_bucketing
+
+      @fallback_attribute = nil
     end
 
     # @return [Growthbook::InlineExperiment, nil]
@@ -139,27 +139,27 @@ module Growthbook
 
     def to_json(*_args)
       {
-        'condition'     => @condition,
-        'coverage'      => @coverage,
-        'force'         => @force,
-        'variations'    => @variations,
-        'key'           => @key,
-        'weights'       => @weights,
-        'namespace'     => @namespace,
-        'hashAttribute' => @hash_attribute,
-        'range'         => @range,
-        'ranges'        => @ranges,
-        'meta'          => @meta,
-        'filters'       => @filters,
-        'seed'          => @seed,
-        'name'          => @name,
-        'phase'         => @phase,
-        'tracks'        => @tracks,
-        'fallbackAttribute' => @fallback_attribute,
+        'condition'              => @condition,
+        'coverage'               => @coverage,
+        'force'                  => @force,
+        'variations'             => @variations,
+        'key'                    => @key,
+        'weights'                => @weights,
+        'namespace'              => @namespace,
+        'hashAttribute'          => @hash_attribute,
+        'range'                  => @range,
+        'ranges'                 => @ranges,
+        'meta'                   => @meta,
+        'filters'                => @filters,
+        'seed'                   => @seed,
+        'name'                   => @name,
+        'phase'                  => @phase,
+        'tracks'                 => @tracks,
+        'fallbackAttribute'      => @fallback_attribute,
         'disableStickyBucketing' => @disable_sticky_bucketing,
-        'bucketVersion' => @bucket_version,
-        'minBucketVersion' => @min_bucket_version,
-        'parentConditions' => @parent_conditions
+        'bucketVersion'          => @bucket_version,
+        'minBucketVersion'       => @min_bucket_version,
+        'parentConditions'       => @parent_conditions
       }.compact
     end
 

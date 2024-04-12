@@ -170,4 +170,30 @@ describe 'test suite' do
       end
     end
   end
+
+  describe 'stickyBucket' do
+    test_cases['stickyBucket'].each do |test_case|
+      test_name, ctx, key, expected_result, expected_docs = test_case
+
+      it test_name do
+        service = Growthbook::InMemoryStickyBucketService.new
+        ctx['sticky_bucket_service'] = service
+
+        ctx['sticky_bucket_identifier_attributes'] = ctx.delete('stickyBucketIdentifierAttributes') if ctx.key?('stickyBucketIdentifierAttributes')
+
+        service.assignments = ctx.delete('stickyBucketAssignmentDocs') if ctx.key?('stickyBucketAssignmentDocs')
+
+        gb = Growthbook::Context.new(ctx)
+        res = gb.eval_feature(key)
+
+        if res.experiment_result.nil?
+          expect(expected_result).to be_nil
+        else
+          expect(res.experiment_result.to_json).to eq(expected_result)
+        end
+
+        expect(service.assignments).to eq(expected_docs)
+      end
+    end
+  end
 end

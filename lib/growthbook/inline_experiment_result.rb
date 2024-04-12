@@ -60,6 +60,10 @@ module Growthbook
       @hash_used
     end
 
+    def sticky_bucket_used?
+      @sticky_bucket_used || false
+    end
+
     # Whether or not the user is in the experiment
     # @return [Bool]
     def in_experiment?
@@ -68,17 +72,17 @@ module Growthbook
 
     def to_json(*_args)
       {
-        'inExperiment'  => @in_experiment,
-        'variationId'   => @variation_id,
-        'value'         => @value,
-        'hashUsed'      => @hash_used,
-        'hashAttribute' => @hash_attribute,
-        'hashValue'     => @hash_value,
-        'featureId'     => @feature_id.to_s,
-        'key'           => @key.to_s,
-        'bucket'        => @bucket,
-        'name'          => @name,
-        'passthrough'   => @passthrough,
+        'inExperiment'     => @in_experiment,
+        'variationId'      => @variation_id,
+        'value'            => @value,
+        'hashUsed'         => @hash_used,
+        'hashAttribute'    => @hash_attribute,
+        'hashValue'        => @hash_value,
+        'featureId'        => @feature_id.to_s,
+        'key'              => @key.to_s,
+        'bucket'           => @bucket,
+        'name'             => @name,
+        'passthrough'      => @passthrough,
         'stickyBucketUsed' => @sticky_bucket_used
       }.compact
     end

@@ -50,6 +50,21 @@ module Growthbook
     # @return [String , nil] The phase id of the experiment
     attr_reader phase: String?
 
+    # @return [String, nil] The attribute to use when hash_attribute is missing (requires Sticky Bucketing)
+    attr_accessor fallback_attribute: String?
+
+    # @return [bool, nil] When true, disables sticky bucketing
+    attr_accessor disable_sticky_bucketing: bool?
+
+    # @return [Integer] Appended to the experiment key for sticky bucketing
+    attr_accessor bucket_version: Integer?
+
+    # @return [Integer] Minimum bucket version required for sticky bucketing
+    attr_accessor min_bucket_version: Integer?
+
+    # @return [Array<Hash>] Array of prerequisite flags
+    attr_accessor parent_conditions: Array[{id: string, gate: bool?, condition: Hash[String, untyped]}]
+
     # TODO: Type
     # @return [TrackData[] , nil] Array of tracking calls to fire
     attr_reader tracks: Array[{ experiment: untyped, result: untyped }]?
@@ -67,6 +82,6 @@ module Growthbook
 
     private
 
-    def get_option: (untyped hash, untyped key) -> (untyped | nil)
+    def get_option: (untyped hash, untyped key, ?untyped? default) -> (untyped | nil)
   end
 end
