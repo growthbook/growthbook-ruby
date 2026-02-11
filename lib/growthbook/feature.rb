@@ -21,7 +21,7 @@ module Growthbook
     end
 
     def to_json(*_args)
-      res = {}
+      res = {} #: Hash[String, untyped]
       res['defaultValue'] = @default_value unless @default_value.nil?
       res['rules'] = []
       @rules.each do |rule|

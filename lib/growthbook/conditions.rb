@@ -49,10 +49,9 @@ module Growthbook
     end
 
     def self.operator_object?(obj)
-      obj.each do |key, _value|
-        return false if key[0] != '$'
+      obj.each_key.all? do |key|
+        key[0] == '$'
       end
-      true
     end
 
     def self.get_type(attribute_value)
@@ -91,7 +90,7 @@ module Growthbook
       condition_value.to_json == attribute_value.to_json
     end
 
-    def self.elem_match(condition, attribute_value)
+    def self.elem_match?(condition, attribute_value)
       return false unless attribute_value.is_a? Array
 
       attribute_value.each do |item|
@@ -103,11 +102,13 @@ module Growthbook
       end
       false
     end
+    # alias for backwards compatibility
+    singleton_class.send(:alias_method, :elem_match, :elem_match?)
 
     def self.compare(val1, val2)
       if val1.is_a?(Numeric) || val2.is_a?(Numeric)
-        val1 = val1.is_a?(Numeric) ? val1 : val1.to_f
-        val2 = val2.is_a?(Numeric) ? val2 : val2.to_f
+        val1 = val1.to_f unless val1.is_a?(Numeric)
+        val2 = val2.to_f unless val2.is_a?(Numeric)
       end
 
       return 1 if val1 > val2
@@ -182,7 +183,7 @@ module Growthbook
 
         !in?(attribute_value, condition_value)
       when '$elemMatch'
-        elem_match(condition_value, attribute_value)
+        elem_match?(condition_value, attribute_value)
       when '$size'
         return false unless attribute_value.is_a? Array
 

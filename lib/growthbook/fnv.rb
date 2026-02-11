@@ -14,7 +14,7 @@ class FNV
     hash = INIT32
 
     data.bytes.each do |byte|
-      hash = hash ^ byte
+      hash ^= byte
       hash = (hash * PRIME32) % MOD32
     end
 

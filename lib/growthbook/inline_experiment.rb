@@ -95,7 +95,7 @@ module Growthbook
     end
 
     def to_json(*_args)
-      res = {}
+      res = {} #: Hash[String, untyped]
       res['key'] = @key
       res['variations'] = @variations
       res['weights'] = @weights unless @weights.nil?

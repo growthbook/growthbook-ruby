@@ -63,6 +63,24 @@ module Growthbook
 
     private
 
+    def _eval_prereqs: (untyped parent_conditions, Set[String] stack) -> String
+
+    def _derive_sticky_bucket_identifier_attributes: () -> Array[String]
+
+    def _get_sticky_bucket_attributes: () -> Hash[String, untyped]
+
+    def _get_sticky_bucket_assignments: (?String? attr, ?String? fallback) -> Hash[String, untyped]
+
+    def _blocked?: (Hash[String, untyped] assignments, String? experiment_key, Integer min_bucket_version) -> bool
+
+    def _get_sticky_bucket_variation: (String? experiment_key, ?Integer? bucket_version, ?Integer? min_bucket_version, ?untyped meta, ?String? hash_attribute, ?String? fallback_attribute) -> Hash[String, untyped]
+
+    def _get_sticky_bucket_experiment_key: (String? experiment_key, ?Integer? bucket_version) -> String
+
+    def refresh_sticky_buckets: (?force: bool) -> void
+
+    def _generate_sticky_bucket_assignment_doc: (String | Symbol attribute_name, untyped attribute_value, Hash[String, untyped] assignments) -> Hash[String, untyped]
+
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
 
     def stringify_keys: (Hash[String | Symbol, untyped] hash) -> Hash[String, untyped]

@@ -11,7 +11,7 @@ module Growthbook
       # Check if both strings are numeric so we can do natural ordering
       # for greater than / less than operators
       numeric = begin
-        (!Float(actual).nil? && !Float(desired).nil?)
+        !Float(actual).nil? && !Float(desired).nil?
       rescue StandardError
         false
       end
@@ -60,13 +60,9 @@ module Growthbook
     end
 
     def self.get_equal_weights(num_variations)
-      return [] if num_variations < 1
-
-      weights = []
-      (1..num_variations).each do |_i|
-        weights << (1.0 / num_variations)
+      (1..num_variations).map do
+        (1.0 / num_variations)
       end
-      weights
     end
 
     # Determine bucket ranges for experiment variations
@@ -85,7 +81,7 @@ module Growthbook
 
       # Convert weights to ranges
       cumulative = 0.0
-      ranges = []
+      ranges = [] #: Array[[Float, Float]]
       weights.each do |w|
         start = cumulative
         cumulative += w

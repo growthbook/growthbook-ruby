@@ -33,7 +33,6 @@ module Growthbook
       experiment,
       experiment_result
     )
-
       on = !value.nil? && value != 0 && value != '' && value != false
 
       @value = value
@@ -45,7 +44,7 @@ module Growthbook
     end
 
     def to_json(*_args)
-      json = {}
+      json = {} #: Hash[String, untyped]
       json['on'] = @on
       json['off'] = @off
       json['value'] = @value

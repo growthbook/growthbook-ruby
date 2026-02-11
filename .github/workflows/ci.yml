@@ -2,34 +2,6 @@ name: Build
 on:
   - push
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2.2
-          bundler-cache: true
-      - name: Lint
-        run: |
-          gem install rubocop -v 1.50.2
-          gem install rubocop-rspec -v 2.20.0
-          gem install rubocop-performance -v 1.15
-          rubocop
-
-  type-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.1.1
-          bundler-cache: true
-      - name: RBS type checking with Steep
-        run: |
-          gem install steep -v 1.6.0
-          steep check --log-level=fatal
-
   build-test:
     runs-on: ubuntu-latest
     strategy:
@@ -38,11 +10,12 @@ jobs:
         ruby:
           - "2.5"
           - "3.2.2"
+          - "4.0"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Test
-        run: bundle exec rspec
+        run: bundle exec rake ci

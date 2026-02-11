@@ -21,13 +21,15 @@ module Growthbook
 
     def self.eval_condition_value: (untyped condition_value, untyped attribute_value) -> bool
 
-    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value) -> bool
+    def self.elem_match?: (Hash[String, untyped] condition, untyped attribute_value) -> bool
 
     def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
     def self.in?: (untyped attribute_value, untyped condition_value) -> bool
 
     def self.compare: (untyped val1, untyped val2) -> Integer
+
+    def self.padded_version_string: (untyped input) -> String
 
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.

@@ -1,9 +1,10 @@
-require:
+plugins:
   - rubocop-rspec
   - rubocop-performance
 
 AllCops:
   NewCops: enable
+  SuggestExtensions: false
   TargetRubyVersion: 2.5
 
 Lint:
@@ -31,6 +32,9 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Max: 100
 
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+
 Layout/LineLength:
   Max: 200
 
@@ -39,6 +43,9 @@ Naming/VariableNumber:
 
 Naming/MethodParameterName:
   MinNameLength: 2
+
+Naming/PredicateMethod:
+  AllowedMethods: ['eval_and', 'eval_condition', 'eval_condition_value', 'eval_operator_condition', 'eval_or']
 
 Layout/ArgumentAlignment:
   EnforcedStyle: with_first_argument
@@ -74,6 +81,9 @@ RSpec/ExampleLength:
   Enabled: false
 
 RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/LeakyLocalVariable:
   Enabled: false
 
 RSpec/NestedGroups:

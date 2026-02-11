@@ -14,15 +14,11 @@ You can also run any of those tasks manually. See each section below.
 
 ## Testing
 
-Run unit tests with `bundler exec rspec`
+Run all tests and linters with `bundler exec rake ci`.
+
+Run only the tests with `bundler exec rspec`.
 
 ## Linting
-
-To use the linter, install it:
-
-    gem install rubocop -v 1.50.2
-    gem install rubocop-rspec -v 2.20.0
-    gem install rubocop-performance -v 1.15
 
 To auto-fix formatting, run the following:
 
@@ -43,10 +39,6 @@ If you use Visual Studio Code, you can use the extension [ruby-rubocop](https://
 The project uses RBS for type definitions and Steep for type checking.
 
 RBS comes preinstalled with Ruby version 3+.
-
-Install the required gem:
-
-    gem install steep -v 1.6.0
 
 You may find the following tools helpful:
 

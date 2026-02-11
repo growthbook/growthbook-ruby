@@ -58,8 +58,8 @@ module Growthbook
       @impressions = {}
       @sticky_bucket_assignment_docs = {}
 
-      features = {}
-      attributes = {}
+      features = {} #: Hash[String, untyped]
+      attributes = {} #: Hash[String, untyped]
 
       options.transform_keys(&:to_sym).each do |key, value|
         case key
@@ -347,7 +347,7 @@ module Growthbook
         data = _generate_sticky_bucket_assignment_doc(hash_attribute, hash_value, assignment)
         doc = data['doc']
         if doc && data['changed']
-          @sticky_bucket_assignment_docs ||= {}
+          @sticky_bucket_assignment_docs ||= {} #: Hash[String, untyped]
           @sticky_bucket_assignment_docs[data['key']] = doc
           sticky_bucket_service.save_assignments(doc)
         end
@@ -361,7 +361,7 @@ module Growthbook
     end
 
     def stringify_keys(hash)
-      new_hash = {}
+      new_hash = {} #: Hash[String, untyped]
       hash.each do |key, value|
         new_hash[key.to_s] = value
       end
@@ -382,7 +382,7 @@ module Growthbook
       end
 
       hash_attribute, hash_value = get_hash_attribute(experiment.hash_attribute, experiment.fallback_attribute)
-      meta = experiment.meta ? experiment.meta[variation_index] : {}
+      meta = experiment.meta ? experiment.meta[variation_index] : {} #: Hash[String, untyped]
 
       result = Growthbook::InlineExperimentResult.new(
         {
@@ -503,7 +503,7 @@ module Growthbook
 
     def _derive_sticky_bucket_identifier_attributes
       attributes = Set.new
-      @features.each do |_key, feature|
+      @features.each_value do |feature|
         feature.rules.each do |rule|
           if rule.variations
             attributes.add(rule.hash_attribute || 'id')
@@ -515,7 +515,7 @@ module Growthbook
     end
 
     def _get_sticky_bucket_attributes
-      attributes = {}
+      attributes = {} #: Hash[String, untyped]
       @sticky_bucket_identifier_attributes = _derive_sticky_bucket_identifier_attributes if @using_derived_sticky_bucket_attributes
 
       return attributes unless @sticky_bucket_identifier_attributes
@@ -528,7 +528,7 @@ module Growthbook
     end
 
     def _get_sticky_bucket_assignments(attr = nil, fallback = nil)
-      merged = {}
+      merged = {} #: Hash[String, untyped]
 
       _, hash_value = get_hash_attribute(attr, nil)
       key = "#{attr}||#{hash_value}"
@@ -547,7 +547,7 @@ module Growthbook
       merged
     end
 
-    def _is_blocked(assignments, experiment_key, min_bucket_version)
+    def _blocked?(assignments, experiment_key, min_bucket_version)
       return false if min_bucket_version.zero?
 
       (0...min_bucket_version).each do |i|
@@ -560,12 +560,12 @@ module Growthbook
     def _get_sticky_bucket_variation(experiment_key, bucket_version = nil, min_bucket_version = nil, meta = nil, hash_attribute = nil, fallback_attribute = nil)
       bucket_version ||= 0
       min_bucket_version ||= 0
-      meta ||= []
+      meta ||= [] #: Array[Hash[String, untyped]]
 
       id = _get_sticky_bucket_experiment_key(experiment_key, bucket_version)
 
       assignments = _get_sticky_bucket_assignments(hash_attribute, fallback_attribute)
-      if _is_blocked(assignments, experiment_key, min_bucket_version)
+      if _blocked?(assignments, experiment_key, min_bucket_version)
         return {
           'variation'        => -1,
           'versionIsBlocked' => true
@@ -597,7 +597,7 @@ module Growthbook
 
     def _generate_sticky_bucket_assignment_doc(attribute_name, attribute_value, assignments)
       key = "#{attribute_name}||#{attribute_value}"
-      existing_assignments = @sticky_bucket_assignment_docs[key]&.fetch('assignments', {})
+      existing_assignments = @sticky_bucket_assignment_docs[key]&.fetch('assignments', nil) || {} #: Hash[String, untyped]
 
       if existing_assignments
         new_assignments = existing_assignments.merge(assignments)

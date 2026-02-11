@@ -16,7 +16,7 @@ module Growthbook
     end
 
     def get_all_assignments(attributes)
-      docs = {}
+      docs = {} #: Hash[String, untyped]
       attributes.each do |attribute_name, attribute_value|
         doc = get_assignments(attribute_name, attribute_value)
         docs[get_key(attribute_name, attribute_value)] = doc if doc
