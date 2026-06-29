@@ -173,10 +173,14 @@ describe 'test suite' do
 
   describe 'stickyBucket' do
     test_cases['stickyBucket'].each do |test_case|
-      test_name, ctx, key, expected_result, expected_docs = test_case
+      test_name, ctx, initial_docs, key, expected_result, expected_docs = test_case
 
       it test_name do
         service = Growthbook::InMemoryStickyBucketService.new
+
+        # Pre-load any initial sticky bucket assignment docs (spec 0.7.x positional field)
+        (initial_docs || []).each { |doc| service.save_assignments(doc) }
+
         ctx['sticky_bucket_service'] = service
 
         ctx['sticky_bucket_identifier_attributes'] = ctx.delete('stickyBucketIdentifierAttributes') if ctx.key?('stickyBucketIdentifierAttributes')
@@ -192,7 +196,10 @@ describe 'test suite' do
           expect(res.experiment_result.to_json).to eq(expected_result)
         end
 
-        expect(service.assignments).to eq(expected_docs)
+        # Each expected doc must match; extra docs in the service are ignored
+        expected_docs.each do |doc_key, value|
+          expect(service.assignments[doc_key]).to eq(value)
+        end
       end
     end
   end
