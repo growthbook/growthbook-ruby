@@ -35,6 +35,9 @@ module Growthbook
     # @return [Hash[String, Any]] Forced feature values
     attr_reader :forced_features
 
+    # @return [Hash[String, Array]] Saved groups, used by the $inGroup/$notInGroup operators
+    attr_reader :saved_groups
+
     # @return [Growthbook::StickyBucketService] Sticky bucket service for sticky bucketing
     attr_reader :sticky_bucket_service
 
@@ -59,6 +62,7 @@ module Growthbook
       @enabled = true
       @impressions = {}
       @sticky_bucket_assignment_docs = {}
+      @saved_groups = {}
 
       features = {}
       attributes = {}
@@ -92,6 +96,8 @@ module Growthbook
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
           @sticky_bucket_identifier_attributes = value
+        when :saved_groups, :savedGroups
+          @saved_groups = value || {}
         else
           warn("Unknown context option: #{key}")
         end
@@ -160,7 +166,7 @@ module Growthbook
 
         return 'cyclic' if parent_res.source == 'cyclicPrerequisite'
 
-        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'])
+        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'], @saved_groups)
         return 'gate' if parent_condition['gate']
 
         return 'fail'
@@ -373,7 +379,7 @@ module Growthbook
     def condition_passes?(condition)
       return false if condition.nil?
 
-      Growthbook::Conditions.eval_condition(@attributes, condition)
+      Growthbook::Conditions.eval_condition(@attributes, condition, @saved_groups)
     end
 
     def get_experiment_result(experiment, variation_index = -1, hash_used: false, feature_id: '', bucket: nil, sticky_bucket_used: false)

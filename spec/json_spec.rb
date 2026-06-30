@@ -114,13 +114,14 @@ describe 'test suite' do
     # Loop through each test case in the JSON file
     test_cases['evalCondition'].each do |test_case|
       # Extract data about the test case
-      test_name, condition, attributes, expected = test_case
+      test_name, condition, attributes, expected, saved_groups = test_case
 
       # Run the actual test case
       it test_name do
         result = Growthbook::Conditions.eval_condition(
           attributes,
-          condition
+          condition,
+          saved_groups || {}
         )
         expect(result).to eq(expected)
       end

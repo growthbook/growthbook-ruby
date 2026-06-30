@@ -8,14 +8,20 @@ module Growthbook
   class Conditions
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
-    def self.eval_condition(attributes, condition)
-      return eval_or(attributes, condition['$or']) if condition.key?('$or')
-      return !eval_or(attributes, condition['$nor']) if condition.key?('$nor')
-      return eval_and(attributes, condition['$and']) if condition.key?('$and')
-      return !eval_condition(attributes, condition['$not']) if condition.key?('$not')
-
+    def self.eval_condition(attributes, condition, saved_groups = {})
       condition.each do |key, value|
-        return false unless eval_condition_value(value, get_path(attributes, key))
+        case key
+        when '$or'
+          return false unless eval_or(attributes, value, saved_groups)
+        when '$nor'
+          return false if eval_or(attributes, value, saved_groups)
+        when '$and'
+          return false unless eval_and(attributes, value, saved_groups)
+        when '$not'
+          return false if eval_condition(attributes, value, saved_groups)
+        else
+          return false unless eval_condition_value(value, get_path(attributes, key), saved_groups)
+        end
       end
 
       true
@@ -32,18 +38,18 @@ module Growthbook
       condition
     end
 
-    def self.eval_or(attributes, conditions)
+    def self.eval_or(attributes, conditions, saved_groups = {})
       return true if conditions.length <= 0
 
       conditions.each do |condition|
-        return true if eval_condition(attributes, condition)
+        return true if eval_condition(attributes, condition, saved_groups)
       end
       false
     end
 
-    def self.eval_and(attributes, conditions)
+    def self.eval_and(attributes, conditions, saved_groups = {})
       conditions.each do |condition|
-        return false unless eval_condition(attributes, condition)
+        return false unless eval_condition(attributes, condition, saved_groups)
       end
       true
     end
@@ -81,23 +87,25 @@ module Growthbook
       current
     end
 
-    def self.eval_condition_value(condition_value, attribute_value)
+    def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive = false)
       if condition_value.is_a?(Hash) && operator_object?(condition_value)
         condition_value.each do |key, value|
-          return false unless eval_operator_condition(key, attribute_value, value)
+          return false unless eval_operator_condition(key, attribute_value, value, saved_groups)
         end
         return true
       end
+      return condition_value.downcase == attribute_value.downcase if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
+
       condition_value.to_json == attribute_value.to_json
     end
 
-    def self.elem_match(condition, attribute_value)
+    def self.elem_match(condition, attribute_value, saved_groups = {})
       return false unless attribute_value.is_a? Array
 
       attribute_value.each do |item|
         if operator_object?(condition)
-          return true if eval_condition_value(condition, item)
-        elsif eval_condition(item, condition)
+          return true if eval_condition_value(condition, item, saved_groups)
+        elsif eval_condition(item, condition, saved_groups)
           return true
         end
       end
@@ -116,7 +124,7 @@ module Growthbook
       0
     end
 
-    def self.eval_operator_condition(operator, attribute_value, condition_value)
+    def self.eval_operator_condition(operator, attribute_value, condition_value, saved_groups = {})
       case operator
       when '$veq'
         padded_version_string(attribute_value) == padded_version_string(condition_value)
@@ -173,6 +181,13 @@ module Growthbook
         rescue StandardError
           false
         end
+      when '$regexi'
+        silence_warnings do
+          re = Regexp.new(condition_value, Regexp::IGNORECASE)
+          !!attribute_value.match(re)
+        rescue StandardError
+          false
+        end
       when '$in'
         return false unless condition_value.is_a?(Array)
 
@@ -181,23 +196,36 @@ module Growthbook
         return false unless condition_value.is_a?(Array)
 
         !in?(attribute_value, condition_value)
+      when '$ini'
+        return false unless condition_value.is_a?(Array)
+
+        in?(attribute_value, condition_value, true)
+      when '$nini'
+        return false unless condition_value.is_a?(Array)
+
+        !in?(attribute_value, condition_value, true)
+      when '$inGroup'
+        return false unless condition_value.is_a?(String)
+        return false unless saved_groups.key?(condition_value)
+
+        in?(attribute_value, saved_groups[condition_value] || [])
+      when '$notInGroup'
+        return false unless condition_value.is_a?(String)
+        return true unless saved_groups.key?(condition_value)
+
+        !in?(attribute_value, saved_groups[condition_value] || [])
       when '$elemMatch'
-        elem_match(condition_value, attribute_value)
+        elem_match(condition_value, attribute_value, saved_groups)
       when '$size'
         return false unless attribute_value.is_a? Array
 
-        eval_condition_value(condition_value, attribute_value.length)
+        eval_condition_value(condition_value, attribute_value.length, saved_groups)
       when '$all'
-        return false unless attribute_value.is_a? Array
+        in_all?(condition_value, attribute_value, saved_groups, false)
+      when '$alli'
+        return false unless condition_value.is_a?(Array)
 
-        condition_value.each do |condition|
-          passed = false
-          attribute_value.each do |attr|
-            passed = true if eval_condition_value(condition, attr)
-          end
-          return false unless passed
-        end
-        true
+        in_all?(condition_value, attribute_value, saved_groups, true)
       when '$exists'
         exists = !attribute_value.nil?
         if condition_value
@@ -208,10 +236,20 @@ module Growthbook
       when '$type'
         condition_value == get_type(attribute_value)
       when '$not'
-        !eval_condition_value(condition_value, attribute_value)
+        !eval_condition_value(condition_value, attribute_value, saved_groups)
       else
         false
       end
+    end
+
+    def self.in_all?(condition_values, attribute_value, saved_groups, insensitive)
+      return false unless attribute_value.is_a? Array
+
+      condition_values.each do |cond|
+        passed = attribute_value.any? { |attr| eval_condition_value(cond, attr, saved_groups, insensitive) }
+        return false unless passed
+      end
+      true
     end
 
     def self.padded_version_string(input)
@@ -231,7 +269,17 @@ module Growthbook
       end.join('-')
     end
 
-    def self.in?(actual, expected)
+    def self.in?(actual, expected, insensitive = false)
+      expected ||= []
+
+      if insensitive
+        fold = ->(val) { val.is_a?(String) ? val.downcase : val }
+        folded_expected = expected.map { |exp| fold.call(exp) }
+        return actual.any? { |el| folded_expected.include?(fold.call(el)) } if actual.is_a?(Array)
+
+        return folded_expected.include?(fold.call(actual))
+      end
+
       return expected.include?(actual) unless actual.is_a?(Array)
 
       (actual & expected).any?
