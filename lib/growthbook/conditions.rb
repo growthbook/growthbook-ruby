@@ -134,6 +134,7 @@ module Growthbook
       when '$vgte' then a >= b
       when '$vlt' then a < b
       when '$vlte' then a <= b
+      else false
       end
     end
 
@@ -146,6 +147,7 @@ module Growthbook
       when '$lte' then result <= 0
       when '$gt' then result.positive?
       when '$gte' then result >= 0
+      else false
       end
     rescue StandardError
       # Values weren't comparable (e.g. booleans); fall back to direct equality

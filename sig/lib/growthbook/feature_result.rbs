@@ -29,7 +29,7 @@ module Growthbook
     # @return [String]
     attr_reader rule_id: String
 
-    def initialize: (untyped value, String source, (InlineExperiment | nil) experiment, (InlineExperimentResult | nil) experiment_result, ?String rule_id) -> void
+    def initialize: (untyped value, String source, (InlineExperiment | nil) experiment, (InlineExperimentResult | nil) experiment_result, ?(String | nil) rule_id) -> void
 
     def to_json: (*untyped _args) -> Hash[String, untyped]
   end
