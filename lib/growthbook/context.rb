@@ -470,7 +470,7 @@ module Growthbook
 
     def included_in_rollout?(seed:, hash_attribute:, fallback_attribute:, hash_version:, range:, coverage:)
       return true if range.nil? && coverage.nil?
-      return false if range.nil? && coverage == 0
+      return false if range.nil? && coverage&.zero?
 
       _, hash_value_raw = get_hash_attribute(hash_attribute, fallback_attribute)
 

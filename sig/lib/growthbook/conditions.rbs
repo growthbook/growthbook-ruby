@@ -19,15 +19,19 @@ module Growthbook
 
     def self.get_path: (Hash[String, untyped]? attributes, String path) -> (nil | untyped)
 
-    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?bool insensitive) -> bool
+    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?insensitive: bool) -> bool
 
     def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, ?Hash[String, untyped] saved_groups) -> bool
+
+    def self.eval_version_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
+
+    def self.eval_compare_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
     def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value, ?Hash[String, untyped] saved_groups) -> bool
 
     def self.in_all?: (Array[untyped] condition_values, untyped attribute_value, Hash[String, untyped] saved_groups, bool insensitive) -> bool
 
-    def self.in?: (untyped attribute_value, untyped condition_value, ?bool insensitive) -> bool
+    def self.in?: (untyped attribute_value, untyped condition_value, ?insensitive: bool) -> bool
 
     def self.compare: (untyped val1, untyped val2) -> Integer
 

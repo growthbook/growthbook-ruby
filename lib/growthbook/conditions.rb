@@ -87,7 +87,7 @@ module Growthbook
       current
     end
 
-    def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive = false)
+    def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive: false)
       if condition_value.is_a?(Hash) && operator_object?(condition_value)
         condition_value.each do |key, value|
           return false unless eval_operator_condition(key, attribute_value, value, saved_groups)
@@ -124,56 +124,43 @@ module Growthbook
       0
     end
 
+    def self.eval_version_operator(operator, attribute_value, condition_value)
+      a = padded_version_string(attribute_value)
+      b = padded_version_string(condition_value)
+      case operator
+      when '$veq' then a == b
+      when '$vne' then a != b
+      when '$vgt' then a > b
+      when '$vgte' then a >= b
+      when '$vlt' then a < b
+      when '$vlte' then a <= b
+      end
+    end
+
+    def self.eval_compare_operator(operator, attribute_value, condition_value)
+      result = compare(attribute_value, condition_value)
+      case operator
+      when '$eq' then result.zero?
+      when '$ne' then result != 0
+      when '$lt' then result.negative?
+      when '$lte' then result <= 0
+      when '$gt' then result.positive?
+      when '$gte' then result >= 0
+      end
+    rescue StandardError
+      # Values weren't comparable (e.g. booleans); fall back to direct equality
+      return attribute_value == condition_value if operator == '$eq'
+      return attribute_value != condition_value if operator == '$ne'
+
+      false
+    end
+
     def self.eval_operator_condition(operator, attribute_value, condition_value, saved_groups = {})
       case operator
-      when '$veq'
-        padded_version_string(attribute_value) == padded_version_string(condition_value)
-      when '$vne'
-        padded_version_string(attribute_value) != padded_version_string(condition_value)
-      when '$vgt'
-        padded_version_string(attribute_value) > padded_version_string(condition_value)
-      when '$vgte'
-        padded_version_string(attribute_value) >= padded_version_string(condition_value)
-      when '$vlt'
-        padded_version_string(attribute_value) < padded_version_string(condition_value)
-      when '$vlte'
-        padded_version_string(attribute_value) <= padded_version_string(condition_value)
-      when '$eq'
-        begin
-          compare(attribute_value, condition_value).zero?
-        rescue StandardError
-          attribute_value == condition_value
-        end
-      when '$ne'
-        begin
-          compare(attribute_value, condition_value) != 0
-        rescue StandardError
-          attribute_value != condition_value
-        end
-      when '$lt'
-        begin
-          compare(attribute_value, condition_value).negative?
-        rescue StandardError
-          false
-        end
-      when '$lte'
-        begin
-          compare(attribute_value, condition_value) <= 0
-        rescue StandardError
-          false
-        end
-      when '$gt'
-        begin
-          compare(attribute_value, condition_value).positive?
-        rescue StandardError
-          false
-        end
-      when '$gte'
-        begin
-          compare(attribute_value, condition_value) >= 0
-        rescue StandardError
-          false
-        end
+      when '$veq', '$vne', '$vgt', '$vgte', '$vlt', '$vlte'
+        eval_version_operator(operator, attribute_value, condition_value)
+      when '$eq', '$ne', '$lt', '$lte', '$gt', '$gte'
+        eval_compare_operator(operator, attribute_value, condition_value)
       when '$regex'
         silence_warnings do
           re = Regexp.new(condition_value)
@@ -199,11 +186,11 @@ module Growthbook
       when '$ini'
         return false unless condition_value.is_a?(Array)
 
-        in?(attribute_value, condition_value, true)
+        in?(attribute_value, condition_value, insensitive: true)
       when '$nini'
         return false unless condition_value.is_a?(Array)
 
-        !in?(attribute_value, condition_value, true)
+        !in?(attribute_value, condition_value, insensitive: true)
       when '$inGroup'
         return false unless condition_value.is_a?(String)
         return false unless saved_groups.key?(condition_value)
@@ -246,7 +233,7 @@ module Growthbook
       return false unless attribute_value.is_a? Array
 
       condition_values.each do |cond|
-        passed = attribute_value.any? { |attr| eval_condition_value(cond, attr, saved_groups, insensitive) }
+        passed = attribute_value.any? { |attr| eval_condition_value(cond, attr, saved_groups, insensitive: insensitive) }
         return false unless passed
       end
       true
@@ -269,7 +256,7 @@ module Growthbook
       end.join('-')
     end
 
-    def self.in?(actual, expected, insensitive = false)
+    def self.in?(actual, expected, insensitive: false)
       expected ||= []
 
       if insensitive
