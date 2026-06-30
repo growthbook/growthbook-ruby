@@ -138,6 +138,7 @@ describe Growthbook::Context do
             'off'              => false,
             'value'            => 2,
             'source'           => 'experiment',
+            'ruleId'           => '',
             'experiment'       => {
               'key'        => 'feature1',
               'variations' => [2, 3]

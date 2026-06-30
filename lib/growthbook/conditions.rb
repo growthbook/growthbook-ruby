@@ -142,13 +142,13 @@ module Growthbook
         begin
           compare(attribute_value, condition_value).zero?
         rescue StandardError
-          false
+          attribute_value == condition_value
         end
       when '$ne'
         begin
           compare(attribute_value, condition_value) != 0
         rescue StandardError
-          false
+          attribute_value != condition_value
         end
       when '$lt'
         begin

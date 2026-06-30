@@ -184,6 +184,9 @@ module Growthbook
 
       return get_feature_result(key.to_s, nil, 'cyclicPrerequisite', nil, nil) if stack.include?(key.to_s)
 
+      # Work on a copy so sibling prerequisite evaluations don't pollute each
+      # other's path (matches the by-value stack semantics of the other SDKs)
+      stack = stack.dup
       stack.add(key.to_s)
 
       feature.rules.each do |rule|
@@ -467,6 +470,7 @@ module Growthbook
 
     def included_in_rollout?(seed:, hash_attribute:, fallback_attribute:, hash_version:, range:, coverage:)
       return true if range.nil? && coverage.nil?
+      return false if range.nil? && coverage == 0
 
       _, hash_value_raw = get_hash_attribute(hash_attribute, fallback_attribute)
 
