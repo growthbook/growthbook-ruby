@@ -27,11 +27,16 @@ module Growthbook
     # @return [Growthbook::InlineExperimentResult, nil]
     attr_reader :experiment_result
 
+    # The id of the rule (if any) that was used to assign the value
+    # @return [String]
+    attr_reader :rule_id
+
     def initialize(
       value,
       source,
       experiment,
-      experiment_result
+      experiment_result,
+      rule_id = ''
     )
 
       on = !value.nil? && value != 0 && value != '' && value != false
@@ -42,6 +47,7 @@ module Growthbook
       @source = source
       @experiment = experiment
       @experiment_result = experiment_result
+      @rule_id = rule_id || ''
     end
 
     def to_json(*_args)
@@ -50,6 +56,7 @@ module Growthbook
       json['off'] = @off
       json['value'] = @value
       json['source'] = @source
+      json['ruleId'] = @rule_id
 
       if @experiment
         json['experiment'] = @experiment.to_json

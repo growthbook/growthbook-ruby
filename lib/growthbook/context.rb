@@ -214,7 +214,7 @@ module Growthbook
           )
           next unless included_in_rollout
 
-          return get_feature_result(key.to_s, rule.force, 'force', nil, nil)
+          return get_feature_result(key.to_s, rule.force, 'force', nil, nil, rule.id)
         end
         # Experiment rule
         next unless rule.experiment?
@@ -226,7 +226,7 @@ module Growthbook
 
         next unless result.in_experiment && !result.passthrough
 
-        return get_feature_result(key.to_s, result.value, 'experiment', exp, result)
+        return get_feature_result(key.to_s, result.value, 'experiment', exp, result, rule.id)
       end
 
       # Fallback
@@ -407,8 +407,8 @@ module Growthbook
       result
     end
 
-    def get_feature_result(key, value, source, experiment, experiment_result)
-      res = Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    def get_feature_result(key, value, source, experiment, experiment_result, rule_id = '')
+      res = Growthbook::FeatureResult.new(value, source, experiment, experiment_result, rule_id)
 
       track_feature_usage(key, res)
 
