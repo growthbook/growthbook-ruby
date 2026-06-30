@@ -94,7 +94,7 @@ module Growthbook
         end
         return true
       end
-      return condition_value.downcase == attribute_value.downcase if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
+      return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
       condition_value.to_json == attribute_value.to_json
     end
