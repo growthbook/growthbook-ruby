@@ -386,4 +386,71 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
   end
+
+  describe '#saved_groups_json' do
+    subject(:repository) do
+      described_class.new(endpoint: endpoint, decryption_key: decryption_key)
+    end
+
+    before do
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: json_response, headers: {})
+    end
+
+    context 'when the payload includes savedGroups' do
+      let(:decryption_key) { nil }
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-with-groups' }
+      let(:json_response) do
+        <<~JSON
+          {
+            "status": 200,
+            "features": {},
+            "savedGroups": { "admins": ["user-1", "user-2"], "beta": [123, 456] }
+          }
+        JSON
+      end
+
+      it 'exposes the parsed saved groups' do
+        repository.fetch
+        expect(repository.saved_groups_json).to eq(
+          'admins' => %w[user-1 user-2],
+          'beta'   => [123, 456]
+        )
+      end
+    end
+
+    context 'when the payload has no savedGroups' do
+      let(:decryption_key) { nil }
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-no-groups' }
+      let(:json_response) { '{ "status": 200, "features": {} }' }
+
+      it 'defaults to an empty hash' do
+        repository.fetch
+        expect(repository.saved_groups_json).to eq({})
+      end
+    end
+
+    context 'when the payload includes encryptedSavedGroups' do
+      let(:decryption_key) { 'BhB1wORFmZLTDjbvstvS8w==' }
+      let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-encrypted-groups' }
+      let(:json_response) do
+        <<~JSON
+          {
+            "status": 200,
+            "features": {},
+            "encryptedFeatures": "Utj/Xwn7YaTXX8vHosRFQg==.yYuNdFoTv1aebOyhC7lTUpNSUW9toE4nSTMATKaT3mGwrzUUMrGg/3uJ0edpxRdoZcAD778+eDBlT9+i/wc+eMzBTK9KkEWSZG/hljlZjRP8zVbfggm/yy1E87xsGl1JnSkQ+iRyMTsrdEvvo2AkoQqFbmEOvOklcYAIZTMaYsgCOi+9BRbI1s6HLpI/kCE4kcuhePY0b20oWrpDL++wDQ==",
+            "encryptedSavedGroups": "jUmZ+agHSAI5JKtNty1zqQ==.rkUx/e1//+46KeWjlZQGb4rtj/1t6FUVpkrCQJiyEJ/+qmsrAEsVh7tLRZA+eskF"
+          }
+        JSON
+      end
+
+      it 'exposes the decrypted saved groups' do
+        repository.fetch
+        expect(repository.saved_groups_json).to eq(
+          'admins' => %w[user-1 user-2],
+          'beta'   => [123, 456]
+        )
+      end
+    end
+  end
 end

@@ -15,10 +15,14 @@ module Growthbook
     # Parsed features JSON
     attr_reader :features_json
 
+    # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
+    attr_reader :saved_groups_json
+
     def initialize(endpoint:, decryption_key:)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
+      @saved_groups_json = {}
     end
 
     def fetch
@@ -56,7 +60,11 @@ module Growthbook
     end
 
     def parsed_plain_text_response
-      @features_json = parsed_response['features'] unless parsed_response.nil?
+      parsed = parsed_response
+      return nil if parsed.nil?
+
+      @saved_groups_json = parsed['savedGroups'] || {}
+      @features_json = parsed['features']
     rescue StandardError
       nil
     end
@@ -65,10 +73,24 @@ module Growthbook
       k = decryption_key
       return nil if k.nil?
 
-      decrypted_str = Growthbook::DecryptionUtil.decrypt(parsed_response['encryptedFeatures'], key: k)
+      parsed = parsed_response
+      return nil if parsed.nil?
+
+      @saved_groups_json = decrypted_saved_groups(parsed, k)
+
+      decrypted_str = Growthbook::DecryptionUtil.decrypt(parsed['encryptedFeatures'], key: k)
       @features_json = JSON.parse(decrypted_str) unless decrypted_str.nil?
     rescue StandardError
       nil
+    end
+
+    def decrypted_saved_groups(parsed, key)
+      if parsed['encryptedSavedGroups']
+        decrypted = Growthbook::DecryptionUtil.decrypt(parsed['encryptedSavedGroups'], key: key)
+        return JSON.parse(decrypted) unless decrypted.nil?
+      end
+
+      parsed['savedGroups'] || {}
     end
 
     def parsed_response
