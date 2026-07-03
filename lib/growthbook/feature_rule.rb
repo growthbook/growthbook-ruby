@@ -72,6 +72,9 @@ module Growthbook
     # @return [Array<Hash>] Array of prerequisite flags
     attr_accessor :parent_conditions
 
+    # @return [Hash, nil] Arbitrary custom fields attached to the rule
+    attr_reader :custom_fields
+
     def initialize(rule)
       @id = get_option(rule, :id)
       @coverage = get_option(rule, :coverage)
@@ -99,6 +102,7 @@ module Growthbook
       @bucket_version = get_option(rule, :bucket_version) || get_option(rule, :bucketVersion) || 0
       @min_bucket_version = get_option(rule, :min_bucket_version) || get_option(rule, :minBucketVersion) || 0
       @parent_conditions = get_option(rule, :parent_conditions) || get_option(rule, :parentConditions) || []
+      @custom_fields = get_option(rule, :custom_fields) || get_option(rule, :customFields)
 
       return unless @disable_sticky_bucketing
 
@@ -127,7 +131,8 @@ module Growthbook
         fallback_attribute: @fallback_attribute,
         disable_sticky_bucketing: @disable_sticky_bucketing,
         bucket_version: @bucket_version,
-        min_bucket_version: @min_bucket_version
+        min_bucket_version: @min_bucket_version,
+        custom_fields: @custom_fields
       )
     end
 

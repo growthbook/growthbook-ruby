@@ -66,6 +66,9 @@ module Growthbook
     # @return [Array<Hash>] Array of prerequisite flags
     attr_accessor :parent_conditions
 
+    # @return [Hash, nil] Arbitrary custom fields attached to the experiment
+    attr_accessor :custom_fields
+
     def initialize(options = {})
       @key = get_option(options, :key, '').to_s
       @variations = get_option(options, :variations, [])
@@ -88,6 +91,7 @@ module Growthbook
       @bucket_version = get_option(options, :bucket_version) || get_option(options, :bucketVersion) || 0
       @min_bucket_version = get_option(options, :min_bucket_version) || get_option(options, :minBucketVersion) || 0
       @parent_conditions = get_option(options, :parent_conditions) || get_option(options, :parentConditions) || []
+      @custom_fields = get_option(options, :custom_fields) || get_option(options, :customFields)
 
       return unless @disable_sticky_bucketing
 
