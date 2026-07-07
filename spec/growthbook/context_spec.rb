@@ -3,9 +3,30 @@
 require_relative '../spec_helper'
 require 'growthbook'
 require 'json'
+require 'open3'
+require 'rbconfig'
 
 describe Growthbook::Context do
   describe 'feature helper methods' do
+    it 'can evaluate a feature after loading the public SDK entrypoint' do
+      script = <<~RUBY
+        require 'growthbook'
+        gb = Growthbook::Context.new(features: { feature: { defaultValue: true } })
+        exit(gb.eval_feature(:feature).value == true ? 0 : 1)
+      RUBY
+
+      _stdout, stderr, status = Open3.capture3(
+        RbConfig.ruby,
+        '-Ilib',
+        '-e',
+        script,
+        chdir: File.expand_path('../..', __dir__)
+      )
+
+      expect(stderr).to eq('')
+      expect(status).to be_success
+    end
+
     gb = described_class.new(
       features: {
         feature1: {
