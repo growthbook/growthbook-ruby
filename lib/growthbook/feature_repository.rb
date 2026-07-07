@@ -18,14 +18,26 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
-    def initialize(endpoint:, decryption_key:)
+    # [Integer, nil] Seconds a fetched payload stays cached (nil = never expires)
+    attr_reader :ttl
+
+    def initialize(endpoint:, decryption_key:, ttl: 60, cache: nil)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @ttl = ttl
+      @cache = cache || Growthbook::InMemoryFeatureCache.new
     end
 
     def fetch
+      cached = @cache.get(endpoint)
+      unless cached.nil?
+        @features_json = cached['features']
+        @saved_groups_json = cached['savedGroups']
+        return @features_json
+      end
+
       uri = URI(endpoint)
       res = Net::HTTP.get_response(uri)
 
@@ -33,11 +45,9 @@ module Growthbook
 
       return nil if response.nil?
 
-      if use_decryption?
-        parsed_decrypted_response
-      else
-        parsed_plain_text_response
-      end
+      result = use_decryption? ? parsed_decrypted_response : parsed_plain_text_response
+      @cache.set(endpoint, { 'features' => @features_json, 'savedGroups' => @saved_groups_json }, @ttl) unless result.nil?
+      result
     rescue StandardError
       nil
     end
@@ -45,7 +55,9 @@ module Growthbook
     def fetch!
       fetch
 
-      raise FeatureFetchError if response.nil?
+      # A cache hit populates features_json without an HTTP response, so only
+      # treat a missing response as a fetch error when we also have no features
+      raise FeatureFetchError if response.nil? && (features_json.nil? || features_json.empty?)
       raise FeatureParseError if features_json.nil? || features_json.empty?
 
       features_json

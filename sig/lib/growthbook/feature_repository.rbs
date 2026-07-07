@@ -1,12 +1,16 @@
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
-    def initialize: (endpoint: String, decryption_key: String?) -> void
+    @ttl: Integer?
+    @cache: FeatureCache
+
+    def initialize: (endpoint: String, decryption_key: String?, ?ttl: Integer?, ?cache: FeatureCache?) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
+    attr_reader ttl: Integer?
 
     def fetch: () -> (nil | Hash[String, untyped])
 

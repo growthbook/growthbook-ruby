@@ -453,4 +453,41 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
   end
+
+  describe 'caching' do
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-cache' }
+    let(:json_response) { '{ "status": 200, "features": { "flag": { "defaultValue": true } } }' }
+
+    before do
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: json_response, headers: {})
+    end
+
+    it 'serves a second fetch from cache without another request' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60)
+      first = repo.fetch
+      second = repo.fetch
+
+      expect(second).to eq(first)
+      expect(a_request(:get, endpoint)).to have_been_made.once
+    end
+
+    it 'refetches once the cached entry has expired' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 0)
+      repo.fetch
+      repo.fetch
+
+      expect(a_request(:get, endpoint)).to have_been_made.twice
+    end
+
+    it 'caches both features and saved groups' do
+      cache = Growthbook::InMemoryFeatureCache.new
+      described_class.new(endpoint: endpoint, decryption_key: nil, cache: cache).fetch
+
+      expect(cache.get(endpoint)).to eq(
+        'features'    => { 'flag' => { 'defaultValue' => true } },
+        'savedGroups' => {}
+      )
+    end
+  end
 end
