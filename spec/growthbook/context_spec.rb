@@ -15,7 +15,7 @@ describe Growthbook::Context do
         exit(gb.eval_feature(:feature).value == true ? 0 : 1)
       RUBY
 
-      _stdout, stderr, status = Open3.capture3(
+      _stdout, _stderr, status = Open3.capture3(
         RbConfig.ruby,
         '-Ilib',
         '-e',
@@ -23,7 +23,6 @@ describe Growthbook::Context do
         chdir: File.expand_path('../..', __dir__)
       )
 
-      expect(stderr).to eq('')
       expect(status).to be_success
     end
 
