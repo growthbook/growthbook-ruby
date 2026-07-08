@@ -6,13 +6,13 @@
 <title>
   Class: Growthbook::Context
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.44
   
 </title>
 
-  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css">
 
-  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+  <link rel="stylesheet" href="../css/common.css" type="text/css">
 
 <script type="text/javascript">
   pathId = "Growthbook::Context";
@@ -27,6 +27,8 @@
 
   </head>
   <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
     <div class="nav_wrap">
       <iframe id="nav" src="../class_list.html?1"></iframe>
       <div id="resizer"></div>
@@ -94,16 +96,15 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/growthbook/context.rb</dd>
+    <dd>lib/growthbook/context.rb
+</dd>
   </dl>
   
 </div>
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    
-<p>Context object passed into the GrowthBook constructor.</p>
-
+    <p>Context object passed into the GrowthBook constructor.</p>
 
   </div>
 </div>
@@ -137,9 +138,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Map of user attributes that are used to assign variations.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Map of user attributes that are used to assign variations.</p></div></span>
   
 </li>
 
@@ -164,9 +163,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Switch to globally disable all experiments.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Switch to globally disable all experiments.</p></div></span>
   
 </li>
 
@@ -191,9 +188,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Feature definitions (usually pulled from an API or cache).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Feature definitions (usually pulled from an API or cache).</p></div></span>
   
 </li>
 
@@ -218,9 +213,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Forced feature values.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Forced feature values.</p></div></span>
   
 </li>
 
@@ -245,9 +238,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Force specific experiments to always assign a specific variation (used for QA).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Force specific experiments to always assign a specific variation (used for QA).</p></div></span>
   
 </li>
 
@@ -274,9 +265,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Tracked impressions.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Tracked impressions.</p></div></span>
   
 </li>
 
@@ -301,9 +290,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>An object that responds to <code>on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)</code>.</p></div></span>
   
 </li>
 
@@ -328,9 +315,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>An object that responds to ‘on_feature_usage(String, Growthbook::FeatureResult)`.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>An object that responds to <code>on_feature_usage(String, Growthbook::FeatureResult)</code>.</p></div></span>
   
 </li>
 
@@ -355,9 +340,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>If true, random assignment is disabled and only explicitly forced variations are used.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>If true, random assignment is disabled and only explicitly forced variations are used.</p></div></span>
   
 </li>
 
@@ -384,9 +367,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The attributes that are used to assign sticky buckets.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The attributes that are used to assign sticky buckets.</p></div></span>
   
 </li>
 
@@ -413,9 +394,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The attributes that are used to assign sticky buckets.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The attributes that are used to assign sticky buckets.</p></div></span>
   
 </li>
 
@@ -442,9 +421,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The attributes that identify users.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The attributes that identify users.</p></div></span>
   
 </li>
 
@@ -471,9 +448,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Sticky bucket service for sticky bucketing.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Sticky bucket service for sticky bucketing.</p></div></span>
   
 </li>
 
@@ -498,9 +473,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The URL of the current page.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The URL of the current page.</p></div></span>
   
 </li>
 
@@ -527,9 +500,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>If true, the context is using derived sticky bucket attributes.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>If true, the context is using derived sticky bucket attributes.</p></div></span>
   
 </li>
 
@@ -610,9 +581,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>A new instance of Context.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>A new instance of Context.</p></div></span>
   
 </li>
 
@@ -684,6 +653,7 @@
 
       
     </ul>
+    
   
 
 <div id="constructor_details" class="method_details_list">
@@ -700,9 +670,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns a new instance of Context.</p>
-
+    <p>Returns a new instance of Context.</p>
 
   </div>
 </div>
@@ -715,8 +683,6 @@
       <pre class="lines">
 
 
-51
-52
 53
 54
 55
@@ -765,10 +731,12 @@
 98
 99
 100
-101</pre>
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -844,9 +812,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Map of user attributes that are used to assign variations.</p>
-
+    <p>Returns Map of user attributes that are used to assign variations.</p>
 
   </div>
 </div>
@@ -863,9 +829,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Map of user attributes that are used to assign variations</p>
-</div>
+        <div class='inline'><p>Map of user attributes that are used to assign variations</p></div>
       
     </li>
   
@@ -877,12 +841,12 @@
       <pre class="lines">
 
 
-22
-23
-24</pre>
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 22</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@attributes</span>
@@ -905,9 +869,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Switch to globally disable all experiments. Default true.</p>
-
+    <p>Returns Switch to globally disable all experiments. Default true.</p>
 
   </div>
 </div>
@@ -924,9 +886,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Switch to globally disable all experiments. Default true.</p>
-</div>
+        <div class='inline'><p>Switch to globally disable all experiments. Default true.</p></div>
       
     </li>
   
@@ -938,12 +898,12 @@
       <pre class="lines">
 
 
-7
-8
-9</pre>
+9
+10
+11</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enabled'>enabled</span>
   <span class='ivar'>@enabled</span>
@@ -966,9 +926,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Feature definitions (usually pulled from an API or cache).</p>
-
+    <p>Returns Feature definitions (usually pulled from an API or cache).</p>
 
   </div>
 </div>
@@ -985,9 +943,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Feature definitions (usually pulled from an API or cache)</p>
-</div>
+        <div class='inline'><p>Feature definitions (usually pulled from an API or cache)</p></div>
       
     </li>
   
@@ -999,12 +955,12 @@
       <pre class="lines">
 
 
-25
-26
-27</pre>
+27
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_features'>features</span>
   <span class='ivar'>@features</span>
@@ -1027,9 +983,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Forced feature values.</p>
-
+    <p>Returns Forced feature values.</p>
 
   </div>
 </div>
@@ -1046,9 +1000,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Forced feature values</p>
-</div>
+        <div class='inline'><p>Forced feature values</p></div>
       
     </li>
   
@@ -1060,12 +1012,12 @@
       <pre class="lines">
 
 
-34
-35
-36</pre>
+36
+37
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 34</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_forced_features'>forced_features</span>
   <span class='ivar'>@forced_features</span>
@@ -1088,9 +1040,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Force specific experiments to always assign a specific variation (used for QA).</p>
-
+    <p>Returns Force specific experiments to always assign a specific variation (used for QA).</p>
 
   </div>
 </div>
@@ -1107,9 +1057,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Force specific experiments to always assign a specific variation (used for QA)</p>
-</div>
+        <div class='inline'><p>Force specific experiments to always assign a specific variation (used for QA)</p></div>
       
     </li>
   
@@ -1121,12 +1069,12 @@
       <pre class="lines">
 
 
-28
-29
-30</pre>
+30
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_forced_variations'>forced_variations</span>
   <span class='ivar'>@forced_variations</span>
@@ -1149,9 +1097,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Tracked impressions.</p>
-
+    <p>Returns Tracked impressions.</p>
 
   </div>
 </div>
@@ -1168,9 +1114,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Tracked impressions</p>
-</div>
+        <div class='inline'><p>Tracked impressions</p></div>
       
     </li>
   
@@ -1182,12 +1126,12 @@
       <pre class="lines">
 
 
-31
-32
-33</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_impressions'>impressions</span>
   <span class='ivar'>@impressions</span>
@@ -1210,9 +1154,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`.</p>
-
+    <p>Returns An object that responds to <code>on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)</code>.</p>
 
   </div>
 </div>
@@ -1229,9 +1171,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>An object that responds to ‘on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)`</p>
-</div>
+        <div class='inline'><p>An object that responds to <code>on_experiment_viewed(GrowthBook::InlineExperiment, GrowthBook::InlineExperimentResult)</code></p></div>
       
     </li>
   
@@ -1243,12 +1183,12 @@
       <pre class="lines">
 
 
-16
-17
-18</pre>
+18
+19
+20</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 18</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_listener'>listener</span>
   <span class='ivar'>@listener</span>
@@ -1271,9 +1211,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns An object that responds to ‘on_feature_usage(String, Growthbook::FeatureResult)`.</p>
-
+    <p>Returns An object that responds to <code>on_feature_usage(String, Growthbook::FeatureResult)</code>.</p>
 
   </div>
 </div>
@@ -1290,9 +1228,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>An object that responds to ‘on_feature_usage(String, Growthbook::FeatureResult)`</p>
-</div>
+        <div class='inline'><p>An object that responds to <code>on_feature_usage(String, Growthbook::FeatureResult)</code></p></div>
       
     </li>
   
@@ -1304,12 +1240,12 @@
       <pre class="lines">
 
 
-19
-20
-21</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on_feature_usage'>on_feature_usage</span>
   <span class='ivar'>@on_feature_usage</span>
@@ -1332,9 +1268,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns If true, random assignment is disabled and only explicitly forced variations are used.</p>
-
+    <p>Returns If true, random assignment is disabled and only explicitly forced variations are used.</p>
 
   </div>
 </div>
@@ -1351,9 +1285,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>If true, random assignment is disabled and only explicitly forced variations are used.</p>
-</div>
+        <div class='inline'><p>If true, random assignment is disabled and only explicitly forced variations are used.</p></div>
       
     </li>
   
@@ -1365,12 +1297,12 @@
       <pre class="lines">
 
 
-13
-14
-15</pre>
+15
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 13</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_qa_mode'>qa_mode</span>
   <span class='ivar'>@qa_mode</span>
@@ -1393,9 +1325,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The attributes that are used to assign sticky buckets.</p>
-
+    <p>Returns The attributes that are used to assign sticky buckets.</p>
 
   </div>
 </div>
@@ -1412,9 +1342,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The attributes that are used to assign sticky buckets</p>
-</div>
+        <div class='inline'><p>The attributes that are used to assign sticky buckets</p></div>
       
     </li>
   
@@ -1426,12 +1354,12 @@
       <pre class="lines">
 
 
-43
-44
-45</pre>
+45
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_assignment_docs'>sticky_bucket_assignment_docs</span>
   <span class='ivar'>@sticky_bucket_assignment_docs</span>
@@ -1454,9 +1382,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The attributes that are used to assign sticky buckets.</p>
-
+    <p>Returns The attributes that are used to assign sticky buckets.</p>
 
   </div>
 </div>
@@ -1473,9 +1399,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The attributes that are used to assign sticky buckets</p>
-</div>
+        <div class='inline'><p>The attributes that are used to assign sticky buckets</p></div>
       
     </li>
   
@@ -1487,12 +1411,12 @@
       <pre class="lines">
 
 
-49
-50
-51</pre>
+51
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_attributes'>sticky_bucket_attributes</span>
   <span class='ivar'>@sticky_bucket_attributes</span>
@@ -1515,9 +1439,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The attributes that identify users. If omitted, this will be inferred from the feature definitions.</p>
-
+    <p>Returns The attributes that identify users. If omitted, this will be inferred from the feature definitions.</p>
 
   </div>
 </div>
@@ -1534,9 +1456,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The attributes that identify users. If omitted, this will be inferred from the feature definitions</p>
-</div>
+        <div class='inline'><p>The attributes that identify users. If omitted, this will be inferred from the feature definitions</p></div>
       
     </li>
   
@@ -1548,12 +1468,12 @@
       <pre class="lines">
 
 
-40
-41
-42</pre>
+42
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 40</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_identifier_attributes'>sticky_bucket_identifier_attributes</span>
   <span class='ivar'>@sticky_bucket_identifier_attributes</span>
@@ -1576,9 +1496,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Sticky bucket service for sticky bucketing.</p>
-
+    <p>Returns Sticky bucket service for sticky bucketing.</p>
 
   </div>
 </div>
@@ -1595,9 +1513,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Sticky bucket service for sticky bucketing</p>
-</div>
+        <div class='inline'><p>Sticky bucket service for sticky bucketing</p></div>
       
     </li>
   
@@ -1609,12 +1525,12 @@
       <pre class="lines">
 
 
-37
-38
-39</pre>
+39
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_service'>sticky_bucket_service</span>
   <span class='ivar'>@sticky_bucket_service</span>
@@ -1637,9 +1553,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The URL of the current page.</p>
-
+    <p>Returns The URL of the current page.</p>
 
   </div>
 </div>
@@ -1656,9 +1570,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The URL of the current page</p>
-</div>
+        <div class='inline'><p>The URL of the current page</p></div>
       
     </li>
   
@@ -1670,12 +1582,12 @@
       <pre class="lines">
 
 
-10
-11
-12</pre>
+12
+13
+14</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 10</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 12</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_url'>url</span>
   <span class='ivar'>@url</span>
@@ -1698,9 +1610,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns If true, the context is using derived sticky bucket attributes.</p>
-
+    <p>Returns If true, the context is using derived sticky bucket attributes.</p>
 
   </div>
 </div>
@@ -1717,9 +1627,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>If true, the context is using derived sticky bucket attributes</p>
-</div>
+        <div class='inline'><p>If true, the context is using derived sticky bucket attributes</p></div>
       
     </li>
   
@@ -1731,12 +1639,12 @@
       <pre class="lines">
 
 
-46
-47
-48</pre>
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 48</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_using_derived_sticky_bucket_attributes'>using_derived_sticky_bucket_attributes</span>
   <span class='ivar'>@using_derived_sticky_bucket_attributes</span>
@@ -1768,12 +1676,12 @@
       <pre class="lines">
 
 
-132
-133
-134</pre>
+134
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 134</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__eval_feature'>_eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span>
@@ -1798,13 +1706,13 @@
       <pre class="lines">
 
 
-148
-149
 150
-151</pre>
+151
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 148</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_feature_value'>feature_value</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback'>fallback</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
@@ -1852,12 +1760,12 @@
       <pre class="lines">
 
 
-144
-145
-146</pre>
+146
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_off?'>off?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_off'>off</span>
@@ -1904,12 +1812,12 @@
       <pre class="lines">
 
 
-140
-141
-142</pre>
+142
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on?'>on?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span>
@@ -1934,12 +1842,12 @@
       <pre class="lines">
 
 
-136
-137
-138</pre>
+138
+139
+140</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 136</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
@@ -1954,9 +1862,9 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Apr 12 23:58:59 2024 by
+  Generated on Wed Jul  8 19:12:40 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.2).
+  0.9.44 (ruby-3.2.2).
 </div>
 
     </div>

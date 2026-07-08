@@ -6,13 +6,13 @@
 <title>
   Class: Growthbook::InlineExperiment
   
-    &mdash; Documentation by YARD 0.9.36
+    &mdash; Documentation by YARD 0.9.44
   
 </title>
 
-  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css">
 
-  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+  <link rel="stylesheet" href="../css/common.css" type="text/css">
 
 <script type="text/javascript">
   pathId = "Growthbook::InlineExperiment";
@@ -27,6 +27,8 @@
 
   </head>
   <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
     <div class="nav_wrap">
       <iframe id="nav" src="../class_list.html?1"></iframe>
       <div id="resizer"></div>
@@ -94,16 +96,15 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/growthbook/inline_experiment.rb</dd>
+    <dd>lib/growthbook/inline_experiment.rb
+</dd>
   </dl>
   
 </div>
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    
-<p>Class for creating an inline experiment for evaluating</p>
-
+    <p>Class for creating an inline experiment for evaluating</p>
 
   </div>
 </div>
@@ -137,9 +138,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>If set to false, always return the control (first variation).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>If set to false, always return the control (first variation).</p></div></span>
   
 </li>
 
@@ -164,9 +163,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Appended to the experiment key for sticky bucketing.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Appended to the experiment key for sticky bucketing.</p></div></span>
   
 </li>
 
@@ -191,9 +188,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Optional targeting condition.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Optional targeting condition.</p></div></span>
   
 </li>
 
@@ -218,9 +213,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>What percent of users should be included in the experiment (between 0 and 1, inclusive).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>What percent of users should be included in the experiment (between 0 and 1, inclusive).</p></div></span>
   
 </li>
 
@@ -245,9 +238,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>When true, disables sticky bucketing.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>When true, disables sticky bucketing.</p></div></span>
   
 </li>
 
@@ -272,9 +263,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The attribute to use when hash_attribute is missing (requires Sticky Bucketing).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The attribute to use when hash_attribute is missing (requires Sticky Bucketing).</p></div></span>
   
 </li>
 
@@ -299,9 +288,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Array of filters to apply.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Array of filters to apply.</p></div></span>
   
 </li>
 
@@ -326,9 +313,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>All users included in the experiment will be forced into the specific variation index.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>All users included in the experiment will be forced into the specific variation index.</p></div></span>
   
 </li>
 
@@ -353,9 +338,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>What user attribute should be used to assign variations (defaults to id).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>What user attribute should be used to assign variations (defaults to id).</p></div></span>
   
 </li>
 
@@ -380,9 +363,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The hash version to use (default to 1).</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The hash version to use (default to 1).</p></div></span>
   
 </li>
 
@@ -407,9 +388,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The globally unique identifier for the experiment.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The globally unique identifier for the experiment.</p></div></span>
   
 </li>
 
@@ -434,9 +413,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Meta info about the variations.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Meta info about the variations.</p></div></span>
   
 </li>
 
@@ -461,9 +438,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Minimum bucket version required for sticky bucketing.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Minimum bucket version required for sticky bucketing.</p></div></span>
   
 </li>
 
@@ -488,9 +463,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Human-readable name for the experiment.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Human-readable name for the experiment.</p></div></span>
   
 </li>
 
@@ -515,9 +488,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Adds the experiment to a namespace.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Adds the experiment to a namespace.</p></div></span>
   
 </li>
 
@@ -542,9 +513,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Array of prerequisite flags.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Array of prerequisite flags.</p></div></span>
   
 </li>
 
@@ -569,9 +538,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Id of the current experiment phase.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Id of the current experiment phase.</p></div></span>
   
 </li>
 
@@ -596,9 +563,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Array of ranges, one per variation.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>Array of ranges, one per variation.</p></div></span>
   
 </li>
 
@@ -623,9 +588,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The hash seed to use.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The hash seed to use.</p></div></span>
   
 </li>
 
@@ -650,9 +613,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>The different variations to choose between.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>The different variations to choose between.</p></div></span>
   
 </li>
 
@@ -677,9 +638,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>How to weight traffic between variations.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>How to weight traffic between variations.</p></div></span>
   
 </li>
 
@@ -716,9 +675,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>A new instance of InlineExperiment.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'><p>A new instance of InlineExperiment.</p></div></span>
   
 </li>
 
@@ -746,6 +703,7 @@
 
       
     </ul>
+    
   
 
 <div id="constructor_details" class="method_details_list">
@@ -762,9 +720,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns a new instance of InlineExperiment.</p>
-
+    <p>Returns a new instance of InlineExperiment.</p>
 
   </div>
 </div>
@@ -858,9 +814,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns If set to false, always return the control (first variation).</p>
-
+    <p>Returns If set to false, always return the control (first variation).</p>
 
   </div>
 </div>
@@ -877,9 +831,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>If set to false, always return the control (first variation)</p>
-</div>
+        <div class='inline'><p>If set to false, always return the control (first variation)</p></div>
       
     </li>
   
@@ -919,9 +871,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Appended to the experiment key for sticky bucketing.</p>
-
+    <p>Returns Appended to the experiment key for sticky bucketing.</p>
 
   </div>
 </div>
@@ -938,9 +888,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Appended to the experiment key for sticky bucketing</p>
-</div>
+        <div class='inline'><p>Appended to the experiment key for sticky bucketing</p></div>
       
     </li>
   
@@ -980,9 +928,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Optional targeting condition.</p>
-
+    <p>Returns Optional targeting condition.</p>
 
   </div>
 </div>
@@ -999,9 +945,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Optional targeting condition</p>
-</div>
+        <div class='inline'><p>Optional targeting condition</p></div>
       
     </li>
   
@@ -1041,9 +985,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns What percent of users should be included in the experiment (between 0 and 1, inclusive).</p>
-
+    <p>Returns What percent of users should be included in the experiment (between 0 and 1, inclusive).</p>
 
   </div>
 </div>
@@ -1060,9 +1002,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>What percent of users should be included in the experiment (between 0 and 1, inclusive)</p>
-</div>
+        <div class='inline'><p>What percent of users should be included in the experiment (between 0 and 1, inclusive)</p></div>
       
     </li>
   
@@ -1102,9 +1042,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns When true, disables sticky bucketing.</p>
-
+    <p>Returns When true, disables sticky bucketing.</p>
 
   </div>
 </div>
@@ -1121,9 +1059,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>When true, disables sticky bucketing</p>
-</div>
+        <div class='inline'><p>When true, disables sticky bucketing</p></div>
       
     </li>
   
@@ -1163,9 +1099,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The attribute to use when hash_attribute is missing (requires Sticky Bucketing).</p>
-
+    <p>Returns The attribute to use when hash_attribute is missing (requires Sticky Bucketing).</p>
 
   </div>
 </div>
@@ -1182,9 +1116,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The attribute to use when hash_attribute is missing (requires Sticky Bucketing)</p>
-</div>
+        <div class='inline'><p>The attribute to use when hash_attribute is missing (requires Sticky Bucketing)</p></div>
       
     </li>
   
@@ -1224,9 +1156,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Array of filters to apply.</p>
-
+    <p>Returns Array of filters to apply.</p>
 
   </div>
 </div>
@@ -1243,9 +1173,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Array of filters to apply</p>
-</div>
+        <div class='inline'><p>Array of filters to apply</p></div>
       
     </li>
   
@@ -1285,9 +1213,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns All users included in the experiment will be forced into the specific variation index.</p>
-
+    <p>Returns All users included in the experiment will be forced into the specific variation index.</p>
 
   </div>
 </div>
@@ -1304,9 +1230,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>All users included in the experiment will be forced into the specific variation index</p>
-</div>
+        <div class='inline'><p>All users included in the experiment will be forced into the specific variation index</p></div>
       
     </li>
   
@@ -1346,9 +1270,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns What user attribute should be used to assign variations (defaults to id).</p>
-
+    <p>Returns What user attribute should be used to assign variations (defaults to id).</p>
 
   </div>
 </div>
@@ -1365,9 +1287,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>What user attribute should be used to assign variations (defaults to id)</p>
-</div>
+        <div class='inline'><p>What user attribute should be used to assign variations (defaults to id)</p></div>
       
     </li>
   
@@ -1407,9 +1327,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The hash version to use (default to 1).</p>
-
+    <p>Returns The hash version to use (default to 1).</p>
 
   </div>
 </div>
@@ -1426,9 +1344,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The hash version to use (default to 1)</p>
-</div>
+        <div class='inline'><p>The hash version to use (default to 1)</p></div>
       
     </li>
   
@@ -1468,9 +1384,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The globally unique identifier for the experiment.</p>
-
+    <p>Returns The globally unique identifier for the experiment.</p>
 
   </div>
 </div>
@@ -1487,9 +1401,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The globally unique identifier for the experiment</p>
-</div>
+        <div class='inline'><p>The globally unique identifier for the experiment</p></div>
       
     </li>
   
@@ -1529,9 +1441,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Meta info about the variations.</p>
-
+    <p>Returns Meta info about the variations.</p>
 
   </div>
 </div>
@@ -1548,9 +1458,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Meta info about the variations</p>
-</div>
+        <div class='inline'><p>Meta info about the variations</p></div>
       
     </li>
   
@@ -1590,9 +1498,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Minimum bucket version required for sticky bucketing.</p>
-
+    <p>Returns Minimum bucket version required for sticky bucketing.</p>
 
   </div>
 </div>
@@ -1609,9 +1515,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Minimum bucket version required for sticky bucketing</p>
-</div>
+        <div class='inline'><p>Minimum bucket version required for sticky bucketing</p></div>
       
     </li>
   
@@ -1651,9 +1555,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Human-readable name for the experiment.</p>
-
+    <p>Returns Human-readable name for the experiment.</p>
 
   </div>
 </div>
@@ -1670,9 +1572,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Human-readable name for the experiment</p>
-</div>
+        <div class='inline'><p>Human-readable name for the experiment</p></div>
       
     </li>
   
@@ -1712,9 +1612,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Adds the experiment to a namespace.</p>
-
+    <p>Returns Adds the experiment to a namespace.</p>
 
   </div>
 </div>
@@ -1731,9 +1629,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Adds the experiment to a namespace</p>
-</div>
+        <div class='inline'><p>Adds the experiment to a namespace</p></div>
       
     </li>
   
@@ -1773,9 +1669,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Array of prerequisite flags.</p>
-
+    <p>Returns Array of prerequisite flags.</p>
 
   </div>
 </div>
@@ -1792,9 +1686,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Array of prerequisite flags</p>
-</div>
+        <div class='inline'><p>Array of prerequisite flags</p></div>
       
     </li>
   
@@ -1834,9 +1726,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Id of the current experiment phase.</p>
-
+    <p>Returns Id of the current experiment phase.</p>
 
   </div>
 </div>
@@ -1853,9 +1743,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Id of the current experiment phase</p>
-</div>
+        <div class='inline'><p>Id of the current experiment phase</p></div>
       
     </li>
   
@@ -1895,9 +1783,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns Array of ranges, one per variation.</p>
-
+    <p>Returns Array of ranges, one per variation.</p>
 
   </div>
 </div>
@@ -1914,9 +1800,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>Array of ranges, one per variation</p>
-</div>
+        <div class='inline'><p>Array of ranges, one per variation</p></div>
       
     </li>
   
@@ -1956,9 +1840,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The hash seed to use.</p>
-
+    <p>Returns The hash seed to use.</p>
 
   </div>
 </div>
@@ -1975,9 +1857,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The hash seed to use</p>
-</div>
+        <div class='inline'><p>The hash seed to use</p></div>
       
     </li>
   
@@ -2017,9 +1897,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns The different variations to choose between.</p>
-
+    <p>Returns The different variations to choose between.</p>
 
   </div>
 </div>
@@ -2036,9 +1914,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>The different variations to choose between</p>
-</div>
+        <div class='inline'><p>The different variations to choose between</p></div>
       
     </li>
   
@@ -2078,9 +1954,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    
-<p>Returns How to weight traffic between variations. Must add to 1.</p>
-
+    <p>Returns How to weight traffic between variations. Must add to 1.</p>
 
   </div>
 </div>
@@ -2097,9 +1971,7 @@
       
       
         &mdash;
-        <div class='inline'>
-<p>How to weight traffic between variations. Must add to 1.</p>
-</div>
+        <div class='inline'><p>How to weight traffic between variations. Must add to 1.</p></div>
       
     </li>
   
@@ -2214,9 +2086,9 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Apr 12 23:58:59 2024 by
+  Generated on Wed Jul  8 19:12:40 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.36 (ruby-3.2.2).
+  0.9.44 (ruby-3.2.2).
 </div>
 
     </div>
