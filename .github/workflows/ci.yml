@@ -27,6 +27,7 @@ jobs:
           bundler-cache: true
       - name: RBS type checking with Steep
         run: |
+          gem install rbs -v 3.4.4
           gem install steep -v 1.6.0
           steep check --log-level=fatal
 

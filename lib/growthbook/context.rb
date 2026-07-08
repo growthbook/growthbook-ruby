@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Growthbook
   # Context object passed into the GrowthBook constructor.
   class Context # rubocop:disable Metrics/ClassLength
