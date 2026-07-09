@@ -4,7 +4,7 @@ We welcome all contributions!
 
 ## Requirements
 
--   Ruby version 3.1.1+
+-   Ruby version 3.2+ (CI runs against 3.2, 3.3 and 3.4)
 
 ## Rake tasks
 
@@ -41,12 +41,9 @@ If you use Visual Studio Code, you can use the extension [ruby-rubocop](https://
 ## Type checking
 
 The project uses RBS for type definitions and Steep for type checking.
+Both are managed as development dependencies (see the gemspec), so run:
 
-RBS comes preinstalled with Ruby version 3+.
-
-Install the required gem:
-
-    gem install steep -v 1.6.0
+    bundle exec steep check
 
 You may find the following tools helpful:
 
