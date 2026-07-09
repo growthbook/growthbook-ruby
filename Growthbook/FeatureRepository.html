@@ -209,6 +209,33 @@
 </li>
 
     
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#saved_groups_json-instance_method" title="#saved_groups_json (instance method)">#<strong>saved_groups_json</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Parsed saved groups JSON (used by the $inGroup/$notInGroup operators).</p></div></span>
+  
+</li>
+
+    
   </ul>
 
 
@@ -321,19 +348,21 @@
       <pre class="lines">
 
 
-18
-19
-20
 21
-22</pre>
+22
+23
+24
+25
+26</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>endpoint:</span><span class='comma'>,</span> <span class='label'>decryption_key:</span><span class='rparen'>)</span>
   <span class='ivar'>@endpoint</span> <span class='op'>=</span> <span class='id identifier rubyid_endpoint'>endpoint</span>
   <span class='ivar'>@decryption_key</span> <span class='op'>=</span> <span class='id identifier rubyid_decryption_key'>decryption_key</span>
   <span class='ivar'>@features_json</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@saved_groups_json</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -468,6 +497,47 @@
 </table>
 </div>
     
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="saved_groups_json-instance_method">
+  
+    #<strong>saved_groups_json</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 19</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_saved_groups_json'>saved_groups_json</span>
+  <span class='ivar'>@saved_groups_json</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 
@@ -490,10 +560,6 @@
       <pre class="lines">
 
 
-24
-25
-26
-27
 28
 29
 30
@@ -505,10 +571,14 @@
 36
 37
 38
-39</pre>
+39
+40
+41
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 28</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch'>fetch</span>
   <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='const'>URI</span><span class='lparen'>(</span><span class='id identifier rubyid_endpoint'>endpoint</span><span class='rparen'>)</span>
@@ -568,17 +638,17 @@
       <pre class="lines">
 
 
-41
-42
-43
-44
 45
 46
 47
-48</pre>
+48
+49
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_repository.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fetch!'>fetch!</span>
   <span class='id identifier rubyid_fetch'>fetch</span>
@@ -598,7 +668,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jul  9 13:49:06 2026 by
+  Generated on Thu Jul  9 13:51:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-3.2.2).
 </div>
