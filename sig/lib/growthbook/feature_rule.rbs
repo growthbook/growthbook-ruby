@@ -72,6 +72,9 @@ module Growthbook
     # @return [TrackData[] , nil] Array of tracking calls to fire
     attr_reader tracks: Array[{ experiment: untyped, result: untyped }]?
 
+    # @return [Hash, nil] Arbitrary custom fields attached to the rule
+    attr_reader custom_fields: Hash[String, untyped]?
+
     def initialize: (untyped rule) -> void
 
     # @return [Growthbook::InlineExperiment, nil]
