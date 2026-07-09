@@ -3,6 +3,9 @@
 module Growthbook
   # Internal class that overrides the default value of a Feature based on a set of requirements.
   class FeatureRule
+    # @return [String , nil] Unique identifier for this rule
+    attr_reader :id
+
     # @return [Hash , nil] Optional targeting condition
     attr_reader :condition
 
@@ -70,6 +73,7 @@ module Growthbook
     attr_accessor :parent_conditions
 
     def initialize(rule)
+      @id = get_option(rule, :id)
       @coverage = get_option(rule, :coverage)
       @force = get_option(rule, :force)
       @variations = get_option(rule, :variations)

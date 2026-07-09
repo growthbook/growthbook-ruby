@@ -35,6 +35,9 @@ module Growthbook
     # @return [Hash[String, Any]] Forced feature values
     attr_reader :forced_features
 
+    # @return [Hash[String, Array]] Saved groups, used by the $inGroup/$notInGroup operators
+    attr_reader :saved_groups
+
     # @return [Growthbook::StickyBucketService] Sticky bucket service for sticky bucketing
     attr_reader :sticky_bucket_service
 
@@ -59,6 +62,7 @@ module Growthbook
       @enabled = true
       @impressions = {}
       @sticky_bucket_assignment_docs = {}
+      @saved_groups = {}
 
       features = {}
       attributes = {}
@@ -92,6 +96,8 @@ module Growthbook
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
           @sticky_bucket_identifier_attributes = value
+        when :saved_groups, :savedGroups
+          @saved_groups = value || {}
         else
           warn("Unknown context option: #{key}")
         end
@@ -160,7 +166,7 @@ module Growthbook
 
         return 'cyclic' if parent_res.source == 'cyclicPrerequisite'
 
-        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'])
+        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'], @saved_groups)
         return 'gate' if parent_condition['gate']
 
         return 'fail'
@@ -178,6 +184,9 @@ module Growthbook
 
       return get_feature_result(key.to_s, nil, 'cyclicPrerequisite', nil, nil) if stack.include?(key.to_s)
 
+      # Work on a copy so sibling prerequisite evaluations don't pollute each
+      # other's path (matches the by-value stack semantics of the other SDKs)
+      stack = stack.dup
       stack.add(key.to_s)
 
       feature.rules.each do |rule|
@@ -214,7 +223,7 @@ module Growthbook
           )
           next unless included_in_rollout
 
-          return get_feature_result(key.to_s, rule.force, 'force', nil, nil)
+          return get_feature_result(key.to_s, rule.force, 'force', nil, nil, rule.id)
         end
         # Experiment rule
         next unless rule.experiment?
@@ -226,7 +235,7 @@ module Growthbook
 
         next unless result.in_experiment && !result.passthrough
 
-        return get_feature_result(key.to_s, result.value, 'experiment', exp, result)
+        return get_feature_result(key.to_s, result.value, 'experiment', exp, result, rule.id)
       end
 
       # Fallback
@@ -373,7 +382,7 @@ module Growthbook
     def condition_passes?(condition)
       return false if condition.nil?
 
-      Growthbook::Conditions.eval_condition(@attributes, condition)
+      Growthbook::Conditions.eval_condition(@attributes, condition, @saved_groups)
     end
 
     def get_experiment_result(experiment, variation_index = -1, hash_used: false, feature_id: '', bucket: nil, sticky_bucket_used: false)
@@ -407,8 +416,8 @@ module Growthbook
       result
     end
 
-    def get_feature_result(key, value, source, experiment, experiment_result)
-      res = Growthbook::FeatureResult.new(value, source, experiment, experiment_result)
+    def get_feature_result(key, value, source, experiment, experiment_result, rule_id = '')
+      res = Growthbook::FeatureResult.new(value, source, experiment, experiment_result, rule_id)
 
       track_feature_usage(key, res)
 
@@ -461,6 +470,7 @@ module Growthbook
 
     def included_in_rollout?(seed:, hash_attribute:, fallback_attribute:, hash_version:, range:, coverage:)
       return true if range.nil? && coverage.nil?
+      return false if range.nil? && coverage&.zero?
 
       _, hash_value_raw = get_hash_attribute(hash_attribute, fallback_attribute)
 

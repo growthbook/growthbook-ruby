@@ -1,6 +1,9 @@
 module Growthbook
   # Internal class that overrides the default value of a Feature based on a set of requirements.
   class FeatureRule
+    # @return [String , nil] Unique identifier for this rule
+    attr_reader id: String?
+
     # @return [Hash , nil] Optional targeting condition
     attr_reader condition: (Hash[String, untyped])
     # attr_reader condition: (Hash[String, untyped] | Array[untyped])
