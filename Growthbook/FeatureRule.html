@@ -200,6 +200,33 @@
       <li class="public ">
   <span class="summary_signature">
     
+      <a href="#custom_fields-instance_method" title="#custom_fields (instance method)">#<strong>custom_fields</strong>  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Arbitrary custom fields attached to the rule.</p></div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#disable_sticky_bucketing-instance_method" title="#disable_sticky_bucketing (instance method)">#<strong>disable_sticky_bucketing</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
@@ -885,9 +912,6 @@
       <pre class="lines">
 
 
-75
-76
-77
 78
 79
 80
@@ -916,10 +940,14 @@
 103
 104
 105
-106</pre>
+106
+107
+108
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 75</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='rparen'>)</span>
   <span class='ivar'>@id</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:id</span><span class='rparen'>)</span>
@@ -948,6 +976,7 @@
   <span class='ivar'>@bucket_version</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:bucket_version</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:bucketVersion</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
   <span class='ivar'>@min_bucket_version</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:min_bucket_version</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:minBucketVersion</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
   <span class='ivar'>@parent_conditions</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:parent_conditions</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:parentConditions</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@custom_fields</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:custom_fields</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_rule'>rule</span><span class='comma'>,</span> <span class='symbol'>:customFields</span><span class='rparen'>)</span>
 
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@disable_sticky_bucketing</span>
 
@@ -1128,6 +1157,63 @@
 
 <span class='kw'>def</span> <span class='id identifier rubyid_coverage'>coverage</span>
   <span class='ivar'>@coverage</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="custom_fields-instance_method">
+  
+    #<strong>custom_fields</strong>  &#x21d2; <tt>Hash</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Arbitrary custom fields attached to the rule.</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Arbitrary custom fields attached to the rule</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_custom_fields'>custom_fields</span>
+  <span class='ivar'>@custom_fields</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2318,14 +2404,14 @@
       <pre class="lines">
 
 
-134
-135
-136
-137
-138</pre>
+139
+140
+141
+142
+143</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 134</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_experiment?'>experiment?</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='ivar'>@variations</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2374,12 +2460,12 @@
       <pre class="lines">
 
 
-140
-141
-142</pre>
+145
+146
+147</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 145</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_force?'>force?</span>
   <span class='op'>!</span><span class='id identifier rubyid_experiment?'>experiment?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@force</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2426,10 +2512,6 @@
       <pre class="lines">
 
 
-109
-110
-111
-112
 113
 114
 115
@@ -2449,10 +2531,15 @@
 129
 130
 131
-132</pre>
+132
+133
+134
+135
+136
+137</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 109</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_experiment'>to_experiment</span><span class='lparen'>(</span><span class='id identifier rubyid_feature_key'>feature_key</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='ivar'>@variations</span>
@@ -2475,7 +2562,8 @@
     <span class='label'>fallback_attribute:</span> <span class='ivar'>@fallback_attribute</span><span class='comma'>,</span>
     <span class='label'>disable_sticky_bucketing:</span> <span class='ivar'>@disable_sticky_bucketing</span><span class='comma'>,</span>
     <span class='label'>bucket_version:</span> <span class='ivar'>@bucket_version</span><span class='comma'>,</span>
-    <span class='label'>min_bucket_version:</span> <span class='ivar'>@min_bucket_version</span>
+    <span class='label'>min_bucket_version:</span> <span class='ivar'>@min_bucket_version</span><span class='comma'>,</span>
+    <span class='label'>custom_fields:</span> <span class='ivar'>@custom_fields</span>
   <span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2498,11 +2586,6 @@
       <pre class="lines">
 
 
-144
-145
-146
-147
-148
 149
 150
 151
@@ -2522,10 +2605,15 @@
 165
 166
 167
-168</pre>
+168
+169
+170
+171
+172
+173</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/feature_rule.rb', line 149</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_json'>to_json</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid__args'>_args</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -2562,7 +2650,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jul  9 13:51:36 2026 by
+  Generated on Thu Jul  9 13:53:23 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-3.2.2).
 </div>
