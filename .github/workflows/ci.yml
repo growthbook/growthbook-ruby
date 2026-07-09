@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2.2
+          ruby-version: "3.4"
           bundler-cache: true
       - name: Lint
         run: |
@@ -23,13 +23,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1.1
+          ruby-version: "3.4"
           bundler-cache: true
       - name: RBS type checking with Steep
-        run: |
-          gem install rbs -v 3.4.4
-          gem install steep -v 1.6.0
-          steep check --log-level=fatal
+        run: bundle exec steep check --log-level=fatal
 
   build-test:
     runs-on: ubuntu-latest
@@ -37,8 +34,9 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          - "2.5"
-          - "3.2.2"
+          - "3.2"
+          - "3.3"
+          - "3.4"
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1

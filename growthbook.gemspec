@@ -17,10 +17,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'base64'
   s.add_dependency 'bigdecimal'
 
+  # rbs is pinned to 3.4.x: steep 1.6.0 hangs on rbs 3.6+ (UntypedFunction)
+  s.add_development_dependency 'rbs', '~> 3.4.0'
   s.add_development_dependency 'rspec', '~> 3.2'
   s.add_development_dependency 'rspec-its', '~> 1.3'
   s.add_development_dependency 'simplecov', '~> 0.21'
   s.add_development_dependency 'simplecov-shields-badge', '~> 0.1.0'
+  s.add_development_dependency 'steep', '~> 1.6.0'
   s.add_development_dependency 'webmock', '~> 3.18'
 
   s.metadata['rubygems_mfa_required'] = 'true'
