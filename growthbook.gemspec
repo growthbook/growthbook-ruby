@@ -13,6 +13,10 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.required_ruby_version = '>= 2.5.0'
 
+  # base64 and bigdecimal are no longer default gems starting from Ruby 3.4, so declare them explicitly
+  s.add_dependency 'base64'
+  s.add_dependency 'bigdecimal'
+
   s.add_development_dependency 'rspec', '~> 3.2'
   s.add_development_dependency 'rspec-its', '~> 1.3'
   s.add_development_dependency 'simplecov', '~> 0.21'
