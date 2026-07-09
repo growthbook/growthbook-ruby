@@ -6,6 +6,7 @@ module Growthbook
     attr_reader endpoint: String
     attr_reader decryption_key: String?
     attr_reader features_json: Hash[String, untyped]
+    attr_reader saved_groups_json: Hash[String, untyped]
 
     def fetch: () -> (nil | Hash[String, untyped])
 
@@ -18,6 +19,8 @@ module Growthbook
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 
     def parsed_decrypted_response: () -> (nil | Hash[String, untyped])
+
+    def decrypted_saved_groups: (Hash[String, untyped] parsed, String key) -> Hash[String, untyped]
 
     def parsed_response: () -> (nil | Hash[String, untyped])
 
