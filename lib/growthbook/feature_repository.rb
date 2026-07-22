@@ -18,16 +18,28 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
-    def initialize(endpoint:, decryption_key:)
+    # [Integer] Seconds to wait for the connection to open (min 1)
+    attr_reader :open_timeout
+
+    # [Integer] Seconds to wait for the response to be read (min 1)
+    attr_reader :read_timeout
+
+    def initialize(endpoint:, decryption_key:, open_timeout: 2, read_timeout: 2)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @open_timeout = [open_timeout, 1].max || 1
+      @read_timeout = [read_timeout, 1].max || 1
     end
 
     def fetch
       uri = URI(endpoint)
-      res = Net::HTTP.get_response(uri)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.open_timeout = @open_timeout
+      http.read_timeout = @read_timeout
+      res = http.get(uri.request_uri)
 
       @response = res.is_a?(Net::HTTPSuccess) ? res.body : nil
 
