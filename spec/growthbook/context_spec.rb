@@ -302,4 +302,33 @@ describe Growthbook::Context do
       end
     end
   end
+
+  describe '#update_attributes' do
+    subject(:gb) { described_class.new(attributes: { id: '1', country: 'US' }) }
+
+    it 'merges new attributes into the existing ones' do
+      gb.update_attributes(plan: 'pro')
+
+      expect(gb.attributes).to eq('id' => '1', 'country' => 'US', 'plan' => 'pro')
+    end
+
+    it 'overwrites existing keys and preserves untouched ones' do
+      gb.update_attributes(country: 'FR')
+
+      expect(gb.attributes).to eq('id' => '1', 'country' => 'FR')
+    end
+
+    it 'merges instead of replacing (unlike attributes=)' do
+      gb.attributes = { plan: 'pro' }
+      gb.update_attributes(id: '2')
+
+      expect(gb.attributes).to eq('plan' => 'pro', 'id' => '2')
+    end
+
+    it 'treats nil as a no-op' do
+      gb.update_attributes(nil)
+
+      expect(gb.attributes).to eq('id' => '1', 'country' => 'US')
+    end
+  end
 end

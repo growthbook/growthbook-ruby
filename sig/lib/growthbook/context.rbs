@@ -47,6 +47,8 @@ module Growthbook
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
 
+    def update_attributes: (Hash[String | Symbol, untyped]? attrs) -> untyped
+
     def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
 
     def forced_features=: (Hash[String | Symbol, untyped] forced_features) -> Hash[String, untyped]
