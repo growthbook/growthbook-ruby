@@ -9,7 +9,7 @@ module Growthbook
     attr_accessor :enabled
 
     # @return [String] The URL of the current page
-    attr_accessor :url
+    attr_reader :url
 
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor :qa_mode
@@ -53,7 +53,14 @@ module Growthbook
     # @return [Hash[String, String]] The attributes that are used to assign sticky buckets
     attr_reader :sticky_bucket_attributes
 
+    # @return [Growthbook::RemoteEvalRepository, nil] Repository used to evaluate features on a proxy/edge
+    attr_reader :remote_eval_repository
+
     def initialize(options = {})
+      # Setters re-evaluate remotely; hold that off until the whole context is built
+      @initializing = true
+      decryption_key = nil
+
       @features = {}
       @attributes = {}
       @forced_variations = {}
@@ -76,7 +83,7 @@ module Growthbook
         when :url
           @url = value
         when :decryption_key
-          nil
+          decryption_key = value
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
           features = decrypted unless decrypted.nil?
@@ -98,6 +105,8 @@ module Growthbook
           @sticky_bucket_identifier_attributes = value
         when :saved_groups, :savedGroups
           @saved_groups = value || {}
+        when :remote_eval_repository
+          @remote_eval_repository = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -106,6 +115,11 @@ module Growthbook
       @using_derived_sticky_bucket_attributes = !@sticky_bucket_identifier_attributes
       self.attributes = attributes
       self.features = features
+
+      validate_remote_eval(decryption_key)
+
+      @initializing = false
+      refresh_for_remote_eval
     end
 
     def features=(features)
@@ -127,14 +141,61 @@ module Growthbook
       @attributes = stringify_keys(attrs || {})
 
       refresh_sticky_buckets
+      refresh_for_remote_eval
+    end
+
+    def url=(url)
+      @url = url
+
+      refresh_for_remote_eval
+    end
+
+    def saved_groups=(saved_groups)
+      @saved_groups = saved_groups || {}
     end
 
     def forced_variations=(forced_variations)
       @forced_variations = stringify_keys(forced_variations || {})
+
+      refresh_for_remote_eval
     end
 
     def forced_features=(forced_features)
       @forced_features = stringify_keys(forced_features || {})
+
+      refresh_for_remote_eval
+    end
+
+    # @return [true, false] Whether features are evaluated on a proxy/edge instead of locally
+    def remote_eval?
+      !@remote_eval_repository.nil?
+    end
+
+    # Re-evaluate the features for the current context.
+    #
+    # A no-op outside of remote evaluation mode. Changing the attributes, forced
+    # variations, forced features or URL already triggers this, so it is only
+    # needed to pick up feature changes made on the server while the context
+    # itself stayed the same (responses are cached for the repository's TTL).
+    #
+    # @return [true, false] Whether new features were applied
+    def refresh_for_remote_eval
+      return false if @initializing || @remote_eval_repository.nil?
+
+      data = @remote_eval_repository.fetch(
+        attributes: @attributes,
+        forced_variations: @forced_variations,
+        forced_features: @forced_features,
+        url: @url
+      )
+
+      # Keep the features we already have when the proxy is unreachable
+      return false if data.nil?
+
+      self.saved_groups = data['savedGroups']
+      self.features = data['features'] || {}
+
+      true
     end
 
     def eval_feature(key)
@@ -159,6 +220,16 @@ module Growthbook
     end
 
     private
+
+    # Remote evaluation delegates the whole evaluation to a self-hosted
+    # proxy/edge, which rules out the two features this SDK would otherwise
+    # handle locally
+    def validate_remote_eval(decryption_key)
+      return if @remote_eval_repository.nil?
+
+      raise ArgumentError, 'decryption_key is not compatible with remote evaluation; the proxy handles encryption' unless decryption_key.nil?
+      raise ArgumentError, 'sticky_bucket_service is not compatible with remote evaluation; the proxy handles sticky bucketing' unless @sticky_bucket_service.nil?
+    end
 
     def _eval_prereqs(parent_conditions, stack)
       parent_conditions.each do |parent_condition|

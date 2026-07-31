@@ -1,0 +1,91 @@
+module Growthbook
+  # Optional class for fetching remotely evaluated features from a self-hosted proxy/edge
+  class RemoteEvalRepository
+    DEFAULT_CACHE_TTL: Integer
+    STALE_TTL_MULTIPLIER: Integer
+    DEFAULT_OPEN_TIMEOUT: Integer
+    DEFAULT_READ_TIMEOUT: Integer
+
+    def initialize: (
+      api_host: String?,
+      client_key: String?,
+      ?cache: Growthbook::RemoteEvalCache?,
+      ?cache_key_attributes: Array[String | Symbol]?,
+      ?cache_ttl: Integer,
+      ?open_timeout: Integer,
+      ?read_timeout: Integer
+    ) -> void
+
+    @open_timeout: Integer
+    @read_timeout: Integer
+    @flight: Hash[String, Thread::Mutex]
+    @flight_mutex: Thread::Mutex
+
+    attr_reader endpoint: String
+    attr_reader cache_key_attributes: Array[String | Symbol]?
+    attr_reader cache_ttl: Integer
+    attr_reader features_json: Hash[String, untyped]
+    attr_reader saved_groups_json: Hash[String, untyped]
+
+    def fetch: (
+      ?attributes: Hash[String | Symbol, untyped],
+      ?forced_variations: Hash[String | Symbol, untyped],
+      ?forced_features: Hash[String | Symbol, untyped],
+      ?url: String?
+    ) -> Hash[String, untyped]?
+
+    def fetch!: (
+      ?attributes: Hash[String | Symbol, untyped],
+      ?forced_variations: Hash[String | Symbol, untyped],
+      ?forced_features: Hash[String | Symbol, untyped],
+      ?url: String?
+    ) -> Hash[String, untyped]
+
+    private
+
+    attr_reader cache: Growthbook::RemoteEvalCache?
+
+    def cloud_host?: (String? host) -> bool
+
+    def build_payload: (Hash[String | Symbol, untyped] attributes, Hash[String | Symbol, untyped] forced_variations, Hash[String | Symbol, untyped] forced_features, String? url) -> Hash[String, untyped]
+
+    def cache_key: (Hash[String, untyped] payload) -> String
+
+    def sort_recursive: (untyped value) -> untyped
+
+    def post: (Hash[String, untyped] payload) -> Hash[String, untyped]?
+
+    def parse: (untyped body) -> Hash[String, untyped]?
+
+    def apply: (Hash[String, untyped]? response) -> Hash[String, untyped]?
+
+    def fresh?: (Hash[String, untyped]? cached) -> bool
+
+    def read_cache: (String key) -> Hash[String, untyped]?
+
+    def write_cache: (String key, Hash[String, untyped] response) -> untyped
+
+    def single_flight: (String key) { () -> untyped } -> untyped
+
+    def stringify_keys: (Hash[String | Symbol, untyped]? hash) -> Hash[String, untyped]
+
+    class RemoteEvalFetchError < StandardError
+    end
+  end
+end
+
+module Net
+  class HTTPResponse
+    def body: () -> String?
+  end
+
+  class HTTP
+    class Post
+      def self.new: (untyped uri) -> untyped
+    end
+
+    def self.start: (String? address, Integer? port, **untyped options) { (untyped) -> untyped } -> untyped
+
+    def request: (untyped request) -> untyped
+  end
+end
