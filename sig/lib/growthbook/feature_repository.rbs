@@ -1,10 +1,13 @@
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    DEFAULT_TIMEOUT: Integer
+    MIN_TIMEOUT: Integer
+
     @open_timeout: Integer
     @read_timeout: Integer
 
-    def initialize: (endpoint: String, decryption_key: String?, ?open_timeout: Integer, ?read_timeout: Integer) -> void
+    def initialize: (endpoint: String, decryption_key: String?, ?open_timeout: Integer?, ?read_timeout: Integer?) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
@@ -20,6 +23,8 @@ module Growthbook
     private
 
     attr_reader response: String?
+
+    def normalize_timeout: (Integer? seconds) -> Integer
 
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 

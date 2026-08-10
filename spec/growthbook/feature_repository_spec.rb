@@ -475,6 +475,12 @@ RSpec.describe Growthbook::FeatureRepository do
       expect(repo.read_timeout).to eq(1)
     end
 
+    it 'falls back to the default when a timeout is nil' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: nil, read_timeout: nil)
+      expect(repo.open_timeout).to eq(2)
+      expect(repo.read_timeout).to eq(2)
+    end
+
     it 'returns nil when the request times out' do
       stub_request(:get, endpoint).to_timeout
       repo = described_class.new(endpoint: endpoint, decryption_key: nil)

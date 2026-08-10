@@ -6,6 +6,14 @@ require 'uri'
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    # Seconds to wait before giving up on a request. Ruby's own default is 60s,
+    # which is far too long to block on in a request path.
+    DEFAULT_TIMEOUT = 2
+
+    # Lowest timeout that can be configured, so a 0 cannot make every request
+    # fail instantly
+    MIN_TIMEOUT = 1
+
     # [String] The SDK endpoint
     attr_reader :endpoint
 
@@ -24,18 +32,20 @@ module Growthbook
     # [Integer] Seconds to wait for the response to be read (min 1)
     attr_reader :read_timeout
 
-    def initialize(endpoint:, decryption_key:, open_timeout: 2, read_timeout: 2)
+    def initialize(endpoint:, decryption_key:, open_timeout: DEFAULT_TIMEOUT, read_timeout: DEFAULT_TIMEOUT)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
-      @open_timeout = [open_timeout, 1].max || 1
-      @read_timeout = [read_timeout, 1].max || 1
+      @open_timeout = normalize_timeout(open_timeout)
+      @read_timeout = normalize_timeout(read_timeout)
     end
 
     def fetch
       uri = URI(endpoint)
-      http = Net::HTTP.new(uri.host, uri.port)
+      # hostname, not host: an IPv6 literal comes back from host wrapped in
+      # brackets, which Net::HTTP cannot connect to
+      http = Net::HTTP.new(uri.hostname, uri.port)
       http.use_ssl = uri.scheme == 'https'
       http.open_timeout = @open_timeout
       http.read_timeout = @read_timeout
@@ -66,6 +76,17 @@ module Growthbook
     private
 
     attr_reader :response
+
+    # nil has to be resolved before any comparison: it would mean "wait forever"
+    # if it reached Net::HTTP, and [nil, 1].max raises rather than returning 1.
+    # Spelled out rather than using [seconds, MIN_TIMEOUT].max because Array#max
+    # is typed as nilable, which the type check rejects.
+    def normalize_timeout(seconds)
+      seconds = DEFAULT_TIMEOUT if seconds.nil?
+      return MIN_TIMEOUT if seconds < MIN_TIMEOUT
+
+      seconds
+    end
 
     def use_decryption?
       !decryption_key.nil?
