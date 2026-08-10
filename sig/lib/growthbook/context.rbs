@@ -31,6 +31,8 @@ module Growthbook
 
     attr_reader saved_groups: Hash[String, untyped]
 
+    attr_reader contextual_bandits: Hash[String, Growthbook::ContextualBanditDefinition]
+
     attr_reader sticky_bucket_service: Growthbook::StickyBucketService
 
     attr_reader sticky_bucket_identifier_attributes: Array[String]
@@ -46,6 +48,8 @@ module Growthbook
     def features=: (Hash[String | Symbol, untyped] features) -> void
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
+
+    def contextual_bandits=: (Hash[untyped, untyped]? contextual_bandits) -> void
 
     def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
 
@@ -92,5 +96,7 @@ module Growthbook
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
 
     def track_feature_usage: (String, FeatureResult) -> void
+
+    def apply_contextual_bandit: (InlineExperiment exp, String contextual_bandit_ref) -> void
   end
 end

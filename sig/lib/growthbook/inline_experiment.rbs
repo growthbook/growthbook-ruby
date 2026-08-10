@@ -67,11 +67,19 @@ module Growthbook
     # @return [Hash, nil] Arbitrary custom fields attached to the experiment
     attr_accessor custom_fields: Hash[String, untyped]?
 
+    # @return [Growthbook::ContextualBandit, nil] How a contextual bandit routed this evaluation
+    attr_accessor contextual_bandit: Growthbook::ContextualBandit?
+
+    @coverage_specified: bool
+    @hash_attribute_specified: bool
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     def to_json: (*untyped _args) -> Hash[String, untyped]
 
     private
+
+    def option?: (untyped hash, untyped key) -> bool
 
     def get_option: (untyped hash, untyped key, ?untyped? default) -> untyped
   end

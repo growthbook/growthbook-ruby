@@ -172,6 +172,21 @@ describe 'test suite' do
     end
   end
 
+  describe 'contextualBandit' do
+    # Loop through each test case in the JSON file
+    test_cases['contextualBandit'].each do |test_case|
+      # Extract data about the test case
+      test_name, context, key, expected = test_case
+
+      # Run the actual test case
+      it test_name do
+        gb = Growthbook::Context.new(context)
+        result = gb.eval_feature(key)
+        expect(result.to_json).to eq(expected)
+      end
+    end
+  end
+
   describe 'stickyBucket' do
     test_cases['stickyBucket'].each do |test_case|
       test_name, ctx, initial_docs, key, expected_result, expected_docs = test_case
