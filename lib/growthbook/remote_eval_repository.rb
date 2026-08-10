@@ -27,8 +27,15 @@ module Growthbook
     # so that a failing endpoint can still be served from a stale entry
     STALE_TTL_MULTIPLIER = 10
 
-    DEFAULT_OPEN_TIMEOUT = 5
-    DEFAULT_READ_TIMEOUT = 10
+    # Seconds to wait before giving up on a request. Kept short because remote
+    # eval sits in the request path: a hung proxy would otherwise block a thread
+    # for the whole timeout on every cache miss. Failing is cheap here - a stale
+    # cached response or the current features are served instead.
+    DEFAULT_TIMEOUT = 2
+
+    # Lowest timeout that can be configured, so a 0 cannot make every request
+    # fail instantly
+    MIN_TIMEOUT = 1
 
     # [String] The remote evaluation endpoint the payload is POSTed to
     attr_reader :endpoint
@@ -38,6 +45,12 @@ module Growthbook
 
     # [Integer] Seconds a cached response is considered fresh
     attr_reader :cache_ttl
+
+    # [Integer] Seconds to wait for the connection to open (min 1)
+    attr_reader :open_timeout
+
+    # [Integer] Seconds to wait for the response to be read (min 1)
+    attr_reader :read_timeout
 
     # Parsed features JSON of the last successful evaluation
     attr_reader :features_json
@@ -57,8 +70,8 @@ module Growthbook
       cache: InMemoryRemoteEvalCache.new,
       cache_key_attributes: nil,
       cache_ttl: DEFAULT_CACHE_TTL,
-      open_timeout: DEFAULT_OPEN_TIMEOUT,
-      read_timeout: DEFAULT_READ_TIMEOUT,
+      open_timeout: DEFAULT_TIMEOUT,
+      read_timeout: DEFAULT_TIMEOUT,
       allow_insecure_http: false
     )
       raise ArgumentError, 'api_host must be provided for remote evaluation' if api_host.nil? || api_host.to_s.empty?
@@ -70,8 +83,8 @@ module Growthbook
       @cache = cache
       @cache_key_attributes = cache_key_attributes
       @cache_ttl = cache_ttl
-      @open_timeout = open_timeout
-      @read_timeout = read_timeout
+      @open_timeout = normalize_timeout(open_timeout)
+      @read_timeout = normalize_timeout(read_timeout)
       @features_json = {}
       @saved_groups_json = {}
       @flight = {}
@@ -144,6 +157,15 @@ module Growthbook
       raise ArgumentError,
             'Refusing to send the evaluation context over plaintext http: it contains user attributes and the client key. ' \
             'Use https, or pass allow_insecure_http: true if the proxy is only reachable over a trusted network.'
+    end
+
+    # nil has to be resolved before any comparison: it would mean "wait forever"
+    # if it reached Net::HTTP, and [nil, 1].max raises rather than returning 1
+    def normalize_timeout(seconds)
+      seconds = DEFAULT_TIMEOUT if seconds.nil?
+      return MIN_TIMEOUT if seconds < MIN_TIMEOUT
+
+      seconds
     end
 
     def cloud_host?(host)

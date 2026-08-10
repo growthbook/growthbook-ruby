@@ -89,6 +89,25 @@ RSpec.describe Growthbook::RemoteEvalRepository do
         .to raise_error(ArgumentError, /http or https/)
     end
 
+    it 'defaults to 2 seconds for open and read' do
+      expect(repository.open_timeout).to eq(2)
+      expect(repository.read_timeout).to eq(2)
+    end
+
+    it 'accepts custom timeouts' do
+      repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 3, read_timeout: 4)
+
+      expect(repo.open_timeout).to eq(3)
+      expect(repo.read_timeout).to eq(4)
+    end
+
+    it 'enforces a one second minimum and falls back to the default on nil' do
+      repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 0, read_timeout: nil)
+
+      expect(repo.open_timeout).to eq(1)
+      expect(repo.read_timeout).to eq(2)
+    end
+
     it 'requires a client key' do
       expect { described_class.new(api_host: api_host, client_key: '') }
         .to raise_error(ArgumentError, /client_key/)
