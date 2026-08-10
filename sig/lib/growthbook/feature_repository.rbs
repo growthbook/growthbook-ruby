@@ -1,6 +1,14 @@
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    DEFAULT_CACHE_MUTEX: Thread::Mutex
+
+    self.@default_cache: FeatureCache?
+
+    def self.default_cache: () -> FeatureCache
+
+    def self.default_cache=: (FeatureCache? cache) -> void
+
     @ttl: Integer?
     @cache: FeatureCache
 
@@ -19,6 +27,8 @@ module Growthbook
     private
 
     attr_reader response: String?
+
+    def cache_key: () -> String
 
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 

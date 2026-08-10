@@ -1,11 +1,31 @@
 # frozen_string_literal: true
 
+require 'digest'
 require 'net/http'
 require 'uri'
 
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    DEFAULT_CACHE_MUTEX = Mutex.new
+    private_constant :DEFAULT_CACHE_MUTEX
+
+    class << self
+      # Cache shared by every repository that was not given one explicitly.
+      #
+      # Repositories are usually built per request, so a per-instance cache
+      # would be empty on every fetch and the TTL would never take effect.
+      def default_cache
+        DEFAULT_CACHE_MUTEX.synchronize { @default_cache ||= Growthbook::InMemoryFeatureCache.new }
+      end
+
+      # Mainly useful in tests, where a shared cache otherwise leaks payloads
+      # between examples
+      def default_cache=(cache)
+        DEFAULT_CACHE_MUTEX.synchronize { @default_cache = cache }
+      end
+    end
+
     # [String] The SDK endpoint
     attr_reader :endpoint
 
@@ -27,11 +47,11 @@ module Growthbook
       @features_json = {}
       @saved_groups_json = {}
       @ttl = ttl
-      @cache = cache || Growthbook::InMemoryFeatureCache.new
+      @cache = cache || self.class.default_cache
     end
 
     def fetch
-      cached = @cache.get(endpoint)
+      cached = @cache.get(cache_key)
       unless cached.nil?
         @features_json = cached['features']
         @saved_groups_json = cached['savedGroups']
@@ -46,7 +66,7 @@ module Growthbook
       return nil if response.nil?
 
       result = use_decryption? ? parsed_decrypted_response : parsed_plain_text_response
-      @cache.set(endpoint, { 'features' => @features_json, 'savedGroups' => @saved_groups_json }, @ttl) unless result.nil?
+      @cache.set(cache_key, { 'features' => @features_json, 'savedGroups' => @saved_groups_json }, @ttl) unless result.nil?
       result
     rescue StandardError
       nil
@@ -66,6 +86,18 @@ module Growthbook
     private
 
     attr_reader :response
+
+    # The decryption key is part of the key because the cache is shared: two
+    # repositories on the same endpoint with different keys store different
+    # payloads, and keying on the endpoint alone would let one serve the other's
+    # entry - including handing an undecrypted, empty payload to the repository
+    # that does have a key. Digested so the key itself is never part of a cache
+    # key that might be inspected or logged.
+    def cache_key
+      return endpoint if decryption_key.nil?
+
+      "#{endpoint}||#{Digest::SHA256.hexdigest(decryption_key)}"
+    end
 
     def use_decryption?
       !decryption_key.nil?

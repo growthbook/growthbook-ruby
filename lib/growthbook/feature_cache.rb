@@ -11,30 +11,61 @@ module Growthbook
     def set(_key, _value, _ttl)
       nil
     end
+
+    def clear
+      nil
+    end
   end
 
   # Sample in-memory cache with TTL-based expiry (not shared across processes).
+  #
+  # Safe to use from several threads: the default cache is shared by every
+  # FeatureRepository, so concurrent access is the normal case here rather than
+  # the exception. Without the lock, the expiry check in #get is a
+  # check-then-delete race that can drop an entry another thread just wrote.
   class InMemoryFeatureCache < FeatureCache
     def initialize
       super
       @store = {}
+      @mutex = Mutex.new
     end
 
     def get(key)
-      entry = @store[key]
-      return nil if entry.nil?
+      @mutex.synchronize do
+        entry = @store[key]
+        next nil if entry.nil?
 
-      if entry[:expires_at] && Time.now >= entry[:expires_at]
-        @store.delete(key)
-        return nil
+        expires_at = entry[:expires_at]
+        if !expires_at.nil? && monotonic_now >= expires_at
+          @store.delete(key)
+          next nil
+        end
+
+        entry[:value]
       end
-
-      entry[:value]
     end
 
     # @param ttl [Integer, nil] Seconds until expiry; nil means it never expires
     def set(key, value, ttl)
-      @store[key] = { value: value, expires_at: ttl ? Time.now + ttl : nil }
+      @mutex.synchronize do
+        @store[key] = { value: value, expires_at: ttl ? monotonic_now + ttl : nil }
+      end
+
+      value
+    end
+
+    def clear
+      @mutex.synchronize { @store.clear }
+
+      nil
+    end
+
+    private
+
+    # Monotonic time so that a wall-clock change cannot keep an entry alive, or
+    # expire it early, beyond its TTL
+    def monotonic_now
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
 end

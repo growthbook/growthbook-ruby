@@ -489,5 +489,47 @@ RSpec.describe Growthbook::FeatureRepository do
         'savedGroups' => {}
       )
     end
+
+    it 'shares the default cache between repositories' do
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+      second = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+
+      expect(second).to eq('flag' => { 'defaultValue' => true })
+      expect(a_request(:get, endpoint)).to have_been_made.once
+    end
+
+    it 'does not share entries between different decryption keys' do
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+      described_class.new(endpoint: endpoint, decryption_key: 'BhB1wORFmZLTDjbvstvS8w==', ttl: 60).fetch
+
+      # The second repository has to fetch for itself: the payload the first one
+      # cached was never decrypted
+      expect(a_request(:get, endpoint)).to have_been_made.twice
+    end
+
+    it 'keeps the raw decryption key out of the cache key' do
+      cache = Growthbook::InMemoryFeatureCache.new
+      described_class.new(endpoint: endpoint, decryption_key: 'BhB1wORFmZLTDjbvstvS8w==', cache: cache).fetch
+
+      expect(cache.instance_variable_get(:@store).keys.join).not_to include('BhB1wORFmZLTDjbvstvS8w==')
+    end
+  end
+
+  describe '.default_cache' do
+    it 'is memoized' do
+      cache = described_class.default_cache
+
+      expect(described_class.default_cache).to be(cache)
+    end
+
+    it 'can be replaced' do
+      replacement = Growthbook::InMemoryFeatureCache.new
+      original = described_class.default_cache
+
+      described_class.default_cache = replacement
+      expect(described_class.default_cache).to be(replacement)
+    ensure
+      described_class.default_cache = original
+    end
   end
 end
