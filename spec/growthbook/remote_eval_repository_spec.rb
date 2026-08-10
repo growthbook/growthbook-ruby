@@ -50,6 +50,45 @@ RSpec.describe Growthbook::RemoteEvalRepository do
       expect(repo.endpoint).to eq('https://growthbook.io.example.com/api/eval/sdk-abc123')
     end
 
+    it 'rejects a plaintext http host' do
+      expect { described_class.new(api_host: 'http://gb-proxy.example.com', client_key: 'sdk-abc123') }
+        .to raise_error(ArgumentError, /plaintext http/)
+    end
+
+    it 'allows plaintext http when explicitly opted in' do
+      repo = described_class.new(api_host: 'http://gb-proxy.example.com', client_key: 'sdk-abc123', allow_insecure_http: true)
+
+      expect(repo.endpoint).to eq('http://gb-proxy.example.com/api/eval/sdk-abc123')
+    end
+
+    it 'allows plaintext http on localhost' do
+      repo = described_class.new(api_host: 'http://localhost:3300', client_key: 'sdk-abc123')
+
+      expect(repo.endpoint).to eq('http://localhost:3300/api/eval/sdk-abc123')
+    end
+
+    it 'allows plaintext http on a loopback address' do
+      repo = described_class.new(api_host: 'http://127.0.0.1:3300', client_key: 'sdk-abc123')
+
+      expect(repo.endpoint).to eq('http://127.0.0.1:3300/api/eval/sdk-abc123')
+    end
+
+    it 'allows plaintext http on the ipv6 loopback address' do
+      repo = described_class.new(api_host: 'http://[::1]:3300', client_key: 'sdk-abc123')
+
+      expect(repo.endpoint).to eq('http://[::1]:3300/api/eval/sdk-abc123')
+    end
+
+    it 'rejects an api host without a scheme' do
+      expect { described_class.new(api_host: 'gb-proxy.example.com', client_key: 'sdk-abc123') }
+        .to raise_error(ArgumentError, /absolute URL/)
+    end
+
+    it 'rejects a non-http scheme' do
+      expect { described_class.new(api_host: 'ftp://gb-proxy.example.com', client_key: 'sdk-abc123') }
+        .to raise_error(ArgumentError, /http or https/)
+    end
+
     it 'requires a client key' do
       expect { described_class.new(api_host: api_host, client_key: '') }
         .to raise_error(ArgumentError, /client_key/)

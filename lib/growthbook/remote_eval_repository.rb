@@ -45,11 +45,12 @@ module Growthbook
     # Parsed saved groups JSON of the last successful evaluation
     attr_reader :saved_groups_json
 
-    # @param api_host [String] Base URL of the self-hosted proxy/edge
+    # @param api_host [String] Base https URL of the self-hosted proxy/edge
     # @param client_key [String] The SDK client key
     # @param cache [Growthbook::RemoteEvalCache, nil] Response cache, nil to disable caching
     # @param cache_key_attributes [Array<String>, nil] Restrict the cache key to these attributes
     # @param cache_ttl [Integer] Seconds before a cached response is refetched
+    # @param allow_insecure_http [true, false] Permit a plaintext http api_host on a non-loopback host
     def initialize(
       api_host:,
       client_key:,
@@ -57,17 +58,13 @@ module Growthbook
       cache_key_attributes: nil,
       cache_ttl: DEFAULT_CACHE_TTL,
       open_timeout: DEFAULT_OPEN_TIMEOUT,
-      read_timeout: DEFAULT_READ_TIMEOUT
+      read_timeout: DEFAULT_READ_TIMEOUT,
+      allow_insecure_http: false
     )
       raise ArgumentError, 'api_host must be provided for remote evaluation' if api_host.nil? || api_host.to_s.empty?
       raise ArgumentError, 'client_key must be provided for remote evaluation' if client_key.nil? || client_key.to_s.empty?
 
-      host = begin
-        URI(api_host.to_s).host
-      rescue StandardError
-        nil
-      end
-      raise ArgumentError, 'Cannot use remote evaluation on GrowthBook Cloud; use a self-hosted proxy or edge worker' if cloud_host?(host)
+      validate_api_host(api_host.to_s, allow_insecure_http: allow_insecure_http)
 
       @endpoint = "#{api_host.to_s.sub(%r{/+\z}, '')}/api/eval/#{client_key}"
       @cache = cache
@@ -126,8 +123,38 @@ module Growthbook
 
     attr_reader :cache
 
+    # The payload carries user attributes and the endpoint carries the client
+    # key, so both are rejected over plaintext http. Loopback is exempt (nothing
+    # leaves the machine), and allow_insecure_http covers a proxy reached over a
+    # trusted network, e.g. in-cluster behind a TLS-terminating load balancer.
+    def validate_api_host(api_host, allow_insecure_http:)
+      uri = begin
+        URI(api_host)
+      rescue StandardError
+        nil
+      end
+
+      raise ArgumentError, "api_host must be an absolute URL including the scheme, got #{api_host.inspect}" if uri.nil? || uri.host.nil? || uri.scheme.nil?
+      raise ArgumentError, 'Cannot use remote evaluation on GrowthBook Cloud; use a self-hosted proxy or edge worker' if cloud_host?(uri.host)
+
+      scheme = uri.scheme.downcase
+      raise ArgumentError, "api_host must use http or https, got #{scheme.inspect}" unless %w[http https].include?(scheme)
+      return if scheme == 'https' || allow_insecure_http || loopback_host?(uri.host)
+
+      raise ArgumentError,
+            'Refusing to send the evaluation context over plaintext http: it contains user attributes and the client key. ' \
+            'Use https, or pass allow_insecure_http: true if the proxy is only reachable over a trusted network.'
+    end
+
     def cloud_host?(host)
       !host.nil? && host.match?(/(\A|\.)growthbook\.io\z/i)
+    end
+
+    def loopback_host?(host)
+      # URI#host keeps the brackets around an IPv6 literal
+      host = host.to_s.downcase.delete('[]')
+
+      host == 'localhost' || host.end_with?('.localhost') || host == '::1' || host.match?(/\A127\.\d+\.\d+\.\d+\z/)
     end
 
     # The wire format expected by the eval endpoint. forcedFeatures is a list of

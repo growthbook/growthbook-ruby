@@ -13,7 +13,8 @@ module Growthbook
       ?cache_key_attributes: Array[String | Symbol]?,
       ?cache_ttl: Integer,
       ?open_timeout: Integer,
-      ?read_timeout: Integer
+      ?read_timeout: Integer,
+      ?allow_insecure_http: bool
     ) -> void
 
     @open_timeout: Integer
@@ -45,7 +46,11 @@ module Growthbook
 
     attr_reader cache: Growthbook::RemoteEvalCache?
 
+    def validate_api_host: (String api_host, allow_insecure_http: bool) -> void
+
     def cloud_host?: (String? host) -> bool
+
+    def loopback_host?: (String? host) -> bool
 
     def build_payload: (Hash[String | Symbol, untyped] attributes, Hash[String | Symbol, untyped] forced_variations, Hash[String | Symbol, untyped] forced_features, String? url) -> Hash[String, untyped]
 

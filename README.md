@@ -44,7 +44,18 @@ Remote evaluation requires a **self-hosted** proxy or edge worker and is **not**
 
 - a GrowthBook Cloud host (`*.growthbook.io`) — point `api_host` at your own proxy/edge;
 - a `decryption_key` — encryption is handled by the proxy, not the SDK;
-- a `sticky_bucket_service` — sticky bucketing is handled server-side.
+- a `sticky_bucket_service` — sticky bucketing is handled server-side;
+- an `api_host` that is not an absolute URL, or uses a scheme other than `http`/`https`.
+
+`api_host` must use `https`: the request body carries user attributes and the URL carries the client key, so neither may travel in the clear. A plaintext `http` host is allowed on loopback (`localhost`, `127.0.0.0/8`, `::1`), and elsewhere only with an explicit opt-in — use it when the proxy is reachable only over a trusted network, for example in-cluster behind a TLS-terminating load balancer:
+
+```ruby
+Growthbook::RemoteEvalRepository.new(
+  api_host: 'http://growthbook-proxy.internal:3300',
+  client_key: 'sdk-abc123',
+  allow_insecure_http: true
+)
+```
 
 ### Re-evaluation when the context changes
 
