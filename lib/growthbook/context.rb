@@ -415,7 +415,13 @@ module Growthbook
       definition = @contextual_bandits[contextual_bandit_ref.to_s]
       return if definition.nil?
 
-      leaf = definition.contexts.find { |context| Growthbook::Conditions.eval_condition(@attributes, context.condition || {}, @saved_groups) }
+      leaf = begin
+        definition.contexts.find { |context| Growthbook::Conditions.eval_condition(@attributes, context.condition || {}, @saved_groups) }
+      rescue StandardError
+        # Any throw while selecting a leaf abandons the selection entirely and falls back, rather
+        # than carrying on with the remaining leaves - matching the reference implementation
+        nil
+      end
 
       if leaf && !leaf.weights.nil?
         exp.weights = leaf.weights
@@ -578,7 +584,9 @@ module Growthbook
       attributes = Set.new
       @features.each do |_key, feature|
         feature.rules.each do |rule|
-          if rule.variations
+          # experiment_variations, not variations: a contextual bandit rule keeps its variations
+          # under contextualVariations, and its hash attributes are needed here all the same
+          if rule.experiment_variations
             attributes.add(rule.hash_attribute || 'id')
             attributes.add(rule.fallback_attribute) if rule.fallback_attribute
           end

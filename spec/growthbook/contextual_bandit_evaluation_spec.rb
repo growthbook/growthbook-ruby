@@ -83,6 +83,28 @@ RSpec.describe 'contextual bandit evaluation' do
       expect(result.bandit_version).to be_nil
     end
 
+    it 'falls back to the fallback leaf when a leaf condition throws' do
+      allow(Growthbook::Conditions).to receive(:eval_condition).and_raise(StandardError, 'boom')
+      gb = Growthbook::Context.new(features: features, attributes: { id: '1' }, contextual_bandits: bandits)
+
+      result = gb.eval_feature('bandit-feature').experiment_result
+
+      expect(result.leaf_id).to eq(-1)
+      expect(result.variation_weights).to eq([0.5, 0.5])
+    end
+
+    it 'derives sticky bucket attributes from a bandit rule too' do
+      bandit_rule = features['bandit-feature']['rules'].first.merge('hashAttribute' => 'device_id')
+      gb = Growthbook::Context.new(
+        features: { 'bandit-feature' => { 'defaultValue' => 'default', 'rules' => [bandit_rule] } },
+        attributes: { 'device_id' => 'device-1' },
+        contextual_bandits: bandits,
+        sticky_bucket_service: Growthbook::InMemoryStickyBucketService.new
+      )
+
+      expect(gb.sticky_bucket_attributes).to eq('device_id' => 'device-1')
+    end
+
     it 'does not treat a bandit rule as a force rule' do
       rule = Growthbook::FeatureRule.new(features['bandit-feature']['rules'].first)
 
