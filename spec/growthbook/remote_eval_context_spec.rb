@@ -89,7 +89,7 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
       expect(gb.feature_value('banner_text')).to eq('Bienvenue')
     end
 
-    it 're-evaluates for the merged attributes' do
+    it 'sends the new attributes in the payload' do
       stub_eval('Welcome')
       gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
 
@@ -97,7 +97,7 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
         body: hash_including('attributes' => { 'id' => '1', 'country' => 'FR' })
       ).to_return(status: 200, body: JSON.generate('features' => { 'banner_text' => { 'defaultValue' => 'Bienvenue' } }))
 
-      gb.update_attributes(country: 'FR')
+      gb.attributes = { id: '1', country: 'FR' }
 
       expect(stub).to have_been_requested.once
       expect(gb.feature_value('banner_text')).to eq('Bienvenue')
@@ -148,7 +148,7 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
       gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
 
       stub_request(:post, endpoint).to_return(status: 500)
-      gb.update_attributes(country: 'FR')
+      gb.attributes = { id: '1', country: 'FR' }
 
       expect(gb.feature_value('banner_text')).to eq('Welcome')
     end
@@ -196,7 +196,7 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
     end
 
     it 'makes no request when the context changes' do
-      gb.update_attributes(id: '1')
+      gb.attributes = { id: '1' }
       gb.url = 'https://example.com'
 
       expect(gb.feature_value('banner_text')).to eq('Local')

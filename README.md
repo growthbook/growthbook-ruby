@@ -59,10 +59,10 @@ Growthbook::RemoteEvalRepository.new(
 
 ### Re-evaluation when the context changes
 
-Because the proxy evaluates features for one specific context, the SDK re-evaluates whenever that context changes: `attributes=`, `update_attributes`, `forced_variations=`, `forced_features=` and `url=` all trigger a new request. Responses are cached per context, so repeated contexts are served without a network call.
+Because the proxy evaluates features for one specific context, the SDK re-evaluates whenever that context changes: `attributes=`, `forced_variations=`, `forced_features=` and `url=` all trigger a new request. Responses are cached per context, so repeated contexts are served without a network call.
 
 ```ruby
-gb.update_attributes(country: 'FR') # re-evaluates for the merged attributes
+gb.attributes = { id: 'user-123', country: 'FR' } # re-evaluates for the new attributes
 ```
 
 Feature changes made on the server while the context stays the same are picked up by `refresh_for_remote_eval`, which refetches once the cached response is older than the TTL:
