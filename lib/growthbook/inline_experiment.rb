@@ -69,11 +69,20 @@ module Growthbook
     # @return [Hash, nil] Arbitrary custom fields attached to the experiment
     attr_accessor :custom_fields
 
+    # @return [Growthbook::ContextualBandit, nil] How a contextual bandit routed this
+    #   evaluation, when one supplied the weights
+    attr_accessor :contextual_bandit
+
     def initialize(options = {})
       @key = get_option(options, :key, '').to_s
       @variations = get_option(options, :variations, [])
       @weights = get_option(options, :weights)
       @active = get_option(options, :active, true)
+      # Remember whether these were spelled out, so the serialized experiment echoes back what
+      # the rule actually set instead of hiding a value that happens to equal the default
+      @coverage_specified = option?(options, :coverage)
+      @hash_attribute_specified = option?(options, :hash_attribute) || option?(options, :hashAttribute)
+
       @coverage = get_option(options, :coverage, 1.0)
       @ranges = get_option(options, :ranges)
       @condition = get_option(options, :condition)
@@ -104,12 +113,12 @@ module Growthbook
       res['variations'] = @variations
       res['weights'] = @weights unless @weights.nil?
       res['active'] = @active if @active != true && !@active.nil?
-      res['coverage'] = @coverage if @coverage != 1 && !@coverage.nil?
+      res['coverage'] = @coverage if @coverage_specified || (@coverage != 1 && !@coverage.nil?)
       res['ranges'] = @ranges
       res['condition'] = @condition
       res['namespace'] = @namespace
       res['force'] = @force unless @force.nil?
-      res['hashAttribute'] = @hash_attribute if @hash_attribute != 'id' && !@hash_attribute.nil?
+      res['hashAttribute'] = @hash_attribute if @hash_attribute_specified || (@hash_attribute != 'id' && !@hash_attribute.nil?)
       res['hashVersion'] = @hash_version
       res['meta'] = @meta
       res['filters'] = @filters
@@ -121,11 +130,18 @@ module Growthbook
       res['bucketVersion'] = @bucket_version if @bucket_version != 0
       res['minBucketVersion'] = @min_bucket_version if @min_bucket_version != 0
       res['parentConditions'] = @parent_conditions unless @parent_conditions.empty?
+      res['contextualBandit'] = @contextual_bandit.to_json unless @contextual_bandit.nil?
 
       res.compact
     end
 
     private
+
+    # An explicit nil counts as absent: FeatureRule#to_experiment always passes every key, so
+    # the value is what tells us whether the rule actually set it
+    def option?(hash, key)
+      !get_option(hash, key).nil?
+    end
 
     def get_option(hash, key, default = nil)
       return hash[key.to_sym] if hash.key?(key.to_sym)
