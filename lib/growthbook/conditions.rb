@@ -5,7 +5,7 @@ require 'json'
 module Growthbook
   # internal use only
   # Utils for condition evaluation
-  class Conditions
+  class Conditions # rubocop:disable Metrics/ClassLength
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition(attributes, condition, saved_groups = {})
@@ -94,9 +94,94 @@ module Growthbook
         end
         return true
       end
-      return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
-      condition_value.to_json == attribute_value.to_json
+      case condition_value
+      when String
+        return js_string(attribute_value).casecmp?(condition_value) if insensitive
+
+        js_string(attribute_value) == condition_value
+      when Numeric
+        js_number(attribute_value) == condition_value
+      when true, false
+        !attribute_value.nil? && js_truthy?(attribute_value) == condition_value
+      when nil
+        attribute_value.nil?
+      else
+        condition_value.to_json == attribute_value.to_json
+      end
+    end
+
+    # Mirrors JavaScript's String(value). A missing attribute is nil, like null in the JS SDK.
+    def self.js_string(value)
+      case value
+      when nil then 'null'
+      when String then value
+      when Integer then value.abs < 10**21 ? value.to_s : js_float_string(value.to_f)
+      when Numeric then js_float_string(value.to_f)
+      when Array then value.map { |v| v.nil? ? '' : js_string(v) }.join(',')
+      when Hash then '[object Object]'
+      else value.to_s
+      end
+    end
+
+    # Mirrors JavaScript's Number#toString for floats
+    def self.js_float_string(num)
+      return 'NaN' if num.nan?
+      return num.positive? ? 'Infinity' : '-Infinity' if num.infinite?
+      return '0' if num.zero?
+      return "-#{js_float_string(-num)}" if num.negative?
+
+      mantissa, exp = num.to_s.split('e')
+      int_part, frac_part = mantissa.split('.')
+      all_digits = int_part + frac_part.to_s
+      stripped = all_digits.sub(/\A0+/, '')
+      point = int_part.length + exp.to_i - (all_digits.length - stripped.length)
+      digits = stripped.sub(/0+\z/, '')
+      len = digits.length
+
+      if len <= point && point <= 21
+        digits + ('0' * (point - len))
+      elsif point.positive? && point <= 21
+        "#{digits[0, point]}.#{digits[point..-1]}"
+      elsif point > -6 && point <= 0
+        "0.#{'0' * -point}#{digits}"
+      else
+        e = point - 1
+        sign = e.negative? ? '-' : '+'
+        head = len == 1 ? digits : "#{digits[0]}.#{digits[1..-1]}"
+        "#{head}e#{sign}#{e.abs}"
+      end
+    end
+
+    JS_NUMBER_PATTERN = /\A[+-]?(Infinity|(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?)\z/.freeze
+
+    # Mirrors JavaScript's Number(value) coercion
+    def self.js_number(value)
+      case value
+      when nil, false then 0
+      when true then 1
+      when Numeric then value
+      when String
+        str = value.gsub(/\A[\s\u00a0\ufeff\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+|[\s\u00a0\ufeff\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+\z/, '')
+        return 0 if str.empty?
+        return str.to_i(16) if /\A0[xX]\h+\z/.match?(str)
+        return str.to_i(8) if /\A0[oO][0-7]+\z/.match?(str)
+        return str.to_i(2) if /\A0[bB][01]+\z/.match?(str)
+        return Float::NAN unless JS_NUMBER_PATTERN.match?(str)
+        return str.start_with?('-') ? -Float::INFINITY : Float::INFINITY if str.include?('Infinity')
+
+        Float(str.sub(/\A([+-]?)\./) { "#{Regexp.last_match(1)}0." }.sub(/\.(?=[eE]|\z)/, ''))
+      when Array then js_number(js_string(value))
+      else Float::NAN
+      end
+    end
+
+    # Mirrors JavaScript truthiness (!!value)
+    def self.js_truthy?(value)
+      return false if value.nil? || value == false || value == ''
+      return !(value.zero? || (value.is_a?(Float) && value.nan?)) if value.is_a?(Numeric)
+
+      true
     end
 
     def self.elem_match(condition, attribute_value, saved_groups = {})
@@ -242,10 +327,13 @@ module Growthbook
     end
 
     def self.padded_version_string(input)
+      input = js_string(input) if input.is_a?(Numeric)
+      input = '0' if !input.is_a?(String) || input.empty?
+
       # Remove build info and leading `v` if any
       # Split version into parts (both core version numbers and pre-release tags)
       # "v1.2.3-rc.1+build123" -> ["1","2","3","rc","1"]
-      parts = input.gsub(/(^v|\+.*$)/, '').split(/[-.]/)
+      parts = input.gsub(/(\Av|\+.*\z)/, '').split(/[-.]/)
 
       # If it's SemVer without a pre-release, add `~` to the end
       # ["1","0","0"] -> ["1","0","0","~"]
@@ -254,7 +342,7 @@ module Growthbook
 
       # Left pad each numeric part with spaces so string comparisons will work ("9">"10", but " 9"<"10")
       parts.map do |part|
-        /^[0-9]+$/.match?(part) ? part.rjust(5, ' ') : part
+        /\A[0-9]+\z/.match?(part) ? part.rjust(5, ' ') : part
       end.join('-')
     end
 

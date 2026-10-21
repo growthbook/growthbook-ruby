@@ -21,6 +21,16 @@ module Growthbook
 
     def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?insensitive: bool) -> bool
 
+    def self.js_string: (untyped value) -> String
+
+    def self.js_float_string: (Float num) -> String
+
+    JS_NUMBER_PATTERN: Regexp
+
+    def self.js_number: (untyped value) -> Numeric
+
+    def self.js_truthy?: (untyped value) -> bool
+
     def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, ?Hash[String, untyped] saved_groups) -> bool
 
     def self.eval_version_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
