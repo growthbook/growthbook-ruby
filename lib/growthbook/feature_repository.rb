@@ -47,11 +47,15 @@ module Growthbook
       @features_json = {}
       @saved_groups_json = {}
       @ttl = ttl
-      @cache = cache || self.class.default_cache
+      # false disables caching outright; nil means "no preference", which is the shared default
+      @cache = cache == false ? Growthbook::FeatureCache.new : cache || self.class.default_cache
     end
 
-    def fetch
-      cached = @cache.get(cache_key)
+    # @param force [true, false] Skip the cached entry and refetch, overwriting it. The supported
+    #   way to get a fresh payload, including past an entry another repository wrote to the
+    #   shared cache - a repository's own ttl governs what it writes, not what it reads.
+    def fetch(force: false)
+      cached = force ? nil : @cache.get(cache_key)
       unless cached.nil?
         @features_json = cached['features']
         @saved_groups_json = cached['savedGroups']

@@ -480,6 +480,47 @@ RSpec.describe Growthbook::FeatureRepository do
       expect(a_request(:get, endpoint)).to have_been_made.twice
     end
 
+    it 'disables caching when given false' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, cache: false)
+
+      repo.fetch
+      repo.fetch
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'refetches past a cached entry when forced' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60)
+      repo.fetch
+
+      repo.fetch(force: true)
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'refetches past an entry another repository wrote' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+
+      described_class.new(endpoint: endpoint, decryption_key: nil).fetch(force: true)
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'overwrites the cached entry when forced' do
+      stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      cache = Growthbook::InMemoryFeatureCache.new
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, cache: cache)
+      repo.fetch
+
+      stub_request(:get, endpoint).to_return(status: 200, body: '{ "features": { "flag": { "defaultValue": false } } }')
+      repo.fetch(force: true)
+
+      expect(cache.get(endpoint)['features']).to eq('flag' => { 'defaultValue' => false })
+    end
+
     it 'caches both features and saved groups' do
       cache = Growthbook::InMemoryFeatureCache.new
       described_class.new(endpoint: endpoint, decryption_key: nil, cache: cache).fetch

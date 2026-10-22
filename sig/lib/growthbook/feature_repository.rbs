@@ -12,7 +12,7 @@ module Growthbook
     @ttl: Integer?
     @cache: FeatureCache
 
-    def initialize: (endpoint: String, decryption_key: String?, ?ttl: Integer?, ?cache: FeatureCache?) -> void
+    def initialize: (endpoint: String, decryption_key: String?, ?ttl: Integer?, ?cache: FeatureCache | false | nil) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
@@ -20,7 +20,7 @@ module Growthbook
     attr_reader saved_groups_json: Hash[String, untyped]
     attr_reader ttl: Integer?
 
-    def fetch: () -> (nil | Hash[String, untyped])
+    def fetch: (?force: bool) -> (nil | Hash[String, untyped])
 
     def fetch!: () -> (nil | Hash[String, untyped])
 
