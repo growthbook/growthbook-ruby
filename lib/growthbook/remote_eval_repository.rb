@@ -33,10 +33,6 @@ module Growthbook
     # cached response or the current features are served instead.
     DEFAULT_TIMEOUT = 2
 
-    # Lowest timeout that can be configured, so a 0 cannot make every request
-    # fail instantly
-    MIN_TIMEOUT = 1
-
     # [String] The remote evaluation endpoint the payload is POSTed to
     attr_reader :endpoint
 
@@ -46,10 +42,10 @@ module Growthbook
     # [Integer] Seconds a cached response is considered fresh
     attr_reader :cache_ttl
 
-    # [Integer] Seconds to wait for the connection to open (min 1)
+    # [Numeric] Seconds to wait for the connection to open
     attr_reader :open_timeout
 
-    # [Integer] Seconds to wait for the response to be read (min 1)
+    # [Numeric] Seconds to wait for the response to be read
     attr_reader :read_timeout
 
     # Parsed features JSON of the last successful evaluation
@@ -83,8 +79,8 @@ module Growthbook
       @cache = cache
       @cache_key_attributes = cache_key_attributes
       @cache_ttl = cache_ttl
-      @open_timeout = normalize_timeout(open_timeout)
-      @read_timeout = normalize_timeout(read_timeout)
+      @open_timeout = normalize_timeout(:open_timeout, open_timeout)
+      @read_timeout = normalize_timeout(:read_timeout, read_timeout)
       @features_json = {}
       @saved_groups_json = {}
       @flight = {}
@@ -161,9 +157,13 @@ module Growthbook
 
     # nil has to be resolved before any comparison: it would mean "wait forever"
     # if it reached Net::HTTP, and [nil, 1].max raises rather than returning 1
-    def normalize_timeout(seconds)
+    # nil has to be resolved before any comparison: it would mean "wait forever" if it reached
+    # Net::HTTP. Fractions are accepted - Net::HTTP takes them, and sub-second is reasonable
+    # against an in-cluster proxy - while zero and negatives are refused rather than clamped,
+    # their meaning in Net::HTTP being ambiguous between instant failure and no timeout at all.
+    def normalize_timeout(name, seconds)
       seconds = DEFAULT_TIMEOUT if seconds.nil?
-      return MIN_TIMEOUT if seconds < MIN_TIMEOUT
+      raise ArgumentError, "#{name} must be a positive number of seconds, got #{seconds.inspect}" unless seconds.is_a?(Numeric) && seconds.positive?
 
       seconds
     end

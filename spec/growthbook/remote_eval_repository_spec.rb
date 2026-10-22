@@ -101,11 +101,21 @@ RSpec.describe Growthbook::RemoteEvalRepository do
       expect(repo.read_timeout).to eq(4)
     end
 
-    it 'enforces a one second minimum and falls back to the default on nil' do
-      repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 0, read_timeout: nil)
+    it 'falls back to the default on nil' do
+      repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', read_timeout: nil)
 
-      expect(repo.open_timeout).to eq(1)
       expect(repo.read_timeout).to eq(2)
+    end
+
+    it 'accepts a sub-second timeout' do
+      repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 0.5)
+
+      expect(repo.open_timeout).to eq(0.5)
+    end
+
+    it 'refuses a non-positive timeout rather than clamping it' do
+      expect { described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 0) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
     end
 
     it 'requires a client key' do

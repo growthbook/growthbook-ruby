@@ -4,7 +4,6 @@ module Growthbook
     DEFAULT_CACHE_TTL: Integer
     STALE_TTL_MULTIPLIER: Integer
     DEFAULT_TIMEOUT: Integer
-    MIN_TIMEOUT: Integer
 
     def initialize: (
       api_host: String?,
@@ -12,8 +11,8 @@ module Growthbook
       ?cache: Growthbook::RemoteEvalCache?,
       ?cache_key_attributes: Array[String | Symbol]?,
       ?cache_ttl: Integer,
-      ?open_timeout: Integer?,
-      ?read_timeout: Integer?,
+      ?open_timeout: Numeric?,
+      ?read_timeout: Numeric?,
       ?allow_insecure_http: bool
     ) -> void
 
@@ -23,8 +22,8 @@ module Growthbook
     attr_reader endpoint: String
     attr_reader cache_key_attributes: Array[String | Symbol]?
     attr_reader cache_ttl: Integer
-    attr_reader open_timeout: Integer
-    attr_reader read_timeout: Integer
+    attr_reader open_timeout: Numeric
+    attr_reader read_timeout: Numeric
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
 
@@ -46,7 +45,7 @@ module Growthbook
 
     attr_reader cache: Growthbook::RemoteEvalCache?
 
-    def normalize_timeout: (Integer? seconds) -> Integer
+    def normalize_timeout: (Symbol name, untyped seconds) -> Numeric
 
     def validate_api_host: (String api_host, allow_insecure_http: bool) -> void
 
