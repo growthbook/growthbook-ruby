@@ -189,11 +189,14 @@ module Growthbook
         url: @url
       )
 
-      # Keep the features we already have when the proxy is unreachable
-      return false if data.nil?
+      if data.nil?
+        discard_remote_eval_features unless remote_eval_features_match_context?
+        return false
+      end
 
       self.saved_groups = data['savedGroups']
       self.features = data['features'] || {}
+      @remote_eval_applied_for = remote_eval_context
 
       true
     end
@@ -440,6 +443,28 @@ module Growthbook
 
       # 15. Return the result
       result
+    end
+
+    # Everything the proxy evaluated against. Hash equality ignores insertion order, so this
+    # compares what the values are rather than how they were built.
+    def remote_eval_context
+      [@attributes.dup, @forced_variations.dup, @forced_features.dup, @url]
+    end
+
+    # True when the features in hand are the ones the proxy returned for the context we are in -
+    # or when none of them came from a remote evaluation at all, in which case they are the
+    # caller's own and not ours to throw away.
+    def remote_eval_features_match_context?
+      @remote_eval_applied_for.nil? || @remote_eval_applied_for == remote_eval_context
+    end
+
+    # A failed re-evaluation after the context changed leaves features that belong to a different
+    # user. That is not staleness, it is the wrong subject, so they go rather than being reported
+    # under the new identity - evaluation falls back to defaults instead.
+    def discard_remote_eval_features
+      self.saved_groups = {}
+      self.features = {}
+      @remote_eval_applied_for = nil
     end
 
     def stringify_keys(hash)

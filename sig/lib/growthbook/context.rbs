@@ -45,6 +45,8 @@ module Growthbook
 
     @initializing: bool
 
+    @remote_eval_applied_for: Array[untyped]?
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     def features=: (Hash[String | Symbol, untyped] features) -> void
@@ -106,5 +108,11 @@ module Growthbook
     def track_feature_usage: (String, FeatureResult) -> void
 
     def validate_remote_eval: (String? decryption_key) -> void
+
+    def remote_eval_context: () -> Array[untyped]
+
+    def remote_eval_features_match_context?: () -> bool
+
+    def discard_remote_eval_features: () -> void
   end
 end

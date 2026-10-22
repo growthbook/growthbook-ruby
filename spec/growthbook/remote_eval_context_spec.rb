@@ -143,14 +143,14 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
       expect(gb.url).to eq('https://example.com/pricing')
     end
 
-    it 'keeps the current features when re-evaluation fails' do
+    it 'does not report the previous context features when re-evaluation fails' do
       stub_eval('Welcome')
       gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
 
       stub_request(:post, endpoint).to_return(status: 500)
       gb.attributes = { id: '1', country: 'FR' }
 
-      expect(gb.feature_value('banner_text')).to eq('Welcome')
+      expect(gb.feature_value('banner_text', 'fallback')).to eq('fallback')
     end
 
     it 'serves an unchanged context from the cache' do
@@ -204,6 +204,50 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
 
     it 'reports refresh as a no-op' do
       expect(gb.refresh_for_remote_eval).to be(false)
+    end
+  end
+
+  describe 'when a refresh fails' do
+    it 'keeps the features when the context has not changed' do
+      stub_eval('Welcome')
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
+
+      stub_request(:post, endpoint).to_return(status: 500)
+      gb.refresh_for_remote_eval
+
+      expect(gb.feature_value('banner_text')).to eq('Welcome')
+    end
+
+    it 'discards features belonging to a different context' do
+      stub_eval('Welcome')
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
+
+      stub_request(:post, endpoint).to_return(status: 500)
+      gb.attributes = { id: '2' }
+
+      expect(gb.feature_value('banner_text', 'fallback')).to eq('fallback')
+    end
+
+    it 'discards the saved groups with them' do
+      stub_eval('Welcome', 'beta' => %w[1 2])
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' })
+
+      stub_request(:post, endpoint).to_return(status: 500)
+      gb.attributes = { id: '2' }
+
+      expect(gb.saved_groups).to eq({})
+    end
+
+    it 'keeps features the caller supplied rather than the proxy' do
+      stub_request(:post, endpoint).to_return(status: 500)
+
+      gb = Growthbook::Context.new(
+        remote_eval_repository: repository,
+        attributes: { id: '1' },
+        features: { 'banner_text' => { 'defaultValue' => 'local' } }
+      )
+
+      expect(gb.feature_value('banner_text')).to eq('local')
     end
   end
 end

@@ -71,7 +71,7 @@ Feature changes made on the server while the context stays the same are picked u
 gb.refresh_for_remote_eval
 ```
 
-If the proxy is unreachable, a stale cached response is used when there is one; otherwise the features already in the context are kept rather than dropped, and `refresh_for_remote_eval` returns `false`.
+If the proxy is unreachable, a stale cached response is used when there is one — it is keyed by the evaluation context, so it belongs to the right user. Otherwise `refresh_for_remote_eval` returns `false`, and what happens to the current features depends on whether the context moved: they are kept when it did not, and discarded when it did, so evaluation falls back to defaults rather than reporting the previous user's values under the new identity. Features the application supplied itself are never discarded.
 
 ### Caching
 
