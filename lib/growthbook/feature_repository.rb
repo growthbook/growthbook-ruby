@@ -6,6 +6,10 @@ require 'uri'
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    # Seconds to wait before giving up on a request. Ruby's own default is 60s,
+    # which is far too long to block on in a request path.
+    DEFAULT_TIMEOUT = 2
+
     # [String] The SDK endpoint
     attr_reader :endpoint
 
@@ -18,16 +22,30 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
-    def initialize(endpoint:, decryption_key:)
+    # [Numeric] Seconds to wait for the connection to open
+    attr_reader :open_timeout
+
+    # [Numeric] Seconds to wait for the response to be read
+    attr_reader :read_timeout
+
+    def initialize(endpoint:, decryption_key:, open_timeout: DEFAULT_TIMEOUT, read_timeout: DEFAULT_TIMEOUT)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @open_timeout = normalize_timeout(:open_timeout, open_timeout)
+      @read_timeout = normalize_timeout(:read_timeout, read_timeout)
     end
 
     def fetch
       uri = URI(endpoint)
-      res = Net::HTTP.get_response(uri)
+      # hostname, not host: an IPv6 literal comes back from host wrapped in
+      # brackets, which Net::HTTP cannot connect to
+      http = Net::HTTP.new(uri.hostname, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.open_timeout = @open_timeout
+      http.read_timeout = @read_timeout
+      res = http.get(uri.request_uri)
 
       @response = res.is_a?(Net::HTTPSuccess) ? res.body : nil
 
@@ -54,6 +72,22 @@ module Growthbook
     private
 
     attr_reader :response
+
+    # nil has to be resolved before any comparison: it would mean "wait forever"
+    # if it reached Net::HTTP, and [nil, 1].max raises rather than returning 1.
+    # Spelled out rather than using [seconds, MIN_TIMEOUT].max because Array#max
+    # is typed as nilable, which the type check rejects.
+    # nil has to be resolved before any comparison: it would mean "wait forever" if it reached
+    # Net::HTTP. Everything else is accepted as given, including fractions - Net::HTTP takes them,
+    # and half a second is reasonable against a proxy on the same network. Zero and negatives are
+    # refused rather than clamped: Net::HTTP stores them as-is and their meaning is ambiguous
+    # between failing instantly and not timing out at all.
+    def normalize_timeout(name, seconds)
+      seconds = DEFAULT_TIMEOUT if seconds.nil?
+      raise ArgumentError, "#{name} must be a positive number of seconds, got #{seconds.inspect}" unless seconds.is_a?(Numeric) && seconds.positive?
+
+      seconds
+    end
 
     def use_decryption?
       !decryption_key.nil?

@@ -1,12 +1,19 @@
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
-    def initialize: (endpoint: String, decryption_key: String?) -> void
+    DEFAULT_TIMEOUT: Integer
+
+    @open_timeout: Numeric
+    @read_timeout: Numeric
+
+    def initialize: (endpoint: String, decryption_key: String?, ?open_timeout: Numeric?, ?read_timeout: Numeric?) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
+    attr_reader open_timeout: Numeric
+    attr_reader read_timeout: Numeric
 
     def fetch: () -> (nil | Hash[String, untyped])
 
@@ -15,6 +22,8 @@ module Growthbook
     private
 
     attr_reader response: String?
+
+    def normalize_timeout: (Symbol name, untyped seconds) -> Numeric
 
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 
@@ -40,6 +49,11 @@ module Net
   end
 
   class HTTP
+    def self.new: (untyped host, untyped port) -> HTTP
     def get_response: (String) -> untyped
+    def use_ssl=: (bool) -> bool
+    def open_timeout=: (Numeric) -> Numeric
+    def read_timeout=: (Numeric) -> Numeric
+    def get: (String) -> untyped
   end
 end
