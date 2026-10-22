@@ -469,10 +469,25 @@ RSpec.describe Growthbook::FeatureRepository do
       expect(repo.read_timeout).to eq(10)
     end
 
-    it 'enforces a one second minimum' do
-      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0, read_timeout: -3)
-      expect(repo.open_timeout).to eq(1)
-      expect(repo.read_timeout).to eq(1)
+    it 'accepts a sub-second timeout' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0.5, read_timeout: 0.25)
+      expect(repo.open_timeout).to eq(0.5)
+      expect(repo.read_timeout).to eq(0.25)
+    end
+
+    it 'refuses zero rather than clamping it' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
+    it 'refuses a negative timeout' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, read_timeout: -3) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
+    it 'refuses a non-numeric timeout' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, read_timeout: '2') }
+        .to raise_error(ArgumentError, /positive number of seconds/)
     end
 
     it 'falls back to the default when a timeout is nil' do

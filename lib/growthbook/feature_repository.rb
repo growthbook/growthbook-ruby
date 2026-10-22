@@ -10,10 +10,6 @@ module Growthbook
     # which is far too long to block on in a request path.
     DEFAULT_TIMEOUT = 2
 
-    # Lowest timeout that can be configured, so a 0 cannot make every request
-    # fail instantly
-    MIN_TIMEOUT = 1
-
     # [String] The SDK endpoint
     attr_reader :endpoint
 
@@ -26,10 +22,10 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
-    # [Integer] Seconds to wait for the connection to open (min 1)
+    # [Numeric] Seconds to wait for the connection to open
     attr_reader :open_timeout
 
-    # [Integer] Seconds to wait for the response to be read (min 1)
+    # [Numeric] Seconds to wait for the response to be read
     attr_reader :read_timeout
 
     def initialize(endpoint:, decryption_key:, open_timeout: DEFAULT_TIMEOUT, read_timeout: DEFAULT_TIMEOUT)
@@ -37,8 +33,8 @@ module Growthbook
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
-      @open_timeout = normalize_timeout(open_timeout)
-      @read_timeout = normalize_timeout(read_timeout)
+      @open_timeout = normalize_timeout(:open_timeout, open_timeout)
+      @read_timeout = normalize_timeout(:read_timeout, read_timeout)
     end
 
     def fetch
@@ -81,9 +77,14 @@ module Growthbook
     # if it reached Net::HTTP, and [nil, 1].max raises rather than returning 1.
     # Spelled out rather than using [seconds, MIN_TIMEOUT].max because Array#max
     # is typed as nilable, which the type check rejects.
-    def normalize_timeout(seconds)
+    # nil has to be resolved before any comparison: it would mean "wait forever" if it reached
+    # Net::HTTP. Everything else is accepted as given, including fractions - Net::HTTP takes them,
+    # and half a second is reasonable against a proxy on the same network. Zero and negatives are
+    # refused rather than clamped: Net::HTTP stores them as-is and their meaning is ambiguous
+    # between failing instantly and not timing out at all.
+    def normalize_timeout(name, seconds)
       seconds = DEFAULT_TIMEOUT if seconds.nil?
-      return MIN_TIMEOUT if seconds < MIN_TIMEOUT
+      raise ArgumentError, "#{name} must be a positive number of seconds, got #{seconds.inspect}" unless seconds.is_a?(Numeric) && seconds.positive?
 
       seconds
     end
