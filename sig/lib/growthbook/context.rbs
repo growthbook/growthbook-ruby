@@ -69,6 +69,9 @@ module Growthbook
 
     def stringify_keys: (Hash[String | Symbol, untyped] hash) -> Hash[String, untyped]
 
+    # A malformed prerequisite condition never matches, rather than raising into the app
+    def parent_condition_passes?: (untyped parent_value, Hash[String, untyped]? condition) -> bool
+
     def condition_passes?: (Hash[String, untyped]? condition) -> bool
 
     def get_experiment_result: (InlineExperiment experiment, ?::Integer variation_index, ?hash_used: bool, ?sticky_bucket_used: bool, ?feature_id: ::String | Symbol, ?bucket: Float?) -> InlineExperimentResult

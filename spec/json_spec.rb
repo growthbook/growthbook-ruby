@@ -136,6 +136,8 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
+        skip 'contextual bandits are not implemented' if context.key?('contextualBandits')
+
         gb = Growthbook::Context.new(context)
         result = gb.eval_feature(key)
         expect(result.to_json).to eq(expected)

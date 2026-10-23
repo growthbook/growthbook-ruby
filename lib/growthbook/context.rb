@@ -166,7 +166,7 @@ module Growthbook
 
         return 'cyclic' if parent_res.source == 'cyclicPrerequisite'
 
-        next if Growthbook::Conditions.eval_condition({ 'value' => parent_res.value }, parent_condition['condition'], @saved_groups)
+        next if parent_condition_passes?(parent_res.value, parent_condition['condition'])
         return 'gate' if parent_condition['gate']
 
         return 'fail'
@@ -377,6 +377,13 @@ module Growthbook
         new_hash[key.to_s] = value
       end
       new_hash
+    end
+
+    # A malformed prerequisite condition never matches, rather than raising into the app
+    def parent_condition_passes?(parent_value, condition)
+      Growthbook::Conditions.eval_condition({ 'value' => parent_value }, condition || {}, @saved_groups)
+    rescue StandardError
+      false
     end
 
     def condition_passes?(condition)

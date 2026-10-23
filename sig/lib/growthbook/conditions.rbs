@@ -33,7 +33,15 @@ module Growthbook
 
     def self.in?: (untyped attribute_value, untyped condition_value, ?insensitive: bool) -> bool
 
-    def self.compare: (untyped val1, untyped val2) -> Integer
+    # Only two numbers or two strings can be ordered; anything else is a type mismatch
+    def self.orderable?: (untyped val1, untyped val2) -> bool
+
+    def self.number?: (untyped value) -> bool
+
+    # Values of different types are never equal (no "5" == 5 or 0 == nil)
+    def self.strict_equal?: (untyped val1, untyped val2) -> bool
+
+    def self.padded_version_string: (untyped input) -> String
 
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.
