@@ -139,6 +139,25 @@ describe 'test suite' do
     end
   end
 
+  describe 'reducePayload' do
+    test_cases['reducePayload'].each do |test_case|
+      test_name, input, expected = test_case
+
+      it test_name do
+        # The SDK has no global attributes, so merge them first; the user's take precedence
+        attributes = (input['globalAttributes'] || {}).merge(input['attributes'] || {})
+        result = Growthbook.reduce_payload(
+          input['payload'],
+          attributes: attributes,
+          include: input['include'] || {},
+          exclude: input['exclude'] || {},
+          prerequisites: input['prerequisites'] || 'keep'
+        )
+        expect(result).to eq(expected)
+      end
+    end
+  end
+
   describe 'feature' do
     # Loop through each test case in the JSON file
     test_cases['feature'].each do |test_case|

@@ -1,0 +1,11 @@
+# The GrowthBook SDK
+module Growthbook
+  # Partially evaluate a targeting condition when only some attributes are known
+  def self.prune_condition: (Hash[untyped, untyped]? attributes, Hash[untyped, untyped] condition, ?Hash[String, untyped]? saved_groups) -> (bool | Hash[String, untyped])
+
+  # Shrink a features payload for a user whose attributes are only partly known
+  def self.reduce_payload: (Hash[untyped, untyped] payload, ?attributes: Hash[untyped, untyped]?, ?include: Hash[untyped, untyped]?, ?exclude: Hash[untyped, untyped]?, ?prerequisites: String | Symbol) -> Hash[String, untyped]
+
+  # Filters with string keys, accepting `custom_fields` for `customFields`
+  def self.payload_filters: (Hash[untyped, untyped]? filters) -> Hash[String, untyped]
+end
