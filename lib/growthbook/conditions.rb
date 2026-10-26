@@ -471,8 +471,8 @@ module Growthbook
     end
 
     def self.padded_version_string(input)
-      # Format numbers like JS does (2.0 -> "2"); treat empty input as version 0
-      input = (input.is_a?(Float) && input.finite? && input == input.floor ? input.to_i : input).to_s if number?(input)
+      # Format numbers like JS does (2.0 -> "2", 0.000002 -> "0.000002"); treat empty input as version 0
+      input = Util.js_number_to_s(input) if number?(input)
       input = '0' if input.empty?
 
       # Remove build info and leading `v` if any

@@ -50,4 +50,13 @@ describe 'conditions' do
     end
   end
 
+  context 'with numeric version operands' do
+    it 'formats numbers like JavaScript' do
+      expect(Growthbook::Conditions.eval_condition({ 'a' => 0.000002 }, { 'a' => { '$vgt' => 1.5 } })).to be(false)
+      expect(Growthbook::Conditions.eval_condition({ 'a' => 0.000002 }, { 'a' => { '$vlt' => 1.5 } })).to be(true)
+      { 1e21 => '1e+21', 1e20 => '100000000000000000000', 2.0 => '2', 1e-7 => '1e-7' }.each do |number, string|
+        expect(Growthbook::Conditions.padded_version_string(number)).to eq(Growthbook::Conditions.padded_version_string(string))
+      end
+    end
+  end
 end
