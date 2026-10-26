@@ -492,7 +492,8 @@ module Growthbook
       return false if n.nil?
 
       return Growthbook::Util.in_range?(n, range) if range
-      return n <= coverage if coverage
+      # Half-open, like in_range?, so a coverage of k/10000 includes exactly k hash buckets
+      return n < coverage if coverage
 
       true
     end
