@@ -9,6 +9,13 @@ RSpec.describe 'payload reduction' do
       expect(Growthbook.prune_condition({ id: '123' }, { id: '123', country: 'US' })).to eq({ 'country' => 'US' })
     end
 
+    it 'compares numbers by value, like JavaScript' do
+      expect(Growthbook.prune_condition({ 'a' => 1.0 }, { 'a' => 1 })).to be(true)
+      expect(Growthbook.prune_condition({ 'a' => -0.0 }, { 'a' => 0 })).to be(true)
+      expect(Growthbook.prune_condition({ 'a' => { 'b' => 1.0 } }, { 'a' => { 'b' => 1 } })).to be(true)
+      expect(Growthbook.prune_condition({ 'a' => '1' }, { 'a' => 1 })).to be(false)
+    end
+
     it 'does not fall back to the group attribute for an explicit null attributeKey' do
       saved_groups = { 'g' => { 'type' => 'list', 'attributeKey' => 'id', 'values' => ['u'] } }
       condition = { '$savedGroup' => { 'id' => 'g', 'attributeKey' => nil } }
@@ -37,6 +44,12 @@ RSpec.describe 'payload reduction' do
       result = Growthbook.reduce_payload(payload, attributes: { id: '123' })
       expect(result['features']['beta']['rules']).to eq([{ 'force' => true }])
       expect(payload).to eq(original)
+    end
+
+    it 'keeps the rule of an integral float attribute that matches' do
+      payload = { 'features' => { 'f' => { 'defaultValue' => false, 'rules' => [{ 'condition' => { 'a' => 1 }, 'force' => true }] } } }
+      result = Growthbook.reduce_payload(payload, attributes: { a: 1.0 })
+      expect(result['features']['f']['rules']).to eq([{ 'force' => true }])
     end
 
     it 'keeps a malformed condition group and its reference as written' do

@@ -97,6 +97,9 @@ module Growthbook
 
     def self.padded_version_string: (untyped input) -> String
 
+    # Serializes like JavaScript's JSON.stringify
+    def self.js_json: (untyped value) -> String
+
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.
     def self.silence_warnings: () { () -> untyped } -> untyped

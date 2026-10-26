@@ -275,7 +275,20 @@ module Growthbook
       end
       return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
-      condition_value.to_json == attribute_value.to_json
+      # Numbers compare by value, like JS ===, so 1.0 equals 1
+      return number?(attribute_value) && condition_value == attribute_value if number?(condition_value)
+
+      js_json(condition_value) == js_json(attribute_value)
+    end
+
+    # Serializes like JavaScript's JSON.stringify, which writes 1.0 as "1" and -0.0 as "0"
+    def self.js_json(value)
+      case value
+      when Hash then "{#{value.map { |k, v| "#{k.to_s.to_json}:#{js_json(v)}" }.join(',')}}"
+      when Array then "[#{value.map { |v| js_json(v) }.join(',')}]"
+      when Integer, Float then value.to_f.finite? ? Util.js_number_to_s(value) : 'null'
+      else value.to_json
+      end
     end
 
     def self.elem_match(condition, attribute_value, ctx)
