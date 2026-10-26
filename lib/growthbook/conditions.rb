@@ -60,7 +60,8 @@ module Growthbook
       when Array
         return condition.map { |v| parse_condition(v) }
       when Hash
-        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+        # Not to_h with a block, which Ruby 2.5 ignores
+        return condition.each_with_object({}) { |(k, v), h| h[k.to_s] = parse_condition(v) }
       end
       condition
     end
