@@ -128,6 +128,17 @@ describe 'test suite' do
     end
   end
 
+  describe 'pruneCondition' do
+    test_cases['pruneCondition'].each do |test_case|
+      test_name, condition, attributes, expected, saved_groups = test_case
+
+      it test_name do
+        result = Growthbook.prune_condition(attributes, condition, saved_groups || {})
+        expect(result).to eq(expected)
+      end
+    end
+  end
+
   describe 'feature' do
     # Loop through each test case in the JSON file
     test_cases['feature'].each do |test_case|
@@ -202,6 +213,46 @@ describe 'test suite' do
         # Each expected doc must match; extra docs in the service are ignored
         expected_docs.each do |doc_key, value|
           expect(service.assignments[doc_key]).to eq(value)
+        end
+      end
+    end
+  end
+
+  describe 'savedGroupReferencesV2' do
+    v2 = test_cases['savedGroupReferencesV2']
+
+    describe 'evalCondition' do
+      v2['evalCondition'].each do |test_case|
+        test_name, condition, attributes, expected, saved_groups = test_case
+
+        it test_name do
+          result = Growthbook::Conditions.eval_condition(attributes, condition, saved_groups || {})
+          expect(result).to eq(expected)
+        end
+      end
+    end
+
+    describe 'feature' do
+      v2['feature'].each do |test_case|
+        test_name, context, key, expected = test_case
+
+        it test_name do
+          gb = Growthbook::Context.new(context)
+          expect(gb.eval_feature(key).to_json).to eq(expected)
+        end
+      end
+    end
+
+    describe 'run' do
+      v2['run'].each do |test_case|
+        test_name, context, experiment, value, in_experiment, hash_used = test_case
+
+        it test_name do
+          gb = Growthbook::Context.new(context)
+          result = gb.run(Growthbook::InlineExperiment.new(experiment))
+          expect(result.value).to eq(value)
+          expect(result.in_experiment?).to eq(in_experiment)
+          expect(result.hash_used?).to eq(hash_used)
         end
       end
     end

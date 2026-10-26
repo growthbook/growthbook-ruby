@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'set'
 
 module Growthbook
   # internal use only
@@ -10,24 +11,73 @@ module Growthbook
     # also an operator on a value
     CONDITION_OPERATORS = %w[$or $nor $and $savedGroup].freeze
 
+    # Keys that pass when what they hold fails
+    NEGATING_KEYS = %w[$not $nor].freeze
+
+    # Saved groups for one evaluation, and the group ids already being resolved, to stop cycles
+    class EvalContext
+      # @return [Hash] Saved groups payload, keyed by group id
+      attr_reader :saved_groups
+
+      # @return [Set<String>] Ids of the saved groups being resolved
+      attr_reader :visited
+
+      def initialize(saved_groups, visited = Set.new)
+        @saved_groups = saved_groups || {}
+        @visited = visited
+      end
+
+      # A copy that also holds id, so sibling groups don't see each other's ids
+      def visiting(id)
+        EvalContext.new(@saved_groups, @visited.dup.add(id))
+      end
+    end
+
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition(attributes, condition, saved_groups = {})
-      eval_condition_result(attributes, condition, saved_groups || {}) == true
+      eval_condition_result(attributes, condition, EvalContext.new(saved_groups)) == true
     end
 
-    # Like eval_condition, but returns nil instead of false when the result
-    # depends on an operator this SDK doesn't support
-    def self.eval_condition_result(attributes, condition, saved_groups = {})
+    # Partially evaluate a condition when only some attributes are known, e.g. on
+    # a server. Attributes missing from `attributes` are unknown. Returns true or
+    # false once the result can't depend on them, otherwise the condition minus
+    # every branch that is already decided.
+    def self.prune_condition(attributes, condition, saved_groups = {})
+      prune_with_context(attributes, condition, EvalContext.new(saved_groups))
+    end
+
+    # Prune the saved group a reference points to. Returns its result once decided
+    # (nil for a group type this SDK doesn't know), otherwise its condition minus
+    # every branch that is already decided.
+    def self.prune_saved_group(attributes, reference, saved_groups)
+      eval_saved_group(attributes, reference, EvalContext.new(saved_groups), prune: true)
+    end
+
+    # Helper function to ensure conditions only have string keys (no symbols)
+    def self.parse_condition(condition)
+      case condition
+      when Array
+        return condition.map { |v| parse_condition(v) }
+      when Hash
+        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+      end
+      condition
+    end
+
+    # Evaluates a condition to true or false, or nil when the result depends on an
+    # operator or saved group type this SDK doesn't support
+    def self.eval_condition_result(attributes, condition, ctx)
       # @type var result: bool?
       result = true
       condition.each do |key, value|
         r = case key
-            when '$or' then eval_or(attributes, value, saved_groups)
-            when '$nor' then negate(eval_or(attributes, value, saved_groups))
-            when '$and' then eval_and(attributes, value, saved_groups)
-            when '$not' then negate(eval_condition_result(attributes, value, saved_groups))
-            else eval_condition_value(value, get_path(attributes, key), saved_groups)
+            when '$or' then eval_or(attributes, value, ctx)
+            when '$nor' then negate(eval_or(attributes, value, ctx))
+            when '$and' then eval_and(attributes, value, ctx)
+            when '$not' then negate(eval_condition_result(attributes, value, ctx))
+            when '$savedGroup' then eval_saved_group(attributes, value, ctx)
+            else eval_condition_value(value, get_path(attributes, key), ctx)
         end
         # One failing entry decides it, wherever an unsupported one is
         return false if r == false
@@ -42,24 +92,13 @@ module Growthbook
       result.nil? ? nil : !result
     end
 
-    # Helper function to ensure conditions only have string keys (no symbols)
-    def self.parse_condition(condition)
-      case condition
-      when Array
-        return condition.map { |v| parse_condition(v) }
-      when Hash
-        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
-      end
-      condition
-    end
-
-    def self.eval_or(attributes, conditions, saved_groups = {})
+    def self.eval_or(attributes, conditions, ctx)
       return true if conditions.length <= 0
 
       # @type var result: bool?
       result = false
       conditions.each do |condition|
-        r = eval_condition_result(attributes, condition, saved_groups)
+        r = eval_condition_result(attributes, condition, ctx)
         return true if r == true
 
         result = nil if r.nil?
@@ -67,16 +106,120 @@ module Growthbook
       result
     end
 
-    def self.eval_and(attributes, conditions, saved_groups = {})
+    def self.eval_and(attributes, conditions, ctx)
       # @type var result: bool?
       result = true
       conditions.each do |condition|
-        r = eval_condition_result(attributes, condition, saved_groups)
+        r = eval_condition_result(attributes, condition, ctx)
         return false if r == false
 
         result = nil if r.nil?
       end
       result
+    end
+
+    # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
+    # With prune, an unknown attribute leaves a list group undecided (nil), and a
+    # condition group is pruned rather than evaluated.
+    def self.eval_saved_group(attributes, reference, ctx, prune: false)
+      return false unless reference.is_a?(Hash)
+
+      id = reference['id']
+      attribute_key = reference['attributeKey']
+      return false if !id.is_a?(String) || ctx.visited.include?(id)
+      # Falling back to the entry's attribute would check a different population
+      return false if !attribute_key.nil? && !attribute_key.is_a?(String)
+
+      entry = ctx.saved_groups[id]
+      # Absent, or a v1 bare array
+      return false unless entry.is_a?(Hash)
+
+      case entry['type']
+      when 'list'
+        # The override wins over the entry's own attribute
+        key = attribute_key || entry['attributeKey']
+        return false unless key.is_a?(String)
+        return false unless entry['values'].is_a?(Array)
+        return nil if prune && !known?(attributes, key)
+
+        in?(get_path(attributes, key), entry['values'])
+      when 'condition'
+        # A condition group has no single attribute, so any override is ignored
+        return false unless entry['condition'].is_a?(Hash)
+
+        group_ctx = ctx.visiting(id)
+        prune ? prune_entries(attributes, entry['condition'], group_ctx) : eval_condition_result(attributes, entry['condition'], group_ctx)
+      end
+      # Any other type was added after this SDK was built. The client SDK may support it.
+    end
+
+    def self.prune_with_context(attributes, condition, ctx)
+      prune_entries(attributes, condition, ctx)
+    rescue StandardError
+      # One that raises, such as a malformed one, stays as written. Evaluating it
+      # fails as a whole, so no part of it can be decided.
+      condition
+    end
+
+    def self.prune_entries(attributes, condition, ctx)
+      out = {}
+      condition.each do |key, value|
+        r = case key
+            when '$or', '$nor', '$and' then prune_list(attributes, value, ctx, or_list: key != '$and')
+            when '$not' then prune_entries(attributes, value, ctx)
+            when '$savedGroup'
+              # Keep an undecided reference as is rather than inlining the group
+              decided = eval_saved_group(attributes, value, ctx, prune: true)
+              decided?(decided) ? decided : nil
+            else
+              # nil when the attribute is unknown, or the value uses an operator
+              # this SDK doesn't support, which the client's SDK may
+              known?(attributes, key) ? eval_condition_value(value, get_path(attributes, key), ctx) : nil
+        end
+        # $not and $nor pass when what they hold fails
+        r = !r if NEGATING_KEYS.include?(key) && decided?(r)
+
+        # One failing entry fails the whole condition, and a passing one is dropped
+        return false if r == false
+
+        # nil is an undecided leaf, which stays as written
+        if r.nil?
+          out[key] = value
+        elsif r != true
+          out[key] = r
+        end
+      end
+      out.empty? ? true : out
+    end
+
+    # Prune an $or (or an $and) list. Returns the conditions still undecided, or
+    # the list's result once there are none.
+    def self.prune_list(attributes, conditions, ctx, or_list:)
+      raise TypeError, 'expected an array of conditions' unless conditions.is_a?(Array)
+
+      out = []
+      conditions.each do |condition|
+        r = prune_entries(attributes, condition, ctx)
+        # One passing condition decides an $or, and one failing condition an $and
+        return true if or_list && r == true
+        return false if !or_list && r == false
+
+        out << r unless decided?(r)
+      end
+      return out unless out.empty?
+
+      # Every condition failed an $or, or passed an $and. Like eval_or, an empty $or passes.
+      or_list ? conditions.empty? : true
+    end
+
+    # True or false, rather than nil or a pruned condition
+    def self.decided?(result)
+      result.is_a?(TrueClass) || result.is_a?(FalseClass)
+    end
+
+    # A nested path is unknown, since the server may only have part of the object
+    def self.known?(attributes, path)
+      !path.include?('.') && attributes.is_a?(Hash) && attributes.key?(path)
     end
 
     def self.operator_object?(obj)
@@ -112,12 +255,12 @@ module Growthbook
       current
     end
 
-    def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive: false)
+    def self.eval_condition_value(condition_value, attribute_value, ctx, insensitive: false)
       if condition_value.is_a?(Hash) && operator_object?(condition_value)
         # @type var result: bool?
         result = true
         condition_value.each do |key, value|
-          r = eval_operator_condition(key, attribute_value, value, saved_groups)
+          r = eval_operator_condition(key, attribute_value, value, ctx)
           return false if r == false
 
           result = nil if r.nil?
@@ -129,7 +272,7 @@ module Growthbook
       condition_value.to_json == attribute_value.to_json
     end
 
-    def self.elem_match(condition, attribute_value, saved_groups = {})
+    def self.elem_match(condition, attribute_value, ctx)
       return false unless attribute_value.is_a? Array
 
       # Operators test each element itself. A condition, including one that only
@@ -140,7 +283,7 @@ module Growthbook
       attribute_value.each do |item|
         next if item.nil?
 
-        r = on_value ? eval_condition_value(condition, item, saved_groups) : eval_condition_result(item, condition, saved_groups)
+        r = on_value ? eval_condition_value(condition, item, ctx) : eval_condition_result(item, condition, ctx)
         return true if r == true
 
         result = nil if r.nil?
@@ -196,7 +339,28 @@ module Growthbook
       get_type(val1) == get_type(val2) && val1 == val2
     end
 
-    def self.eval_operator_condition(operator, attribute_value, condition_value, saved_groups = {})
+    # Gets the values of a saved group for $inGroup/$notInGroup: a bare array, or
+    # the values of a typed list entry. nil when it has no values to check.
+    def self.saved_group_values(saved_groups, id)
+      # An unknown id has always behaved like an empty list. A malformed entry
+      # has not, and must not: $notInGroup would pass everyone.
+      return [] unless saved_groups.key?(id)
+
+      entry = saved_groups[id]
+      return entry if entry.is_a?(Array)
+      # These operators take their attribute from the condition they sit on
+      return entry['values'].is_a?(Array) ? entry['values'] : nil if entry.is_a?(Hash) && entry['type'] == 'list'
+
+      # A condition group, a malformed entry, or an unknown type
+      nil
+    end
+
+    # A saved group type added after this SDK was built
+    def self.new_group_type?(entry)
+      entry.is_a?(Hash) && !%w[list condition].include?(entry['type'])
+    end
+
+    def self.eval_operator_condition(operator, attribute_value, condition_value, ctx)
       case operator
       when '$veq', '$vne', '$vgt', '$vgte', '$vlt', '$vlte'
         eval_version_operator(operator, attribute_value, condition_value)
@@ -236,30 +400,29 @@ module Growthbook
         return false unless condition_value.is_a?(Array)
 
         !in?(attribute_value, condition_value, insensitive: true)
-      when '$inGroup'
-        return false unless condition_value.is_a?(String)
-        return false unless saved_groups.key?(condition_value)
+      when '$inGroup', '$notInGroup'
+        entry = condition_value.is_a?(String) ? ctx.saved_groups[condition_value] : nil
+        return nil if new_group_type?(entry)
 
-        in?(attribute_value, saved_groups[condition_value] || [])
-      when '$notInGroup'
-        return false unless condition_value.is_a?(String)
-        return true unless saved_groups.key?(condition_value)
+        # No values means matching nobody. An empty list would pass everyone.
+        values = condition_value.is_a?(String) ? saved_group_values(ctx.saved_groups, condition_value) : nil
+        return false if values.nil?
 
-        !in?(attribute_value, saved_groups[condition_value] || [])
+        operator == '$inGroup' ? in?(attribute_value, values) : !in?(attribute_value, values)
       when '$elemMatch'
-        elem_match(condition_value, attribute_value, saved_groups)
+        elem_match(condition_value, attribute_value, ctx)
       when '$size'
         return false unless attribute_value.is_a? Array
 
-        eval_condition_value(condition_value, attribute_value.length, saved_groups)
+        eval_condition_value(condition_value, attribute_value.length, ctx)
       when '$all'
         return false unless condition_value.is_a?(Array)
 
-        in_all?(condition_value, attribute_value, saved_groups, false)
+        in_all?(condition_value, attribute_value, ctx, false)
       when '$alli'
         return false unless condition_value.is_a?(Array)
 
-        in_all?(condition_value, attribute_value, saved_groups, true)
+        in_all?(condition_value, attribute_value, ctx, true)
       when '$exists'
         exists = !attribute_value.nil?
         if condition_value
@@ -270,7 +433,7 @@ module Growthbook
       when '$type'
         condition_value == get_type(attribute_value)
       when '$not'
-        negate(eval_condition_value(condition_value, attribute_value, saved_groups))
+        negate(eval_condition_value(condition_value, attribute_value, ctx))
       else
         # Keys this SDK knows, but on a condition rather than on a value, where
         # they never match. Any other operator is unsupported.
@@ -278,7 +441,7 @@ module Growthbook
       end
     end
 
-    def self.in_all?(condition_values, attribute_value, saved_groups, insensitive)
+    def self.in_all?(condition_values, attribute_value, ctx, insensitive)
       return false unless attribute_value.is_a? Array
 
       # @type var result: bool?
@@ -287,9 +450,8 @@ module Growthbook
         # @type var passed: bool?
         passed = false
         attribute_value.each do |attr|
-          r = eval_condition_value(cond, attr, saved_groups, insensitive: insensitive)
+          r = eval_condition_value(cond, attr, ctx, insensitive: insensitive)
           if r == true
-            # @type var passed: bool?
             passed = true
             break
           end
