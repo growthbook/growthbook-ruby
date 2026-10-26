@@ -22,6 +22,7 @@ module Growthbook
       @all_features = payload['features'] || {}
       @added = {}
       @as_written = {}
+      @on_cycle = nil
     end
 
     def reduce
@@ -152,7 +153,7 @@ module Growthbook
 
         # Groups evaluated against something other than the user, or on a
         # cycle, keep their condition as written
-        reducible = !@as_written.key?(value) && !reaches?(value, value, {})
+        reducible = !@as_written.key?(value) && !on_cycle.key?(value)
         condition = reducible ? Growthbook::Conditions.prune_saved_group(@attributes, { 'id' => value }, @saved_groups) : nil
         groups[value] = condition.is_a?(Hash) ? @saved_groups[value].merge('condition' => condition) : @saved_groups[value]
         used_saved_groups(groups[value], groups)
@@ -183,15 +184,68 @@ module Growthbook
     end
 
     # A group on a cycle can't be reduced on its own: its result depends on
-    # which group the evaluation entered the cycle from
-    def reaches?(from, to, visited)
-      group_ids(@saved_groups[from]).any? do |id|
-        next true if id == to
-        next false if visited.key?(id)
+    # which group the evaluation entered the cycle from. The groups on a cycle
+    # are found once, as strongly connected components with more than one
+    # group or a group that references itself.
+    def on_cycle
+      @on_cycle ||= groups_on_cycles
+    end
 
-        visited[id] = true
-        reaches?(id, to, visited)
+    # Iterative Tarjan's algorithm over the group reference graph, so each
+    # group's entry is scanned once however many groups share it
+    def groups_on_cycles
+      edges = {}
+      @saved_groups.each_key { |id| edges[id] = group_ids(@saved_groups[id]).uniq }
+
+      index = {}
+      low = {}
+      on_stack = {}
+      stack = []
+      result = {}
+      counter = 0
+      edges.each_key do |root|
+        next if index.key?(root)
+
+        work = [[root, 0]]
+        index[root] = low[root] = counter
+        counter += 1
+        stack << root
+        on_stack[root] = true
+        until work.empty?
+          node, i = work.last
+          children = edges[node]
+          if i < children.length
+            work.last[1] = i + 1
+            child = children[i]
+            if !index.key?(child)
+              index[child] = low[child] = counter
+              counter += 1
+              stack << child
+              on_stack[child] = true
+              work << [child, 0]
+            elsif on_stack[child]
+              low[node] = [low[node], index[child]].min
+            end
+            next
+          end
+
+          work.pop
+          low[work.last[0]] = [low[work.last[0]], low[node]].min unless work.empty?
+          next unless low[node] == index[node]
+
+          component = []
+          loop do
+            member = stack.pop
+            on_stack.delete(member)
+            component << member
+            break if member == node
+          end
+          next unless component.length > 1 || children.include?(node)
+
+          component.each { |member| result[member] = true }
+        end
       end
+      result
     end
 
     def group_ids(value, found = [])

@@ -32,5 +32,46 @@ RSpec.describe 'payload reduction' do
       expect(result['features']['beta']['rules']).to eq([{ 'force' => true }])
       expect(payload).to eq(original)
     end
+
+    def condition_group(condition)
+      { 'type' => 'condition', 'condition' => condition }
+    end
+
+    it 'reduces many condition groups that share a large list group' do
+      ids = (1..20_000).map { |i| "user-#{i}" }
+      saved_groups = { 'big' => { 'type' => 'list', 'attributeKey' => 'id', 'values' => ids } }
+      rules = (1..300).map do |i|
+        saved_groups["g#{i}"] = condition_group('country' => 'US', '$savedGroup' => { 'id' => 'big' })
+        { 'condition' => { '$savedGroup' => { 'id' => "g#{i}" } }, 'force' => i }
+      end
+      payload = { 'features' => { 'f' => { 'defaultValue' => 0, 'rules' => rules } }, 'savedGroups' => saved_groups }
+
+      result = Growthbook.reduce_payload(payload, attributes: { country: 'US' })
+
+      expect(result['savedGroups'].keys).to match_array(saved_groups.keys)
+      expect(result['savedGroups']['big']).to eq(saved_groups['big'])
+      (1..300).each do |i|
+        expect(result['savedGroups']["g#{i}"]['condition']).to eq({ '$savedGroup' => { 'id' => 'big' } })
+      end
+    end
+
+    it 'keeps groups on a reference cycle as written and reduces the rest' do
+      saved_groups = {
+        'a'       => condition_group('country' => 'US', '$or' => [{ '$savedGroup' => { 'id' => 'b' } }, { 'x' => true }]),
+        'b'       => condition_group('country' => 'US', '$not' => { '$savedGroup' => { 'id' => 'a' } }),
+        'self'    => condition_group('country' => 'US', '$or' => [{ '$savedGroup' => { 'id' => 'self' } }, { 'x' => true }]),
+        'outside' => condition_group('country' => 'US', '$savedGroup' => { 'id' => 'a' }),
+        'plain'   => condition_group('country' => 'US', 'x' => true)
+      }
+      rules = %w[a self outside plain].map { |id| { 'condition' => { '$savedGroup' => { 'id' => id } }, 'force' => id } }
+      payload = { 'features' => { 'f' => { 'defaultValue' => '', 'rules' => rules } }, 'savedGroups' => saved_groups }
+
+      result = Growthbook.reduce_payload(payload, attributes: { country: 'US' })
+
+      %w[a b self].each { |id| expect(result['savedGroups'][id]).to eq(saved_groups[id]) }
+      # Not on a cycle, but it references one, so pruning can't decide it either
+      expect(result['savedGroups']['outside']).to eq(saved_groups['outside'])
+      expect(result['savedGroups']['plain']['condition']).to eq({ 'x' => true })
+    end
   end
 end

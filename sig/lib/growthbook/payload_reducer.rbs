@@ -11,6 +11,7 @@ module Growthbook
     @all_features: Hash[String, untyped]
     @added: Hash[String, untyped]
     @as_written: Hash[String, bool]
+    @on_cycle: Hash[String, bool]?
 
     def initialize: (Hash[String, untyped] payload, attributes: Hash[String, untyped], include: Hash[String, untyped], exclude: Hash[String, untyped], prerequisites: String | Symbol) -> void
 
@@ -47,8 +48,10 @@ module Growthbook
     # Marks the groups that keep their condition as written
     def mark_as_written: (untyped value, bool user, Hash[String, bool] seen) -> void
 
-    # Whether group `from` references group `to`, directly or through other groups
-    def reaches?: (String from, String to, Hash[String, bool] visited) -> bool
+    # The groups on a reference cycle, found once
+    def on_cycle: () -> Hash[String, bool]
+
+    def groups_on_cycles: () -> Hash[String, bool]
 
     def group_ids: (untyped value, ?Array[String] found) -> Array[String]
   end
