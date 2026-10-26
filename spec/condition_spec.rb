@@ -50,6 +50,16 @@ describe 'conditions' do
     end
   end
 
+  context 'with a null literal condition' do
+    it 'does not match NaN or infinity' do
+      [Float::NAN, Float::INFINITY, -Float::INFINITY].each do |value|
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => nil })).to be(false)
+      end
+      expect(Growthbook::Conditions.eval_condition({ 'a' => nil }, { 'a' => nil })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({}, { 'a' => nil })).to be(true)
+    end
+  end
+
   context 'with numeric version operands' do
     it 'formats numbers like JavaScript' do
       expect(Growthbook::Conditions.eval_condition({ 'a' => 0.000002 }, { 'a' => { '$vgt' => 1.5 } })).to be(false)

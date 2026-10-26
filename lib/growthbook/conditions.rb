@@ -275,6 +275,9 @@ module Growthbook
       end
       return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
+      # null matches only null, like JS ===; js_json would also write NaN and infinity as "null"
+      return attribute_value.nil? if condition_value.nil?
+
       # Numbers compare by value, like JS ===, so 1.0 equals 1
       return number?(attribute_value) && condition_value == attribute_value if number?(condition_value)
 

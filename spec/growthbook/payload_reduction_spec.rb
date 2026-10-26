@@ -16,6 +16,12 @@ RSpec.describe 'payload reduction' do
       expect(Growthbook.prune_condition({ 'a' => '1' }, { 'a' => 1 })).to be(false)
     end
 
+    it 'does not match NaN or infinity to a null literal' do
+      expect(Growthbook.prune_condition({ 'a' => Float::NAN }, { 'a' => nil })).to be(false)
+      expect(Growthbook.prune_condition({ 'a' => Float::INFINITY }, { 'a' => nil })).to be(false)
+      expect(Growthbook.prune_condition({ 'a' => nil }, { 'a' => nil })).to be(true)
+    end
+
     it 'does not fall back to the group attribute for an explicit null attributeKey' do
       saved_groups = { 'g' => { 'type' => 'list', 'attributeKey' => 'id', 'values' => ['u'] } }
       condition = { '$savedGroup' => { 'id' => 'g', 'attributeKey' => nil } }
@@ -50,6 +56,12 @@ RSpec.describe 'payload reduction' do
       payload = { 'features' => { 'f' => { 'defaultValue' => false, 'rules' => [{ 'condition' => { 'a' => 1 }, 'force' => true }] } } }
       result = Growthbook.reduce_payload(payload, attributes: { a: 1.0 })
       expect(result['features']['f']['rules']).to eq([{ 'force' => true }])
+    end
+
+    it 'does not make a null literal rule unconditional for a NaN attribute' do
+      payload = { 'features' => { 'f' => { 'defaultValue' => false, 'rules' => [{ 'condition' => { 'a' => nil }, 'force' => true }] } } }
+      result = Growthbook.reduce_payload(payload, attributes: { a: Float::NAN })
+      expect(result['features']['f']['rules']).to eq([{ 'condition' => { '$not' => {} }, 'force' => nil }])
     end
 
     it 'keeps a malformed condition group and its reference as written' do
