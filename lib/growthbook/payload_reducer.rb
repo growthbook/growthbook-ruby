@@ -34,10 +34,18 @@ module Growthbook
 
       reduced = @payload.merge('features' => @added, 'experiments' => experiments)
       # Only when there were any, as with the payload's other optional keys
-      reduced['contextualBandits'] = contextual_bandits(experiments) unless @payload['contextualBandits'].nil?
+      if @payload['contextualBandits']
+        reduced['contextualBandits'] = contextual_bandits(experiments)
+      else
+        reduced.delete('contextualBandits')
+      end
       used = [@added, experiments, reduced['contextualBandits']]
-      mark_as_written(used, true, {})
-      reduced['savedGroups'] = used_saved_groups(used)
+      # Walking the payload is only needed when there are groups to find
+      unless @saved_groups.empty?
+        mark_as_written(used, true, {})
+        groups = used_saved_groups(used)
+      end
+      reduced['savedGroups'] = groups || {}
       reduced
     end
 
@@ -143,6 +151,11 @@ module Growthbook
       bandits
     end
 
+    # A list's values are attribute values, never references to other groups
+    def can_reference?(group)
+      group.is_a?(Hash) && group['type'] != 'list'
+    end
+
     # Each saved group whose id appears as a string anywhere in `value`, with
     # condition groups reduced. This needs no list of the operators that
     # reference groups.
@@ -156,7 +169,7 @@ module Growthbook
         reducible = !@as_written.key?(value) && !on_cycle.key?(value)
         condition = reducible ? Growthbook::Conditions.prune_saved_group(@attributes, { 'id' => value }, @saved_groups) : nil
         groups[value] = condition.is_a?(Hash) ? @saved_groups[value].merge('condition' => condition) : @saved_groups[value]
-        used_saved_groups(groups[value], groups)
+        used_saved_groups(groups[value], groups) if can_reference?(@saved_groups[value])
       when Hash
         value.each_value { |v| used_saved_groups(v, groups) }
       when Array
@@ -175,7 +188,7 @@ module Growthbook
         return if user && seen.key?(value)
 
         (user ? seen : @as_written)[value] = true
-        mark_as_written(@saved_groups[value], user, seen)
+        mark_as_written(@saved_groups[value], user, seen) if can_reference?(@saved_groups[value])
       when Hash
         value.each { |k, v| mark_as_written(v, user && k != '$elemMatch' && k != 'parentConditions', seen) }
       when Array
@@ -195,7 +208,9 @@ module Growthbook
     # group's entry is scanned once however many groups share it
     def groups_on_cycles
       edges = {}
-      @saved_groups.each_key { |id| edges[id] = group_ids(@saved_groups[id]).uniq }
+      @saved_groups.each do |id, group|
+        edges[id] = can_reference?(group) ? group_ids(group).uniq : []
+      end
 
       index = {}
       low = {}

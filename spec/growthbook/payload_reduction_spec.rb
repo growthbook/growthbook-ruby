@@ -115,5 +115,46 @@ RSpec.describe 'payload reduction' do
       expect(result['savedGroups']['outside']).to eq(saved_groups['outside'])
       expect(result['savedGroups']['plain']['condition']).to eq({ 'x' => true })
     end
+
+    def list_group(values)
+      { 'type' => 'list', 'attributeKey' => 'id', 'values' => values }
+    end
+
+    it 'does not treat a list value that names a group as a reference' do
+      saved_groups = {
+        'c'      => condition_group('country' => 'US', '$savedGroup' => { 'id' => 'list' }),
+        'list'   => list_group(%w[c other]),
+        'legacy' => %w[other],
+        'other'  => condition_group('x' => true)
+      }
+      rules = [
+        { 'condition' => { '$savedGroup' => { 'id' => 'c' } }, 'force' => 1 },
+        { 'condition' => { 'tags' => { '$elemMatch' => { '$savedGroup' => { 'id' => 'list' } } } }, 'force' => 2 },
+        # A bare array group is malformed, so only a reference that isn't pruned keeps it
+        { 'condition' => { 'tags' => { '$elemMatch' => { '$savedGroup' => { 'id' => 'legacy' } } } }, 'force' => 3 }
+      ]
+      payload = { 'features' => { 'f' => { 'defaultValue' => 0, 'rules' => rules } }, 'savedGroups' => saved_groups }
+
+      result = Growthbook.reduce_payload(payload, attributes: { country: 'US' })
+
+      # Not on a cycle through the list, and not evaluated against each item
+      expect(result['savedGroups']['c']['condition']).to eq({ '$savedGroup' => { 'id' => 'list' } })
+      # Only named by list values, so not kept
+      expect(result['savedGroups'].keys).to match_array(%w[c list legacy])
+    end
+
+    it 'does not walk the payload when there are no saved groups' do
+      reducer = Growthbook::PayloadReducer.new(payload, attributes: { 'id' => '123' }, include: {}, exclude: {}, prerequisites: 'keep')
+      allow(reducer).to receive(:mark_as_written).and_call_original
+      allow(reducer).to receive(:used_saved_groups).and_call_original
+      expect(reducer.reduce['savedGroups']).to eq({})
+      expect(reducer).not_to have_received(:mark_as_written)
+      expect(reducer).not_to have_received(:used_saved_groups)
+    end
+
+    it 'leaves out contextualBandits when the payload has none' do
+      expect(Growthbook.reduce_payload(payload)).not_to have_key('contextualBandits')
+      expect(Growthbook.reduce_payload(payload.merge('contextualBandits' => nil))).not_to have_key('contextualBandits')
+    end
   end
 end
