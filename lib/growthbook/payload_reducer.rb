@@ -21,19 +21,22 @@ module Growthbook
       @saved_groups = payload['savedGroups'] || {}
       @all_features = payload['features'] || {}
       @added = {}
+      @as_written = {}
     end
 
     def reduce
       @all_features.each do |id, feature|
         add(id) if matches?(feature.is_a?(Hash) ? feature['metadata'] : nil)
       end
-      experiments = (@payload['experiments'] || []).select { |e| matches?(e['metadata']) }.map { |e| prune(e) }
+      experiments = (@payload['experiments'] || []).select { |e| matches?(e['metadata']) }.map { |e| prune(e, false) }
       experiments.each { |e| add_parents(e) }
 
       reduced = @payload.merge('features' => @added, 'experiments' => experiments)
       # Only when there were any, as with the payload's other optional keys
       reduced['contextualBandits'] = contextual_bandits(experiments) unless @payload['contextualBandits'].nil?
-      reduced['savedGroups'] = used_saved_groups([@added, experiments, reduced['contextualBandits']])
+      used = [@added, experiments, reduced['contextualBandits']]
+      mark_as_written(used, true, {})
+      reduced['savedGroups'] = used_saved_groups(used)
       reduced
     end
 
@@ -71,7 +74,7 @@ module Growthbook
     end
 
     # Reduces a rule or an auto experiment
-    def prune(item)
+    def prune(item, rule)
       condition = item['condition'] ? Growthbook::Conditions.prune_condition(@attributes, item['condition'], @saved_groups) : nil
       item = item.dup
       if condition == true
@@ -80,8 +83,9 @@ module Growthbook
         # Kept, since sticky buckets and forced variations skip an experiment's
         # condition, and a rule's prerequisites are checked before it
         item['condition'] = { '$not' => {} }
-        # A force rule that never passes never returns its value
-        item['force'] = nil if item.key?('force')
+        # A force rule that never passes never returns its value. An auto
+        # experiment's forced variation still applies to a sticky bucketed user.
+        item['force'] = nil if rule && item.key?('force')
       elsif condition
         item['condition'] = condition
       end
@@ -105,7 +109,7 @@ module Growthbook
       # Rules scoped to other projects aren't served. A prerequisite from another
       # project keeps its own, as on the server.
       scoped = in_projects?(feature['metadata'] || {})
-      rules = feature['rules']&.select { |r| !scoped || rule_in_projects?(r['metadata']) }&.map { |r| prune(r) }
+      rules = feature['rules']&.select { |r| !scoped || rule_in_projects?(r['metadata']) }&.map { |r| prune(r, true) }
       # Stored before its parents are added, so a prerequisite cycle ends
       @added[id] = rules ? feature.merge('rules' => rules) : feature
       (rules || []).each { |r| add_parents(r) }
@@ -121,6 +125,12 @@ module Growthbook
         next if !ref || bandits.key?(ref) || !all_bandits.key?(ref)
 
         bandit = all_bandits[ref]
+        # Evaluation tolerates a definition that isn't a Hash, so it stays
+        unless bandit.is_a?(Hash)
+          bandits[ref] = bandit
+          next
+        end
+
         contexts = (bandit['contexts'] || []).flat_map do |c|
           condition = Growthbook::Conditions.prune_condition(@attributes, c['condition'] || {}, @saved_groups)
           next [] if condition == false
@@ -140,7 +150,10 @@ module Growthbook
       when String
         return groups if !@saved_groups.key?(value) || groups.key?(value)
 
-        condition = Growthbook::Conditions.prune_saved_group(@attributes, { 'id' => value }, @saved_groups)
+        # Groups evaluated against something other than the user, or on a
+        # cycle, keep their condition as written
+        reducible = !@as_written.key?(value) && !reaches?(value, value, {})
+        condition = reducible ? Growthbook::Conditions.prune_saved_group(@attributes, { 'id' => value }, @saved_groups) : nil
         groups[value] = condition.is_a?(Hash) ? @saved_groups[value].merge('condition' => condition) : @saved_groups[value]
         used_saved_groups(groups[value], groups)
       when Hash
@@ -149,6 +162,48 @@ module Growthbook
         value.each { |v| used_saved_groups(v, groups) }
       end
       groups
+    end
+
+    # Marks the groups that keep their condition as written: those evaluated
+    # against something other than the user (each item in $elemMatch, or the
+    # parent's value in a prerequisite), and the groups those reference
+    def mark_as_written(value, user, seen)
+      case value
+      when String
+        return if !@saved_groups.key?(value) || @as_written.key?(value)
+        return if user && seen.key?(value)
+
+        (user ? seen : @as_written)[value] = true
+        mark_as_written(@saved_groups[value], user, seen)
+      when Hash
+        value.each { |k, v| mark_as_written(v, user && k != '$elemMatch' && k != 'parentConditions', seen) }
+      when Array
+        value.each { |v| mark_as_written(v, user, seen) }
+      end
+    end
+
+    # A group on a cycle can't be reduced on its own: its result depends on
+    # which group the evaluation entered the cycle from
+    def reaches?(from, to, visited)
+      group_ids(@saved_groups[from]).any? do |id|
+        next true if id == to
+        next false if visited.key?(id)
+
+        visited[id] = true
+        reaches?(id, to, visited)
+      end
+    end
+
+    def group_ids(value, found = [])
+      case value
+      when String
+        found << value if @saved_groups.key?(value)
+      when Hash
+        value.each_value { |v| group_ids(v, found) }
+      when Array
+        value.each { |v| group_ids(v, found) }
+      end
+      found
     end
   end
 end

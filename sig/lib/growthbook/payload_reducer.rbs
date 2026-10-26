@@ -10,6 +10,7 @@ module Growthbook
     @saved_groups: Hash[String, untyped]
     @all_features: Hash[String, untyped]
     @added: Hash[String, untyped]
+    @as_written: Hash[String, bool]
 
     def initialize: (Hash[String, untyped] payload, attributes: Hash[String, untyped], include: Hash[String, untyped], exclude: Hash[String, untyped], prerequisites: String | Symbol) -> void
 
@@ -30,7 +31,7 @@ module Growthbook
     def matches?: (Hash[String, untyped]? meta) -> untyped
 
     # Reduces a rule or an auto experiment
-    def prune: (Hash[String, untyped] item) -> Hash[String, untyped]
+    def prune: (Hash[String, untyped] item, bool rule) -> Hash[String, untyped]
 
     # Adds the prerequisites the client evaluates for a rule or experiment
     def add_parents: (Hash[String, untyped] item) -> void
@@ -42,5 +43,13 @@ module Growthbook
 
     # Each saved group whose id appears as a string anywhere in `value`
     def used_saved_groups: (untyped value, ?Hash[String, untyped] groups) -> Hash[String, untyped]
+
+    # Marks the groups that keep their condition as written
+    def mark_as_written: (untyped value, bool user, Hash[String, bool] seen) -> void
+
+    # Whether group `from` references group `to`, directly or through other groups
+    def reaches?: (String from, String to, Hash[String, bool] visited) -> bool
+
+    def group_ids: (untyped value, ?Array[String] found) -> Array[String]
   end
 end
