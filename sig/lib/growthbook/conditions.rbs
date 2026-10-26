@@ -46,7 +46,7 @@ module Growthbook
     def self.eval_and: (untyped attributes, Array[Hash[String, untyped]] conditions, EvalContext ctx) -> bool?
 
     # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
-    def self.eval_saved_group: (untyped attributes, untyped reference, EvalContext ctx, ?prune: bool) -> (bool | Hash[String, untyped] | nil)
+    def self.eval_saved_group: (untyped attributes, untyped reference, EvalContext ctx, ?prune: bool, ?keep_malformed: bool) -> (bool | Hash[String, untyped] | nil)
 
     def self.prune_with_context: (Hash[String, untyped] attributes, Hash[String, untyped] condition, EvalContext ctx) -> (bool | Hash[String, untyped])
 

@@ -33,6 +33,17 @@ RSpec.describe 'payload reduction' do
       expect(payload).to eq(original)
     end
 
+    it 'keeps a malformed condition group and its reference as written' do
+      rules = [{ 'condition' => { '$savedGroup' => { 'id' => 'g' } }, 'force' => true }]
+      payload = {
+        'features'    => { 'f' => { 'defaultValue' => false, 'rules' => rules } },
+        'savedGroups' => { 'g' => { 'type' => 'condition', 'condition' => { '$not' => nil } } }
+      }
+      result = Growthbook.reduce_payload(payload, attributes: {})
+      expect(result['features']).to eq(payload['features'])
+      expect(result['savedGroups']).to eq(payload['savedGroups'])
+    end
+
     def condition_group(condition)
       { 'type' => 'condition', 'condition' => condition }
     end

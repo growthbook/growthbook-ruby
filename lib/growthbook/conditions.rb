@@ -49,9 +49,9 @@ module Growthbook
 
     # Prune the saved group a reference points to. Returns its result once decided
     # (nil for a group type this SDK doesn't know), otherwise its condition minus
-    # every branch that is already decided.
+    # every branch that is already decided. A malformed condition group stays as written.
     def self.prune_saved_group(attributes, reference, saved_groups)
-      eval_saved_group(attributes, reference, EvalContext.new(saved_groups), prune: true)
+      eval_saved_group(attributes, reference, EvalContext.new(saved_groups), prune: true, keep_malformed: true)
     end
 
     # Helper function to ensure conditions only have string keys (no symbols)
@@ -121,8 +121,9 @@ module Growthbook
 
     # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
     # With prune, an unknown attribute leaves a list group undecided (nil), and a
-    # condition group is pruned rather than evaluated.
-    def self.eval_saved_group(attributes, reference, ctx, prune: false)
+    # condition group is pruned rather than evaluated. With keep_malformed, a
+    # condition group that raises while pruning is returned as written.
+    def self.eval_saved_group(attributes, reference, ctx, prune: false, keep_malformed: false)
       return false unless reference.is_a?(Hash)
 
       id = reference['id']
@@ -149,7 +150,10 @@ module Growthbook
         return false unless entry['condition'].is_a?(Hash)
 
         group_ctx = ctx.visiting(id)
-        prune ? prune_entries(attributes, entry['condition'], group_ctx) : eval_condition_result(attributes, entry['condition'], group_ctx)
+        return eval_condition_result(attributes, entry['condition'], group_ctx) unless prune
+
+        # Inside a condition being pruned, the error reaches that condition's prune_with_context
+        keep_malformed ? prune_with_context(attributes, entry['condition'], group_ctx) : prune_entries(attributes, entry['condition'], group_ctx)
       end
       # Any other type was added after this SDK was built. The client SDK may support it.
     end
