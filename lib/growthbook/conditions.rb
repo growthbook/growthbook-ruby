@@ -5,26 +5,41 @@ require 'json'
 module Growthbook
   # internal use only
   # Utils for condition evaluation
-  class Conditions
+  class Conditions # rubocop:disable Metrics/ClassLength
+    # Keys a condition can have that aren't attributes, besides $not, which is
+    # also an operator on a value
+    CONDITION_OPERATORS = %w[$or $nor $and $savedGroup].freeze
+
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition(attributes, condition, saved_groups = {})
-      condition.each do |key, value|
-        case key
-        when '$or'
-          return false unless eval_or(attributes, value, saved_groups)
-        when '$nor'
-          return false if eval_or(attributes, value, saved_groups)
-        when '$and'
-          return false unless eval_and(attributes, value, saved_groups)
-        when '$not'
-          return false if eval_condition(attributes, value, saved_groups)
-        else
-          return false unless eval_condition_value(value, get_path(attributes, key), saved_groups)
-        end
-      end
+      eval_condition_result(attributes, condition, saved_groups || {}) == true
+    end
 
-      true
+    # Like eval_condition, but returns nil instead of false when the result
+    # depends on an operator this SDK doesn't support
+    def self.eval_condition_result(attributes, condition, saved_groups = {})
+      # @type var result: bool?
+      result = true
+      condition.each do |key, value|
+        r = case key
+            when '$or' then eval_or(attributes, value, saved_groups)
+            when '$nor' then negate(eval_or(attributes, value, saved_groups))
+            when '$and' then eval_and(attributes, value, saved_groups)
+            when '$not' then negate(eval_condition_result(attributes, value, saved_groups))
+            else eval_condition_value(value, get_path(attributes, key), saved_groups)
+        end
+        # One failing entry decides it, wherever an unsupported one is
+        return false if r == false
+
+        result = nil if r.nil?
+      end
+      result
+    end
+
+    # $not of an undecided result stays undecided
+    def self.negate(result)
+      result.nil? ? nil : !result
     end
 
     # Helper function to ensure conditions only have string keys (no symbols)
@@ -41,17 +56,27 @@ module Growthbook
     def self.eval_or(attributes, conditions, saved_groups = {})
       return true if conditions.length <= 0
 
+      # @type var result: bool?
+      result = false
       conditions.each do |condition|
-        return true if eval_condition(attributes, condition, saved_groups)
+        r = eval_condition_result(attributes, condition, saved_groups)
+        return true if r == true
+
+        result = nil if r.nil?
       end
-      false
+      result
     end
 
     def self.eval_and(attributes, conditions, saved_groups = {})
+      # @type var result: bool?
+      result = true
       conditions.each do |condition|
-        return false unless eval_condition(attributes, condition, saved_groups)
+        r = eval_condition_result(attributes, condition, saved_groups)
+        return false if r == false
+
+        result = nil if r.nil?
       end
-      true
+      result
     end
 
     def self.operator_object?(obj)
@@ -89,10 +114,15 @@ module Growthbook
 
     def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive: false)
       if condition_value.is_a?(Hash) && operator_object?(condition_value)
+        # @type var result: bool?
+        result = true
         condition_value.each do |key, value|
-          return false unless eval_operator_condition(key, attribute_value, value, saved_groups)
+          r = eval_operator_condition(key, attribute_value, value, saved_groups)
+          return false if r == false
+
+          result = nil if r.nil?
         end
-        return true
+        return result
       end
       return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
@@ -102,14 +132,20 @@ module Growthbook
     def self.elem_match(condition, attribute_value, saved_groups = {})
       return false unless attribute_value.is_a? Array
 
+      # Operators test each element itself. A condition, including one that only
+      # uses $or, $and, $nor, or $savedGroup, tests each element's fields.
+      on_value = operator_object?(condition) && condition.keys.none? { |k| CONDITION_OPERATORS.include?(k) }
+      # @type var result: bool?
+      result = false
       attribute_value.each do |item|
-        if operator_object?(condition)
-          return true if eval_condition_value(condition, item, saved_groups)
-        elsif eval_condition(item, condition, saved_groups)
-          return true
-        end
+        next if item.nil?
+
+        r = on_value ? eval_condition_value(condition, item, saved_groups) : eval_condition_result(item, condition, saved_groups)
+        return true if r == true
+
+        result = nil if r.nil?
       end
-      false
+      result
     end
 
     # Only two numbers or two strings can be ordered; anything else is a type mismatch
@@ -234,20 +270,36 @@ module Growthbook
       when '$type'
         condition_value == get_type(attribute_value)
       when '$not'
-        !eval_condition_value(condition_value, attribute_value, saved_groups)
+        negate(eval_condition_value(condition_value, attribute_value, saved_groups))
       else
-        false
+        # Keys this SDK knows, but on a condition rather than on a value, where
+        # they never match. Any other operator is unsupported.
+        CONDITION_OPERATORS.include?(operator) ? false : nil
       end
     end
 
     def self.in_all?(condition_values, attribute_value, saved_groups, insensitive)
       return false unless attribute_value.is_a? Array
 
+      # @type var result: bool?
+      result = true
       condition_values.each do |cond|
-        passed = attribute_value.any? { |attr| eval_condition_value(cond, attr, saved_groups, insensitive: insensitive) }
-        return false unless passed
+        # @type var passed: bool?
+        passed = false
+        attribute_value.each do |attr|
+          r = eval_condition_value(cond, attr, saved_groups, insensitive: insensitive)
+          if r == true
+            # @type var passed: bool?
+            passed = true
+            break
+          end
+          passed = nil if r.nil?
+        end
+        return false if passed == false
+
+        result = nil if passed.nil?
       end
-      true
+      result
     end
 
     def self.padded_version_string(input)

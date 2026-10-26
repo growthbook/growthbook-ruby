@@ -94,6 +94,25 @@ describe Growthbook::Context do
     end
   end
 
+  describe 'malformed conditions' do
+    it 'skips a rule whose condition raises instead of raising' do
+      gb = described_class.new(
+        attributes: { id: '1' },
+        features: {
+          feature: {
+            defaultValue: 'default',
+            rules: [
+              { condition: { '$not' => nil }, force: 'malformed' },
+              { condition: { 'id' => '1' }, force: 'next rule' }
+            ]
+          }
+        }
+      )
+
+      expect(gb.feature_value(:feature)).to eq('next rule')
+    end
+  end
+
   describe 'feature usage callback' do
     let(:on_feature_usage) { double }
 

@@ -386,10 +386,13 @@ module Growthbook
       false
     end
 
+    # A condition that raises, such as a malformed one, fails rather than breaking evaluation
     def condition_passes?(condition)
       return false if condition.nil?
 
       Growthbook::Conditions.eval_condition(@attributes, condition, @saved_groups)
+    rescue StandardError
+      false
     end
 
     def get_experiment_result(experiment, variation_index = -1, hash_used: false, feature_id: '', bucket: nil, sticky_bucket_used: false)

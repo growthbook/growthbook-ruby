@@ -2,16 +2,27 @@ module Growthbook
   # internal use only
   # Utils for condition evaluation
   class Conditions
+    # Keys a condition can have that aren't attributes, besides $not, which is
+    # also an operator on a value
+    CONDITION_OPERATORS: Array[String]
+
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition, ?Hash[String, untyped] saved_groups) -> bool
 
+    # Like eval_condition, but returns nil instead of false when the result
+    # depends on an operator this SDK doesn't support
+    def self.eval_condition_result: (Hash[String, untyped] attributes, Hash[String, untyped] condition, ?Hash[String, untyped] saved_groups) -> bool?
+
+    # $not of an undecided result stays undecided
+    def self.negate: (bool? result) -> bool?
+
     # Helper function to ensure conditions only have string keys (no symbols)
     def self.parse_condition: (Hash[untyped, untyped] condition) -> (untyped)
 
-    def self.eval_or: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> (bool)
+    def self.eval_or: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> bool?
 
-    def self.eval_and: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> (bool)
+    def self.eval_and: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> bool?
 
     def self.operator_object?: (Hash[String, untyped] obj) -> bool
 
@@ -19,17 +30,17 @@ module Growthbook
 
     def self.get_path: (Hash[String, untyped]? attributes, String path) -> (nil | untyped)
 
-    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?insensitive: bool) -> bool
+    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?insensitive: bool) -> bool?
 
-    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, ?Hash[String, untyped] saved_groups) -> bool
+    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, ?Hash[String, untyped] saved_groups) -> bool?
 
     def self.eval_version_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
     def self.eval_compare_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
-    def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value, ?Hash[String, untyped] saved_groups) -> bool
+    def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value, ?Hash[String, untyped] saved_groups) -> bool?
 
-    def self.in_all?: (Array[untyped] condition_values, untyped attribute_value, Hash[String, untyped] saved_groups, bool insensitive) -> bool
+    def self.in_all?: (Array[untyped] condition_values, untyped attribute_value, Hash[String, untyped] saved_groups, bool insensitive) -> bool?
 
     def self.in?: (untyped attribute_value, untyped condition_value, ?insensitive: bool) -> bool
 
