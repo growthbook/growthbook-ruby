@@ -8,6 +8,12 @@ RSpec.describe 'payload reduction' do
     it 'accepts symbol keys' do
       expect(Growthbook.prune_condition({ id: '123' }, { id: '123', country: 'US' })).to eq({ 'country' => 'US' })
     end
+
+    it 'does not fall back to the group attribute for an explicit null attributeKey' do
+      saved_groups = { 'g' => { 'type' => 'list', 'attributeKey' => 'id', 'values' => ['u'] } }
+      condition = { '$savedGroup' => { 'id' => 'g', 'attributeKey' => nil } }
+      expect(Growthbook.prune_condition({ 'id' => 'u' }, condition, saved_groups)).to be(false)
+    end
   end
 
   describe '.reduce_payload' do

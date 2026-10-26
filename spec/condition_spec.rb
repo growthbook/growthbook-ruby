@@ -40,4 +40,14 @@ describe 'conditions' do
       expect(result.on).to be(true)
     end
   end
+
+  context 'with an explicit null attributeKey' do
+    it 'does not fall back to the group attribute' do
+      saved_groups = { 'g' => { 'type' => 'list', 'attributeKey' => 'id', 'values' => ['u'] } }
+      condition = { '$savedGroup' => { 'id' => 'g', 'attributeKey' => nil } }
+      expect(Growthbook::Conditions.eval_condition({ 'id' => 'u' }, condition, saved_groups)).to be(false)
+      expect(Growthbook::Conditions.eval_condition({ 'id' => 'u' }, { '$savedGroup' => { 'id' => 'g' } }, saved_groups)).to be(true)
+    end
+  end
+
 end

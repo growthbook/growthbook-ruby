@@ -129,8 +129,9 @@ module Growthbook
       id = reference['id']
       attribute_key = reference['attributeKey']
       return false if !id.is_a?(String) || ctx.visited.include?(id)
-      # Falling back to the entry's attribute would check a different population
-      return false if !attribute_key.nil? && !attribute_key.is_a?(String)
+      # Only an absent override falls back to the entry's attribute. Falling back
+      # for any other non-string, nil included, would check a different population.
+      return false if reference.key?('attributeKey') && !attribute_key.is_a?(String)
 
       entry = ctx.saved_groups[id]
       # Absent, or a v1 bare array
