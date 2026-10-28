@@ -250,4 +250,99 @@ RSpec.describe 'Growthbook::Context remote evaluation' do
       expect(gb.feature_value('banner_text')).to eq('local')
     end
   end
+
+  describe 'tracking experiments evaluated on the proxy' do
+    let(:listener) { Class.new(Growthbook::TrackingCallback) { def on_experiment_viewed(_experiment, _result); end }.new }
+    let(:track) do
+      {
+        'experiment' => {
+          'key'           => 'checkout-exp',
+          'variations'    => [{}, 'green'],
+          'hashAttribute' => 'id',
+          'name'          => 'Checkout experiment'
+        },
+        'result'     => {
+          'key'              => '1',
+          'name'             => 'Variation 1',
+          'featureId'        => 'button_color',
+          'inExperiment'     => true,
+          'hashUsed'         => true,
+          'variationId'      => 1,
+          'value'            => 'green',
+          'hashAttribute'    => 'id',
+          'hashValue'        => '1',
+          'stickyBucketUsed' => false,
+          'bucket'           => 0.5726
+        }
+      }
+    end
+
+    def stub_tracked_eval(rule)
+      stub_request(:post, endpoint).to_return(
+        status: 200,
+        body: JSON.generate('features' => { 'button_color' => { 'defaultValue' => 'blue', 'rules' => [rule] } })
+      )
+    end
+
+    before { allow(listener).to receive(:on_experiment_viewed) }
+
+    it 'fires the tracking callback for each track on the matched rule' do
+      stub_tracked_eval('force' => 'green', 'tracks' => [track])
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' }, listener: listener)
+
+      expect(gb.feature_value('button_color')).to eq('green')
+      expect(listener).to have_received(:on_experiment_viewed).once do |experiment, result|
+        expect(experiment.key).to eq('checkout-exp')
+        expect(experiment.variations).to eq([{}, 'green'])
+        expect(experiment.name).to eq('Checkout experiment')
+        expect(result.to_json).to eq(track['result'])
+      end
+    end
+
+    it 'records the impression' do
+      stub_tracked_eval('force' => 'green', 'tracks' => [track])
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' }, listener: listener)
+
+      gb.eval_feature('button_color')
+
+      expect(gb.impressions['checkout-exp'].variation_id).to eq(1)
+    end
+
+    it 'does not fire for a force rule without tracks' do
+      stub_tracked_eval('force' => 'green')
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' }, listener: listener)
+
+      gb.eval_feature('button_color')
+
+      expect(listener).not_to have_received(:on_experiment_viewed)
+    end
+
+    it 'does not fire when the rule is skipped' do
+      stub_tracked_eval('force' => 'green', 'condition' => { 'country' => 'US' }, 'tracks' => [track])
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' }, listener: listener)
+
+      expect(gb.feature_value('button_color')).to eq('blue')
+      expect(listener).not_to have_received(:on_experiment_viewed)
+    end
+
+    it 'skips malformed tracks without breaking the evaluation' do
+      malformed = [nil, 'oops', { 'experiment' => { 'variations' => [] }, 'result' => {} }, { 'experiment' => track['experiment'] }]
+      stub_tracked_eval('force' => 'green', 'tracks' => malformed + [track])
+      gb = Growthbook::Context.new(remote_eval_repository: repository, attributes: { id: '1' }, listener: listener)
+
+      expect(gb.feature_value('button_color')).to eq('green')
+      expect(listener).to have_received(:on_experiment_viewed).once
+    end
+
+    it 'fires for tracks on locally supplied features too' do
+      gb = Growthbook::Context.new(
+        features: { 'button_color' => { 'defaultValue' => 'blue', 'rules' => [{ 'force' => 'green', 'tracks' => [track] }] } },
+        listener: listener
+      )
+
+      gb.eval_feature('button_color')
+
+      expect(listener).to have_received(:on_experiment_viewed).once
+    end
+  end
 end

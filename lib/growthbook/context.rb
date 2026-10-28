@@ -297,6 +297,9 @@ module Growthbook
           )
           next unless included_in_rollout
 
+          # If this was a remotely evaluated experiment, fire the tracking callbacks
+          fire_rule_tracks(rule.tracks)
+
           return get_feature_result(key.to_s, rule.force, 'force', nil, nil, rule.id)
         end
         # Experiment rule
@@ -562,6 +565,45 @@ module Growthbook
 
       @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
       @impressions[experiment.key] = result unless experiment.key.nil?
+    end
+
+    # A remote-eval proxy runs experiments itself and returns a force rule with
+    # the experiment/result pairs the user was exposed to, so the tracking
+    # callback still fires on this side
+    def fire_rule_tracks(tracks)
+      return if listener.nil? || !tracks.is_a?(Array)
+
+      tracks.each do |track|
+        next unless track.is_a?(Hash)
+
+        track = stringify_keys(track)
+        experiment_data = track['experiment']
+        result_data = track['result']
+        next unless experiment_data.is_a?(Hash) && result_data.is_a?(Hash)
+
+        experiment = Growthbook::InlineExperiment.new(experiment_data)
+        next if experiment.key.empty?
+
+        track_experiment(experiment, rule_track_result(stringify_keys(result_data)))
+      end
+    end
+
+    # The proxy sends the result in the camelCase wire format
+    def rule_track_result(data)
+      Growthbook::InlineExperimentResult.new(
+        key: data['key'],
+        in_experiment: data['inExperiment'],
+        variation_id: data['variationId'],
+        value: data['value'],
+        hash_used: data['hashUsed'],
+        hash_attribute: data['hashAttribute'],
+        hash_value: data['hashValue'],
+        feature_id: data['featureId'],
+        bucket: data['bucket'],
+        name: data['name'],
+        passthrough: data['passthrough'],
+        sticky_bucket_used: data['stickyBucketUsed']
+      )
     end
 
     def included_in_rollout?(seed:, hash_attribute:, fallback_attribute:, hash_version:, range:, coverage:)

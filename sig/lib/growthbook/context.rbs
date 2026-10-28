@@ -99,6 +99,10 @@ module Growthbook
 
     def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void
 
+    def fire_rule_tracks: (untyped tracks) -> void
+
+    def rule_track_result: (Hash[String, untyped] data) -> InlineExperimentResult
+
     def included_in_rollout?: (seed: String, hash_attribute: String, fallback_attribute: String?, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
 
     def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
