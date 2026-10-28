@@ -53,8 +53,6 @@ module Growthbook
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
 
-    def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
-
     def saved_groups=: (Hash[String, untyped]? saved_groups) -> untyped
 
     def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> untyped
