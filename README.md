@@ -75,7 +75,7 @@ If the proxy is unreachable, a stale cached response is used when there is one â
 
 ### Caching
 
-By default every attribute is part of the cache key. Use `cache_key_attributes` to narrow it, so that changes to irrelevant attributes do not cause extra requests. Forced features are deliberately excluded from the key: they are applied on this side and the proxy does not filter on them.
+By default every attribute is part of the cache key. Use `cache_key_attributes` to narrow it, so that changes to irrelevant attributes do not cause extra requests. Forced features are not part of the key, as in the JS SDK. The forced values themselves are always applied locally, but the proxy also takes them into account while evaluating, so features that depend on a forced feature (through a prerequisite) may come from a cached response evaluated with a different set of forced features until it expires.
 
 ```ruby
 Growthbook::RemoteEvalRepository.new(
