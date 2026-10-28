@@ -8,7 +8,7 @@ target :lib do
   check 'lib'
   check 'Gemfile'
 
-  library 'base64', 'uri', 'json', 'openssl', 'bigdecimal'
+  library 'base64', 'uri', 'json', 'openssl', 'bigdecimal', 'digest'
 
   configure_code_diagnostics(D::Ruby.strict)
 

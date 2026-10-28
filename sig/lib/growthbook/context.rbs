@@ -5,7 +5,7 @@ module Growthbook
     attr_accessor enabled: bool
 
     # @return [String] The URL of the current page
-    attr_accessor url: String?
+    attr_reader url: String?
 
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor qa_mode: bool?
@@ -41,15 +41,27 @@ module Growthbook
     
     attr_reader sticky_bucket_attributes: Hash[String, untyped]
 
+    attr_reader remote_eval_repository: Growthbook::RemoteEvalRepository?
+
+    @initializing: bool
+
+    @remote_eval_applied_for: Array[untyped]?
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     def features=: (Hash[String | Symbol, untyped] features) -> void
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
 
-    def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
+    def saved_groups=: (Hash[String, untyped]? saved_groups) -> untyped
 
-    def forced_features=: (Hash[String | Symbol, untyped] forced_features) -> Hash[String, untyped]
+    def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> untyped
+
+    def forced_features=: (Hash[String | Symbol, untyped] forced_features) -> untyped
+
+    def remote_eval?: () -> bool
+
+    def refresh_for_remote_eval: () -> bool
 
     def eval_feature: (String | Symbol key) -> FeatureResult
 
@@ -85,6 +97,10 @@ module Growthbook
 
     def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void
 
+    def fire_rule_tracks: (untyped tracks) -> void
+
+    def rule_track_result: (Hash[String, untyped] data) -> InlineExperimentResult
+
     def included_in_rollout?: (seed: String, hash_attribute: String, fallback_attribute: String?, hash_version: Integer?, range: [Float, Float]?, coverage: Float?) -> bool
 
     def filtered_out?: ((Array[{ 'attribute' => String?, 'seed' => String?, 'hashVersion' => Integer, 'ranges' => Array[[Float, Float]] }]) filters) -> bool
@@ -92,5 +108,13 @@ module Growthbook
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
 
     def track_feature_usage: (String, FeatureResult) -> void
+
+    def validate_remote_eval: (String? decryption_key) -> void
+
+    def remote_eval_context: () -> Array[untyped]
+
+    def remote_eval_features_match_context?: () -> bool
+
+    def discard_remote_eval_features: () -> void
   end
 end

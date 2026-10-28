@@ -9,7 +9,7 @@ module Growthbook
     attr_accessor :enabled
 
     # @return [String] The URL of the current page
-    attr_accessor :url
+    attr_reader :url
 
     # @return [true, false, nil] If true, random assignment is disabled and only explicitly forced variations are used.
     attr_accessor :qa_mode
@@ -53,7 +53,14 @@ module Growthbook
     # @return [Hash[String, String]] The attributes that are used to assign sticky buckets
     attr_reader :sticky_bucket_attributes
 
+    # @return [Growthbook::RemoteEvalRepository, nil] Repository used to evaluate features on a proxy/edge
+    attr_reader :remote_eval_repository
+
     def initialize(options = {})
+      # Setters re-evaluate remotely; hold that off until the whole context is built
+      @initializing = true
+      decryption_key = nil
+
       @features = {}
       @attributes = {}
       @forced_variations = {}
@@ -76,7 +83,7 @@ module Growthbook
         when :url
           @url = value
         when :decryption_key
-          nil
+          decryption_key = value
         when :encrypted_features
           decrypted = decrypted_features_from_options(options)
           features = decrypted unless decrypted.nil?
@@ -98,6 +105,8 @@ module Growthbook
           @sticky_bucket_identifier_attributes = value
         when :saved_groups, :savedGroups
           @saved_groups = value || {}
+        when :remote_eval_repository
+          @remote_eval_repository = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -106,6 +115,11 @@ module Growthbook
       @using_derived_sticky_bucket_attributes = !@sticky_bucket_identifier_attributes
       self.attributes = attributes
       self.features = features
+
+      validate_remote_eval(decryption_key)
+
+      @initializing = false
+      refresh_for_remote_eval
     end
 
     def features=(features)
@@ -127,14 +141,64 @@ module Growthbook
       @attributes = stringify_keys(attrs || {})
 
       refresh_sticky_buckets
+      refresh_for_remote_eval
+    end
+
+    def url=(url)
+      @url = url
+
+      refresh_for_remote_eval
+    end
+
+    def saved_groups=(saved_groups)
+      @saved_groups = saved_groups || {}
     end
 
     def forced_variations=(forced_variations)
       @forced_variations = stringify_keys(forced_variations || {})
+
+      refresh_for_remote_eval
     end
 
     def forced_features=(forced_features)
       @forced_features = stringify_keys(forced_features || {})
+
+      refresh_for_remote_eval
+    end
+
+    # @return [true, false] Whether features are evaluated on a proxy/edge instead of locally
+    def remote_eval?
+      !@remote_eval_repository.nil?
+    end
+
+    # Re-evaluate the features for the current context.
+    #
+    # A no-op outside of remote evaluation mode. Changing the attributes, forced
+    # variations, forced features or URL already triggers this, so it is only
+    # needed to pick up feature changes made on the server while the context
+    # itself stayed the same (responses are cached for the repository's TTL).
+    #
+    # @return [true, false] Whether new features were applied
+    def refresh_for_remote_eval
+      return false if @initializing || @remote_eval_repository.nil?
+
+      data = @remote_eval_repository.fetch(
+        attributes: @attributes,
+        forced_variations: @forced_variations,
+        forced_features: @forced_features,
+        url: @url
+      )
+
+      if data.nil?
+        discard_remote_eval_features unless remote_eval_features_match_context?
+        return false
+      end
+
+      self.saved_groups = data['savedGroups']
+      self.features = data['features'] || {}
+      @remote_eval_applied_for = remote_eval_context
+
+      true
     end
 
     def eval_feature(key)
@@ -159,6 +223,16 @@ module Growthbook
     end
 
     private
+
+    # Remote evaluation delegates the whole evaluation to a self-hosted
+    # proxy/edge, which rules out the two features this SDK would otherwise
+    # handle locally
+    def validate_remote_eval(decryption_key)
+      return if @remote_eval_repository.nil?
+
+      raise ArgumentError, 'decryption_key is not compatible with remote evaluation; the proxy handles encryption' unless decryption_key.nil?
+      raise ArgumentError, 'sticky_bucket_service is not compatible with remote evaluation; the proxy handles sticky bucketing' unless @sticky_bucket_service.nil?
+    end
 
     def _eval_prereqs(parent_conditions, stack)
       parent_conditions.each do |parent_condition|
@@ -222,6 +296,9 @@ module Growthbook
             hash_version: rule.hash_version
           )
           next unless included_in_rollout
+
+          # If this was a remotely evaluated experiment, fire the tracking callbacks
+          fire_rule_tracks(rule.tracks)
 
           return get_feature_result(key.to_s, rule.force, 'force', nil, nil, rule.id)
         end
@@ -371,6 +448,28 @@ module Growthbook
       result
     end
 
+    # Everything the proxy evaluated against. Hash equality ignores insertion order, so this
+    # compares what the values are rather than how they were built.
+    def remote_eval_context
+      [@attributes.dup, @forced_variations.dup, @forced_features.dup, @url]
+    end
+
+    # True when the features in hand are the ones the proxy returned for the context we are in -
+    # or when none of them came from a remote evaluation at all, in which case they are the
+    # caller's own and not ours to throw away.
+    def remote_eval_features_match_context?
+      @remote_eval_applied_for.nil? || @remote_eval_applied_for == remote_eval_context
+    end
+
+    # A failed re-evaluation after the context changed leaves features that belong to a different
+    # user. That is not staleness, it is the wrong subject, so they go rather than being reported
+    # under the new identity - evaluation falls back to defaults instead.
+    def discard_remote_eval_features
+      self.saved_groups = {}
+      self.features = {}
+      @remote_eval_applied_for = nil
+    end
+
     def stringify_keys(hash)
       new_hash = {}
       hash.each do |key, value|
@@ -466,6 +565,45 @@ module Growthbook
 
       @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
       @impressions[experiment.key] = result unless experiment.key.nil?
+    end
+
+    # A remote-eval proxy runs experiments itself and returns a force rule with
+    # the experiment/result pairs the user was exposed to, so the tracking
+    # callback still fires on this side
+    def fire_rule_tracks(tracks)
+      return if listener.nil? || !tracks.is_a?(Array)
+
+      tracks.each do |track|
+        next unless track.is_a?(Hash)
+
+        track = stringify_keys(track)
+        experiment_data = track['experiment']
+        result_data = track['result']
+        next unless experiment_data.is_a?(Hash) && result_data.is_a?(Hash)
+
+        experiment = Growthbook::InlineExperiment.new(experiment_data)
+        next if experiment.key.empty?
+
+        track_experiment(experiment, rule_track_result(stringify_keys(result_data)))
+      end
+    end
+
+    # The proxy sends the result in the camelCase wire format
+    def rule_track_result(data)
+      Growthbook::InlineExperimentResult.new(
+        key: data['key'],
+        in_experiment: data['inExperiment'],
+        variation_id: data['variationId'],
+        value: data['value'],
+        hash_used: data['hashUsed'],
+        hash_attribute: data['hashAttribute'],
+        hash_value: data['hashValue'],
+        feature_id: data['featureId'],
+        bucket: data['bucket'],
+        name: data['name'],
+        passthrough: data['passthrough'],
+        sticky_bucket_used: data['stickyBucketUsed']
+      )
     end
 
     def included_in_rollout?(seed:, hash_attribute:, fallback_attribute:, hash_version:, range:, coverage:)
