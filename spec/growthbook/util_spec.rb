@@ -66,4 +66,13 @@ describe Growthbook::Util do
       }.each { |input, expected| expect(described_class.js_number_to_s(input)).to eq(expected), input.inspect }
     end
   end
+
+  describe 'get_hash' do
+    it 'hashes UTF-16 code units like JS' do
+      # An astral character is a surrogate pair, two code units
+      expect(described_class.get_hash(seed: '', value: "\u{1F600}", version: 1)).to eq(0.472)
+      expect(described_class.get_hash(seed: '', value: "\u{1F600}", version: 2)).to eq(0.4971)
+      expect(described_class.get_hash(seed: '', value: 'josé', version: 1)).to eq(0.586)
+    end
+  end
 end

@@ -69,4 +69,51 @@ describe 'conditions' do
       end
     end
   end
+
+  context 'with array or object operands' do
+    it 'never matches them, as JS compares by reference' do
+      [[], [1], {}, { 'a' => 1 }].each do |value|
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => { '$eq' => value } })).to be(false)
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => { '$ne' => value } })).to be(true)
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => { '$in' => [value] } })).to be(false)
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => { '$nin' => [value] } })).to be(true)
+        expect(Growthbook::Conditions.eval_condition({ 'a' => value }, { 'a' => { '$ini' => [value] } })).to be(false)
+      end
+    end
+  end
+
+  context 'with integer and float values' do
+    it 'compares numbers by value inside arrays and saved groups' do
+      expect(Growthbook::Conditions.eval_condition({ 'a' => [1] }, { 'a' => { '$in' => [1.0] } })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'a' => [1.0] }, { 'a' => { '$nin' => [1] } })).to be(false)
+      groups = { 'nums' => [1.0, 2] }
+      expect(Growthbook::Conditions.eval_condition({ 'a' => [1] }, { 'a' => { '$inGroup' => 'nums' } }, groups)).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'a' => 2.0 }, { 'a' => { '$notInGroup' => 'nums' } }, groups)).to be(false)
+    end
+  end
+
+  context 'with a path through an array' do
+    it 'indexes into the array like JS' do
+      expect(Growthbook::Conditions.eval_condition({ 'tags' => %w[a b] }, { 'tags.1' => 'b' })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'tags' => %w[a b] }, { 'tags.length' => 2 })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'tags' => %w[a b] }, { 'tags.2' => { '$exists' => false } })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'tags' => %w[a b] }, { 'tags.01' => { '$exists' => false } })).to be(true)
+    end
+  end
+
+  context 'with non-ASCII strings' do
+    it 'orders them by UTF-16 code units like JS' do
+      expect(Growthbook::Conditions.eval_condition({ 'a' => "\u{1F600}" }, { 'a' => { '$lt' => "\uFFFF" } })).to be(true)
+      expect(Growthbook::Conditions.eval_condition({ 'a' => "\uFFFF" }, { 'a' => { '$gt' => "\u{1F600}" } })).to be(true)
+    end
+  end
+
+  context 'with a non-string regex pattern' do
+    it 'does not match' do
+      [1, nil, true, ['a'], { 'a' => 1 }].each do |pattern|
+        expect(Growthbook::Conditions.eval_condition({ 'a' => '1' }, { 'a' => { '$regex' => pattern } })).to be(false)
+        expect(Growthbook::Conditions.eval_condition({ 'a' => '1' }, { 'a' => { '$regexi' => pattern } })).to be(false)
+      end
+    end
+  end
 end

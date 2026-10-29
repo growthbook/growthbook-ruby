@@ -84,6 +84,12 @@ module Growthbook
 
     def get_hash_attribute: (String | Symbol | nil attribute, String | Symbol | nil fallback) -> [(String | Symbol), (untyped | "")]
 
+    def hashable?: (untyped value) -> bool
+
+    def hash_string: (untyped value) -> String
+
+    def experiment_fallback_attribute: (InlineExperiment experiment) -> String?
+
     def _eval_feature: (String | Symbol key, Set[String] stack) -> FeatureResult
 
     def track_experiment: (InlineExperiment experiment, InlineExperimentResult result) -> void

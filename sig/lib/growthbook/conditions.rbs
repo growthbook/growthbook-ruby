@@ -92,7 +92,10 @@ module Growthbook
 
     def self.number?: (untyped value) -> bool
 
-    # Values of different types are never equal (no "5" == 5 or 0 == nil)
+    # Orders two non-ASCII strings by UTF-16 code units, like JS
+    def self.utf16_units: (untyped val1, untyped val2) -> [untyped, untyped]
+
+    # Like JS ===: arrays and objects are never equal, numbers compare by value
     def self.strict_equal?: (untyped val1, untyped val2) -> bool
 
     def self.padded_version_string: (untyped input) -> String

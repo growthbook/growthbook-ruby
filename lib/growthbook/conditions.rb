@@ -253,9 +253,16 @@ module Growthbook
       current = attributes
 
       parts.each do |value|
-        return nil unless current.is_a?(Hash) && current&.key?(value)
-
-        current = current[value]
+        if current.is_a?(Hash) && current.key?(value)
+          current = current[value]
+        elsif current.is_a?(Array) && value.match?(/\A(0|[1-9][0-9]*)\z/) && value.to_i < current.length
+          # Like JS, a segment can index into an array ("tags.0")
+          current = current[value.to_i]
+        elsif current.is_a?(Array) && value == 'length'
+          current = current.length
+        else
+          return nil
+        end
       end
 
       current
@@ -346,6 +353,7 @@ module Growthbook
       else
         return false unless orderable?(attribute_value, condition_value)
 
+        attribute_value, condition_value = utf16_units(attribute_value, condition_value)
         case operator
         when '$lt' then attribute_value < condition_value
         when '$lte' then attribute_value <= condition_value
@@ -356,8 +364,22 @@ module Growthbook
       end
     end
 
-    # Values of different types are never equal (no "5" == 5 or 0 == nil)
+    # JS orders strings by UTF-16 code units, so a character above U+FFFF (a
+    # surrogate pair) sorts below U+E000..U+FFFF. Big-endian UTF-16 bytes
+    # compare in that order.
+    def self.utf16_units(val1, val2)
+      return [val1, val2] unless val1.is_a?(String) && val2.is_a?(String)
+      return [val1, val2] if val1.ascii_only? && val2.ascii_only?
+
+      [val1.encode('UTF-16BE').b, val2.encode('UTF-16BE').b]
+    end
+
+    # Like JS ===: values of different types are never equal (no "5" == 5 or
+    # 0 == nil), numbers compare by value (1 equals 1.0), and arrays and objects
+    # compare by reference, so two parsed from JSON are never equal
     def self.strict_equal?(val1, val2)
+      return false if val1.is_a?(Array) || val1.is_a?(Hash) || val2.is_a?(Array) || val2.is_a?(Hash)
+
       get_type(val1) == get_type(val2) && val1 == val2
     end
 
@@ -507,20 +529,19 @@ module Growthbook
       end.join('-')
     end
 
+    # Like JS Array#includes: 1 matches 1.0, and an array or object never
+    # matches (JS compares them by reference). An array attribute matches if any
+    # of its items does. Array#include? compares with ==, which matches JS for
+    # everything but arrays and objects.
     def self.in?(actual, expected, insensitive: false)
       expected ||= []
 
-      if insensitive
-        fold = ->(val) { val.is_a?(String) ? val.downcase : val }
-        folded_expected = expected.map { |exp| fold.call(exp) }
-        return actual.any? { |el| folded_expected.include?(fold.call(el)) } if actual.is_a?(Array)
+      fold = ->(val) { insensitive && val.is_a?(String) ? val.downcase : val }
+      folded_expected = insensitive ? expected.map { |exp| fold.call(exp) } : expected
+      includes = ->(val) { !val.is_a?(Array) && !val.is_a?(Hash) && folded_expected.include?(fold.call(val)) }
+      return actual.any? { |el| includes.call(el) } if actual.is_a?(Array)
 
-        return folded_expected.include?(fold.call(actual))
-      end
-
-      return expected.include?(actual) unless actual.is_a?(Array)
-
-      (actual & expected).any?
+      includes.call(actual)
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original

@@ -272,8 +272,8 @@ module Growthbook
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) unless exp.active
 
       # 6. Get hash_attribute/value and return if empty
-      hash_attribute, hash_value_raw = get_hash_attribute(exp.hash_attribute, exp.fallback_attribute)
-      hash_value = hash_value_raw.to_s
+      hash_attribute, hash_value_raw = get_hash_attribute(exp.hash_attribute, experiment_fallback_attribute(exp))
+      hash_value = hash_string(hash_value_raw)
       return get_experiment_result(exp, -1, hash_used: false, feature_id: feature_id) if hash_value.empty?
 
       assigned = -1
@@ -402,7 +402,7 @@ module Growthbook
         in_experiment = false
       end
 
-      hash_attribute, hash_value = get_hash_attribute(experiment.hash_attribute, experiment.fallback_attribute)
+      hash_attribute, hash_value = get_hash_attribute(experiment.hash_attribute, experiment_fallback_attribute(experiment))
       meta = experiment.meta ? experiment.meta[variation_index] : {}
 
       result = Growthbook::InlineExperimentResult.new(
@@ -448,18 +448,43 @@ module Growthbook
       nil
     end
 
+    # Returns the hash attribute and its raw value ('' when missing). Like JS,
+    # only a non-empty string or a finite, non-zero number identifies a user;
+    # anything else counts as missing, and then the fallback attribute is tried
+    # with the same rule.
     def get_hash_attribute(attr, fallback_attr)
-      attr ||= 'id'
+      attr = 'id' if attr.nil? || attr == ''
 
       val = get_attribute(attr)
+      val = '' unless hashable?(val)
 
       # If no match, try fallback
-      if (val.nil? || val == '') && fallback_attr && @sticky_bucket_service
+      if val == '' && fallback_attr && hashable?(get_attribute(fallback_attr))
         val = get_attribute(fallback_attr)
-        attr = fallback_attr unless val.nil? || val == ''
+        attr = fallback_attr
       end
 
       [attr, val]
+    end
+
+    def hashable?(value)
+      return value != '' if value.is_a?(String)
+      return value != 0 && value.to_f.finite? if value.is_a?(Integer) || value.is_a?(Float)
+
+      false
+    end
+
+    # Formats a hash value like JS String(): 1.0 as "1"
+    def hash_string(value)
+      return value if value.is_a?(String)
+      return Growthbook::Util.js_number_to_s(value) if value.is_a?(Integer) || value.is_a?(Float)
+
+      ''
+    end
+
+    # Experiments only use their fallback attribute with sticky bucketing, like JS
+    def experiment_fallback_attribute(experiment)
+      experiment.fallback_attribute if @sticky_bucket_service && !experiment.disable_sticky_bucketing
     end
 
     def get_attribute(key)
@@ -484,7 +509,7 @@ module Growthbook
 
       _, hash_value_raw = get_hash_attribute(hash_attribute, fallback_attribute)
 
-      hash_value = hash_value_raw.to_s
+      hash_value = hash_string(hash_value_raw)
 
       return false if hash_value.empty?
 
@@ -500,10 +525,12 @@ module Growthbook
 
     def filtered_out?(filters)
       filters.any? do |filter|
-        hash_value = get_attribute(filter['attribute'] || 'id').to_s
+        _, hash_value_raw = get_hash_attribute(filter['attribute'], nil)
+        hash_value = hash_string(hash_value_raw)
 
+        # Like JS, a user without a hash value is filtered out
         if hash_value.empty?
-          false
+          true
         else
           n = Growthbook::Util.get_hash(seed: filter['seed'] || '', value: hash_value, version: filter['hashVersion'] || 2)
 
@@ -545,7 +572,7 @@ module Growthbook
 
       @sticky_bucket_identifier_attributes.each do |attr|
         _, hash_value = get_hash_attribute(attr, nil)
-        attributes[attr] = hash_value if hash_value
+        attributes[attr] = hash_string(hash_value)
       end
       attributes
     end
@@ -553,13 +580,13 @@ module Growthbook
     def _get_sticky_bucket_assignments(attr = nil, fallback = nil)
       merged = {}
 
-      _, hash_value = get_hash_attribute(attr, nil)
-      key = "#{attr}||#{hash_value}"
+      attr, hash_value = get_hash_attribute(attr, nil)
+      key = "#{attr}||#{hash_string(hash_value)}"
       merged = @sticky_bucket_assignment_docs[key]['assignments'] if @sticky_bucket_assignment_docs.key?(key)
 
       if fallback
         _, hash_value = get_hash_attribute(fallback, nil)
-        key = "#{fallback}||#{hash_value}"
+        key = "#{fallback}||#{hash_string(hash_value)}"
         if @sticky_bucket_assignment_docs.key?(key)
           @sticky_bucket_assignment_docs[key]['assignments'].each do |k, v|
             merged[k] = v unless merged.key?(k)
