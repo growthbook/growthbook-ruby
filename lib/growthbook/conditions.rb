@@ -516,7 +516,11 @@ module Growthbook
       # Remove build info and leading `v` if any
       # Split version into parts (both core version numbers and pre-release tags)
       # "v1.2.3-rc.1+build123" -> ["1","2","3","rc","1"]
-      parts = input.gsub(/(^v|\+.*$)/, '').split(/[-.]/)
+      # (build metadata starts at the first `+`; no regex, as `^` and `$` match at line breaks in Ruby)
+      version = input.delete_prefix('v')
+      build_index = version.index('+')
+      version = version[0, build_index] if build_index
+      parts = version.split(/[-.]/, -1)
 
       # If it's SemVer without a pre-release, add `~` to the end
       # ["1","0","0"] -> ["1","0","0","~"]
@@ -525,7 +529,7 @@ module Growthbook
 
       # Left pad each numeric part with spaces so string comparisons will work ("9">"10", but " 9"<"10")
       parts.map do |part|
-        /^[0-9]+$/.match?(part) ? part.rjust(5, ' ') : part
+        /\A[0-9]+\z/.match?(part) ? part.rjust(5, ' ') : part
       end.join('-')
     end
 
