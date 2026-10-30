@@ -2,38 +2,106 @@ module Growthbook
   # internal use only
   # Utils for condition evaluation
   class Conditions
+    # Keys a condition can have that aren't attributes, besides $not, which is
+    # also an operator on a value
+    CONDITION_OPERATORS: Array[String]
+
+    # Keys that pass when what they hold fails
+    NEGATING_KEYS: Array[String]
+
+    # Saved groups for one evaluation, and the group ids already being resolved, to stop cycles
+    class EvalContext
+      attr_reader saved_groups: Hash[String, untyped]
+
+      attr_reader visited: Set[String]
+
+      def initialize: (Hash[String, untyped]? saved_groups, ?Set[String] visited) -> void
+
+      # A copy that also holds id, so sibling groups don't see each other's ids
+      def visiting: (String id) -> EvalContext
+    end
+
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
-    def self.eval_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition, ?Hash[String, untyped] saved_groups) -> bool
+    def self.eval_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition, ?Hash[String, untyped]? saved_groups) -> bool
+
+    # Partially evaluate a condition when only some attributes are known
+    def self.prune_condition: (Hash[String, untyped] attributes, Hash[String, untyped] condition, ?Hash[String, untyped]? saved_groups) -> (bool | Hash[String, untyped])
+
+    # Prune the saved group a reference points to
+    def self.prune_saved_group: (Hash[String, untyped] attributes, untyped reference, Hash[String, untyped] saved_groups) -> (bool | Hash[String, untyped] | nil)
 
     # Helper function to ensure conditions only have string keys (no symbols)
-    def self.parse_condition: (Hash[untyped, untyped] condition) -> (untyped)
+    def self.parse_condition: (untyped condition) -> (untyped)
 
-    def self.eval_or: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> (bool)
+    # Evaluates a condition to true or false, or nil when the result depends on an
+    # operator or saved group type this SDK doesn't support
+    def self.eval_condition_result: (untyped attributes, Hash[String, untyped] condition, EvalContext ctx) -> bool?
 
-    def self.eval_and: (Hash[String, untyped] attributes, Array[Hash[String, untyped]] conditions, ?Hash[String, untyped] saved_groups) -> (bool)
+    # $not of an undecided result stays undecided
+    def self.negate: (bool? result) -> bool?
+
+    def self.eval_or: (untyped attributes, Array[Hash[String, untyped]] conditions, EvalContext ctx) -> bool?
+
+    def self.eval_and: (untyped attributes, Array[Hash[String, untyped]] conditions, EvalContext ctx) -> bool?
+
+    # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
+    def self.eval_saved_group: (untyped attributes, untyped reference, EvalContext ctx, ?prune: bool, ?keep_malformed: bool) -> (bool | Hash[String, untyped] | nil)
+
+    def self.prune_with_context: (Hash[String, untyped] attributes, Hash[String, untyped] condition, EvalContext ctx) -> (bool | Hash[String, untyped])
+
+    def self.prune_entries: (untyped attributes, Hash[String, untyped] condition, EvalContext ctx) -> (bool | Hash[String, untyped])
+
+    # Prune an $or (or an $and) list
+    def self.prune_list: (untyped attributes, untyped conditions, EvalContext ctx, or_list: bool) -> (bool | Array[untyped])
+
+    # True or false, rather than nil or a pruned condition
+    def self.decided?: (untyped result) -> bool
+
+    # A nested path is unknown, since the server may only have part of the object
+    def self.known?: (untyped attributes, String path) -> bool
 
     def self.operator_object?: (Hash[String, untyped] obj) -> bool
 
     def self.get_type: (untyped attribute_value) -> ("string" | "number" | "boolean" | "array" | "null" | "object")
 
-    def self.get_path: (Hash[String, untyped]? attributes, String path) -> (nil | untyped)
+    def self.get_path: (untyped attributes, String path) -> (nil | untyped)
 
-    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, ?Hash[String, untyped] saved_groups, ?insensitive: bool) -> bool
+    def self.eval_condition_value: (untyped condition_value, untyped attribute_value, EvalContext ctx, ?insensitive: bool) -> bool?
 
-    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, ?Hash[String, untyped] saved_groups) -> bool
+    def self.elem_match: (Hash[String, untyped] condition, untyped attribute_value, EvalContext ctx) -> bool?
 
     def self.eval_version_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
     def self.eval_compare_operator: (String operator, untyped attribute_value, untyped condition_value) -> bool
 
-    def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value, ?Hash[String, untyped] saved_groups) -> bool
+    # Gets the values of a saved group for $inGroup/$notInGroup
+    def self.saved_group_values: (Hash[String, untyped] saved_groups, String id) -> Array[untyped]?
 
-    def self.in_all?: (Array[untyped] condition_values, untyped attribute_value, Hash[String, untyped] saved_groups, bool insensitive) -> bool
+    # A saved group type added after this SDK was built
+    def self.new_group_type?: (untyped entry) -> bool
+
+    def self.eval_operator_condition: (String operator, untyped attribute_value, untyped condition_value, EvalContext ctx) -> bool?
+
+    def self.in_all?: (Array[untyped] condition_values, untyped attribute_value, EvalContext ctx, bool insensitive) -> bool?
 
     def self.in?: (untyped attribute_value, untyped condition_value, ?insensitive: bool) -> bool
 
-    def self.compare: (untyped val1, untyped val2) -> Integer
+    # Only two numbers or two strings can be ordered; anything else is a type mismatch
+    def self.orderable?: (untyped val1, untyped val2) -> bool
+
+    def self.number?: (untyped value) -> bool
+
+    # Orders two non-ASCII strings by UTF-16 code units, like JS
+    def self.utf16_units: (untyped val1, untyped val2) -> [untyped, untyped]
+
+    # Like JS ===: arrays and objects are never equal, numbers compare by value
+    def self.strict_equal?: (untyped val1, untyped val2) -> bool
+
+    def self.padded_version_string: (untyped input) -> String
+
+    # Serializes like JavaScript's JSON.stringify
+    def self.js_json: (untyped value) -> String
 
     # Sets $VERBOSE for the duration of the block and back to its original
     # value afterwards. Used for testing invalid regexes.

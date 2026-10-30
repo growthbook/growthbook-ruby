@@ -75,6 +75,8 @@ module Growthbook
       @weights = get_option(options, :weights)
       @active = get_option(options, :active, true)
       @coverage = get_option(options, :coverage, 1.0)
+      # Serialize coverage whenever it was given, even when it's 1 (like the JS SDK)
+      @coverage_given = !get_option(options, :coverage).nil?
       @ranges = get_option(options, :ranges)
       @condition = get_option(options, :condition)
       @namespace = get_option(options, :namespace)
@@ -104,7 +106,7 @@ module Growthbook
       res['variations'] = @variations
       res['weights'] = @weights unless @weights.nil?
       res['active'] = @active if @active != true && !@active.nil?
-      res['coverage'] = @coverage if @coverage != 1 && !@coverage.nil?
+      res['coverage'] = @coverage if @coverage_given || (@coverage != 1 && !@coverage.nil?)
       res['ranges'] = @ranges
       res['condition'] = @condition
       res['namespace'] = @namespace

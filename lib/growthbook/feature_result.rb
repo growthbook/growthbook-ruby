@@ -39,7 +39,8 @@ module Growthbook
       rule_id = ''
     )
 
-      on = !value.nil? && value != 0 && value != '' && value != false
+      # JS truthiness: [], {} and "off" are on
+      on = !value.nil? && value != 0 && value != '' && value != false && !(value.is_a?(Float) && value.nan?)
 
       @value = value
       @on = on

@@ -1,0 +1,58 @@
+module Growthbook
+  # internal use only
+  # Shrinks a features payload for a user whose attributes are only partly known
+  class PayloadReducer
+    @payload: Hash[String, untyped]
+    @attributes: Hash[String, untyped]
+    @include: Hash[String, untyped]
+    @exclude: Hash[String, untyped]
+    @filter_prerequisites: bool
+    @saved_groups: Hash[String, untyped]
+    @all_features: Hash[String, untyped]
+    @added: Hash[String, untyped]
+    @as_written: Hash[String, bool]
+    @on_cycle: Hash[String, bool]?
+
+    def initialize: (Hash[String, untyped] payload, attributes: Hash[String, untyped], include: Hash[String, untyped], exclude: Hash[String, untyped], prerequisites: String | Symbol) -> void
+
+    def reduce: () -> Hash[String, untyped]
+
+    private
+
+    # Only an array counts, as with `$in`, and any one of its values is enough
+    def has?: (untyped actual, untyped want) -> bool
+
+    # A rule without projects applies wherever its feature is delivered
+    def rule_in_projects?: (Hash[String, untyped]? meta) -> bool
+
+    # A feature or experiment has to list one of the projects, or be in all of them
+    def in_projects?: (Hash[String, untyped] meta) -> untyped
+
+    # Kept when it matches every `include` filter and no `exclude` filter
+    def matches?: (Hash[String, untyped]? meta) -> untyped
+
+    # Reduces a rule or an auto experiment
+    def prune: (Hash[String, untyped] item, bool rule) -> Hash[String, untyped]
+
+    # Adds the prerequisites the client evaluates for a rule or experiment
+    def add_parents: (Hash[String, untyped] item) -> void
+
+    def add: (untyped id) -> void
+
+    # The contextual bandits that kept rules and experiments use
+    def contextual_bandits: (Array[Hash[String, untyped]] experiments) -> Hash[String, untyped]
+
+    # Each saved group whose id appears as a string anywhere in `value`
+    def used_saved_groups: (untyped value, ?Hash[String, untyped] groups) -> Hash[String, untyped]
+
+    # Marks the groups that keep their condition as written
+    def mark_as_written: (untyped value, bool user, Hash[String, bool] seen) -> void
+
+    # The groups on a reference cycle, found once
+    def on_cycle: () -> Hash[String, bool]
+
+    def groups_on_cycles: () -> Hash[String, bool]
+
+    def group_ids: (untyped value, ?Array[String] found) -> Array[String]
+  end
+end
