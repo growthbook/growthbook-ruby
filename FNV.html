@@ -6,7 +6,7 @@
 <title>
   Class: FNV
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -185,7 +185,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Hashes UTF-16 code units, like JavaScript's charCodeAt, so a character above U+FFFF counts as two units.</p></div></span>
   
 </li>
 
@@ -209,14 +209,22 @@
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Hashes UTF-16 code units, like JavaScript's charCodeAt, so a character
+above U+FFFF counts as two units</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-13
-14
 15
 16
 17
@@ -224,16 +232,20 @@
 19
 20
 21
-22</pre>
+22
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/fnv.rb', line 13</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/fnv.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_fnv1a_32'>fnv1a_32</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#INIT32-constant" title="FNV::INIT32 (constant)">INIT32</a></span></span>
 
-  <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_bytes'>bytes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_byte'>byte</span><span class='op'>|</span>
-    <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='id identifier rubyid_hash'>hash</span> <span class='op'>^</span> <span class='id identifier rubyid_byte'>byte</span>
+  <span class='id identifier rubyid_units'>units</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_ascii_only?'>ascii_only?</span> <span class='op'>?</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_bytes'>bytes</span> <span class='op'>:</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>UTF-16LE</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_unpack'>unpack</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>v*</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_i</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_units'>units</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_unit'>unit</span><span class='op'>|</span>
+    <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='id identifier rubyid_hash'>hash</span> <span class='op'>^</span> <span class='id identifier rubyid_unit'>unit</span>
     <span class='id identifier rubyid_hash'>hash</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span> <span class='op'>*</span> <span class='const'><span class='object_link'><a href="#PRIME32-constant" title="FNV::PRIME32 (constant)">PRIME32</a></span></span><span class='rparen'>)</span> <span class='op'>%</span> <span class='const'><span class='object_link'><a href="#MOD32-constant" title="FNV::MOD32 (constant)">MOD32</a></span></span>
   <span class='kw'>end</span>
 
@@ -249,9 +261,9 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jul  9 13:53:23 2026 by
+  Generated on Fri Oct 30 20:17:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-3.2.2).
+  0.9.45 (ruby-3.2.2).
 </div>
 
     </div>

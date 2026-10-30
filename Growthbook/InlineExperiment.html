@@ -6,7 +6,7 @@
 <title>
   Class: Growthbook::InlineExperiment
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -785,7 +785,9 @@
 96
 97
 98
-99</pre>
+99
+100
+101</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment.rb', line 72</span>
@@ -796,6 +798,8 @@
   <span class='ivar'>@weights</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:weights</span><span class='rparen'>)</span>
   <span class='ivar'>@active</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:active</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
   <span class='ivar'>@coverage</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:coverage</span><span class='comma'>,</span> <span class='float'>1.0</span><span class='rparen'>)</span>
+  <span class='comment'># Serialize coverage whenever it was given, even when it&#39;s 1 (like the JS SDK)
+</span>  <span class='ivar'>@coverage_given</span> <span class='op'>=</span> <span class='op'>!</span><span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:coverage</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='ivar'>@ranges</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:ranges</span><span class='rparen'>)</span>
   <span class='ivar'>@condition</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:condition</span><span class='rparen'>)</span>
   <span class='ivar'>@namespace</span> <span class='op'>=</span> <span class='id identifier rubyid_get_option'>get_option</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='symbol'>:namespace</span><span class='rparen'>)</span>
@@ -2104,8 +2108,6 @@
       <pre class="lines">
 
 
-101
-102
 103
 104
 105
@@ -2129,10 +2131,12 @@
 123
 124
 125
-126</pre>
+126
+127
+128</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment.rb', line 101</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/inline_experiment.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_json'>to_json</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid__args'>_args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -2140,7 +2144,7 @@
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>variations</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@variations</span>
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>weights</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@weights</span> <span class='kw'>unless</span> <span class='ivar'>@weights</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>active</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@active</span> <span class='kw'>if</span> <span class='ivar'>@active</span> <span class='op'>!=</span> <span class='kw'>true</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@active</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
-  <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>coverage</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@coverage</span> <span class='kw'>if</span> <span class='ivar'>@coverage</span> <span class='op'>!=</span> <span class='int'>1</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@coverage</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>coverage</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@coverage</span> <span class='kw'>if</span> <span class='ivar'>@coverage_given</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='ivar'>@coverage</span> <span class='op'>!=</span> <span class='int'>1</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@coverage</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ranges</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@ranges</span>
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>condition</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@condition</span>
   <span class='id identifier rubyid_res'>res</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>namespace</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@namespace</span>
@@ -2170,9 +2174,9 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jul  9 13:53:23 2026 by
+  Generated on Fri Oct 30 20:17:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-3.2.2).
+  0.9.45 (ruby-3.2.2).
 </div>
 
     </div>

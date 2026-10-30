@@ -6,7 +6,7 @@
 <title>
   Module: Growthbook
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -81,7 +81,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/growthbook.rb<span class="defines">,<br>
-  lib/growthbook/util.rb,<br> lib/growthbook/context.rb,<br> lib/growthbook/feature.rb,<br> lib/growthbook/conditions.rb,<br> lib/growthbook/feature_rule.rb,<br> lib/growthbook/feature_result.rb,<br> lib/growthbook/decryption_util.rb,<br> lib/growthbook/inline_experiment.rb,<br> lib/growthbook/tracking_callback.rb,<br> lib/growthbook/feature_repository.rb,<br> lib/growthbook/sticky_bucket_service.rb,<br> lib/growthbook/feature_usage_callback.rb,<br> lib/growthbook/inline_experiment_result.rb</span>
+  lib/growthbook/util.rb,<br> lib/growthbook/context.rb,<br> lib/growthbook/feature.rb,<br> lib/growthbook/conditions.rb,<br> lib/growthbook/feature_rule.rb,<br> lib/growthbook/feature_result.rb,<br> lib/growthbook/decryption_util.rb,<br> lib/growthbook/payload_reducer.rb,<br> lib/growthbook/inline_experiment.rb,<br> lib/growthbook/tracking_callback.rb,<br> lib/growthbook/feature_repository.rb,<br> lib/growthbook/sticky_bucket_service.rb,<br> lib/growthbook/feature_usage_callback.rb,<br> lib/growthbook/inline_experiment_result.rb</span>
 
 </dd>
   </dl>
@@ -103,7 +103,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span>, <span class='object_link'><a href="Growthbook/Context.html" title="Growthbook::Context (class)">Context</a></span>, <span class='object_link'><a href="Growthbook/DecryptionUtil.html" title="Growthbook::DecryptionUtil (class)">DecryptionUtil</a></span>, <span class='object_link'><a href="Growthbook/Feature.html" title="Growthbook::Feature (class)">Feature</a></span>, <span class='object_link'><a href="Growthbook/FeatureRepository.html" title="Growthbook::FeatureRepository (class)">FeatureRepository</a></span>, <span class='object_link'><a href="Growthbook/FeatureResult.html" title="Growthbook::FeatureResult (class)">FeatureResult</a></span>, <span class='object_link'><a href="Growthbook/FeatureRule.html" title="Growthbook::FeatureRule (class)">FeatureRule</a></span>, <span class='object_link'><a href="Growthbook/FeatureUsageCallback.html" title="Growthbook::FeatureUsageCallback (class)">FeatureUsageCallback</a></span>, <span class='object_link'><a href="Growthbook/InMemoryStickyBucketService.html" title="Growthbook::InMemoryStickyBucketService (class)">InMemoryStickyBucketService</a></span>, <span class='object_link'><a href="Growthbook/InlineExperiment.html" title="Growthbook::InlineExperiment (class)">InlineExperiment</a></span>, <span class='object_link'><a href="Growthbook/InlineExperimentResult.html" title="Growthbook::InlineExperimentResult (class)">InlineExperimentResult</a></span>, <span class='object_link'><a href="Growthbook/StickyBucketService.html" title="Growthbook::StickyBucketService (class)">StickyBucketService</a></span>, <span class='object_link'><a href="Growthbook/TrackingCallback.html" title="Growthbook::TrackingCallback (class)">TrackingCallback</a></span>, <span class='object_link'><a href="Growthbook/Util.html" title="Growthbook::Util (class)">Util</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span>, <span class='object_link'><a href="Growthbook/Context.html" title="Growthbook::Context (class)">Context</a></span>, <span class='object_link'><a href="Growthbook/DecryptionUtil.html" title="Growthbook::DecryptionUtil (class)">DecryptionUtil</a></span>, <span class='object_link'><a href="Growthbook/Feature.html" title="Growthbook::Feature (class)">Feature</a></span>, <span class='object_link'><a href="Growthbook/FeatureRepository.html" title="Growthbook::FeatureRepository (class)">FeatureRepository</a></span>, <span class='object_link'><a href="Growthbook/FeatureResult.html" title="Growthbook::FeatureResult (class)">FeatureResult</a></span>, <span class='object_link'><a href="Growthbook/FeatureRule.html" title="Growthbook::FeatureRule (class)">FeatureRule</a></span>, <span class='object_link'><a href="Growthbook/FeatureUsageCallback.html" title="Growthbook::FeatureUsageCallback (class)">FeatureUsageCallback</a></span>, <span class='object_link'><a href="Growthbook/InMemoryStickyBucketService.html" title="Growthbook::InMemoryStickyBucketService (class)">InMemoryStickyBucketService</a></span>, <span class='object_link'><a href="Growthbook/InlineExperiment.html" title="Growthbook::InlineExperiment (class)">InlineExperiment</a></span>, <span class='object_link'><a href="Growthbook/InlineExperimentResult.html" title="Growthbook::InlineExperimentResult (class)">InlineExperimentResult</a></span>, <span class='object_link'><a href="Growthbook/PayloadReducer.html" title="Growthbook::PayloadReducer (class)">PayloadReducer</a></span>, <span class='object_link'><a href="Growthbook/StickyBucketService.html" title="Growthbook::StickyBucketService (class)">StickyBucketService</a></span>, <span class='object_link'><a href="Growthbook/TrackingCallback.html" title="Growthbook::TrackingCallback (class)">TrackingCallback</a></span>, <span class='object_link'><a href="Growthbook/Util.html" title="Growthbook::Util (class)">Util</a></span>
     
   
 </p>
@@ -114,14 +114,343 @@
 
 
 
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
 
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#prune_condition-class_method" title="prune_condition (class method)">.<strong>prune_condition</strong>(attributes, condition, saved_groups = {})  &#x21d2; true, ... </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Partially evaluate a targeting condition when only some attributes are known, e.g.</p></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reduce_payload-class_method" title="reduce_payload (class method)">.<strong>reduce_payload</strong>(payload, attributes: {}, include: {}, exclude: {}, prerequisites: &#39;keep&#39;)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Shrink a features payload for a user whose attributes are only partly known, e.g.</p></div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="prune_condition-class_method">
+  
+    .<strong>prune_condition</strong>(attributes, condition, saved_groups = {})  &#x21d2; <tt>true</tt>, ... 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Partially evaluate a targeting condition when only some attributes are known,
+e.g. on a server. Attributes missing from <code>attributes</code> are unknown.</p>
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>attributes</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The known attributes</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>condition</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The targeting condition</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>saved_groups</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The payload's saved groups</p></div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>, <tt>false</tt>, <tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true or false once the result can't depend on the
+unknown attributes, otherwise the condition minus every branch already decided</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+13
+14
+15
+16
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook.rb', line 13</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_prune_condition'>prune_condition</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_condition'>condition</span><span class='comma'>,</span> <span class='id identifier rubyid_saved_groups'>saved_groups</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span></span><span class='period'>.</span><span class='id identifier rubyid_prune_condition'><span class='object_link'><a href="Growthbook/Conditions.html#prune_condition-class_method" title="Growthbook::Conditions.prune_condition (method)">prune_condition</a></span></span><span class='lparen'>(</span>
+    <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse_condition'><span class='object_link'><a href="Growthbook/Conditions.html#parse_condition-class_method" title="Growthbook::Conditions.parse_condition (method)">parse_condition</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse_condition'><span class='object_link'><a href="Growthbook/Conditions.html#parse_condition-class_method" title="Growthbook::Conditions.parse_condition (method)">parse_condition</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_saved_groups'>saved_groups</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reduce_payload-class_method">
+  
+    .<strong>reduce_payload</strong>(payload, attributes: {}, include: {}, exclude: {}, prerequisites: &#39;keep&#39;)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Shrink a features payload for a user whose attributes are only partly known,
+e.g. on a server that bootstraps a client-side SDK. The result evaluates the
+same as the full payload for anyone who agrees with the known attributes.</p>
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>payload</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A decrypted features payload, as returned by the SDK API
+(features, experiments, savedGroups, contextualBandits)</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>attributes</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The attributes known for the user</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>include</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Keep only features and experiments that match every filter:
+<code>projects</code>, <code>tags</code> (arrays, any one value is enough) and <code>customFields</code> (a hash of field to array of values)</p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>exclude</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Drop features and experiments that match any filter, with the same keys as <code>include</code></p></div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>prerequisites</span>
+      
+      
+        <span class='type'>(<tt>'keep'</tt>, <tt>'filter'</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>&#39;keep&#39;</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>With 'keep' (the default), the prerequisites of kept features and
+experiments are kept even when the filters drop them. With 'filter', only holdouts are.</p></div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The reduced payload, with every other key of <code>payload</code> unchanged</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_reduce_payload'>reduce_payload</span><span class='lparen'>(</span><span class='id identifier rubyid_payload'>payload</span><span class='comma'>,</span> <span class='label'>attributes:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>include:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>exclude:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>prerequisites:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>keep</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/PayloadReducer.html" title="Growthbook::PayloadReducer (class)">PayloadReducer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Growthbook/PayloadReducer.html#initialize-instance_method" title="Growthbook::PayloadReducer#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse_condition'><span class='object_link'><a href="Growthbook/Conditions.html#parse_condition-class_method" title="Growthbook::Conditions.parse_condition (method)">parse_condition</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_payload'>payload</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>attributes:</span> <span class='const'><span class='object_link'><a href="" title="Growthbook (module)">Growthbook</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Growthbook/Conditions.html" title="Growthbook::Conditions (class)">Conditions</a></span></span><span class='period'>.</span><span class='id identifier rubyid_parse_condition'><span class='object_link'><a href="Growthbook/Conditions.html#parse_condition-class_method" title="Growthbook::Conditions.parse_condition (method)">parse_condition</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>include:</span> <span class='id identifier rubyid_payload_filters'>payload_filters</span><span class='lparen'>(</span><span class='id identifier rubyid_include'>include</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>exclude:</span> <span class='id identifier rubyid_payload_filters'>payload_filters</span><span class='lparen'>(</span><span class='id identifier rubyid_exclude'>exclude</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>prerequisites:</span> <span class='id identifier rubyid_prerequisites'>prerequisites</span>
+  <span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reduce'><span class='object_link'><a href="Growthbook/PayloadReducer.html#reduce-instance_method" title="Growthbook::PayloadReducer#reduce (method)">reduce</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
 
 </div>
 
       <div id="footer">
-  Generated on Thu Jul  9 13:53:23 2026 by
+  Generated on Fri Oct 30 20:17:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-3.2.2).
+  0.9.45 (ruby-3.2.2).
 </div>
 
     </div>
