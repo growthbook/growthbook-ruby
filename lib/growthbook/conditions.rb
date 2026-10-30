@@ -120,9 +120,10 @@ module Growthbook
     end
 
     # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
-    # With prune, an unknown attribute leaves a list group undecided (nil), and a
-    # condition group is pruned rather than evaluated. With keep_malformed, a
-    # condition group that raises while pruning is returned as written.
+    # With prune, an unknown attribute leaves a list group undecided (nil), unknown
+    # remote group ids leave a remote group undecided, and a condition group is
+    # pruned rather than evaluated. With keep_malformed, a condition group that
+    # raises while pruning is returned as written.
     def self.eval_saved_group(attributes, reference, ctx, prune: false, keep_malformed: false)
       return false unless reference.is_a?(Hash)
 
@@ -146,6 +147,15 @@ module Growthbook
         return nil if prune && !known?(attributes, key)
 
         in?(get_path(attributes, key), entry['values'])
+      when 'remote'
+        # The ids live outside the payload: the user's groups arrive resolved, in
+        # the __gb_remoteGroupIds attribute. Another attribute needs a derived
+        # group, which isn't supported yet.
+        return false if reference.key?('attributeKey') && attribute_key != entry['attributeKey']
+        return nil if prune && !known?(attributes, RemoteSavedGroups::ATTRIBUTE)
+
+        group_ids = get_path(attributes, RemoteSavedGroups::ATTRIBUTE)
+        group_ids.is_a?(Array) && group_ids.include?(id)
       when 'condition'
         # A condition group has no single attribute, so any override is ignored
         return false unless entry['condition'].is_a?(Hash)

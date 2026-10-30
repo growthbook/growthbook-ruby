@@ -1,0 +1,19 @@
+module Growthbook
+  # A resolver for remote saved groups loaded into Redis by GrowthBook's loader
+  class RedisResolver
+    # A Redis client with the one command RedisResolver needs
+    interface _SetClient
+      def smembers: (String key) -> Array[untyped]
+    end
+
+    @redis: _SetClient
+
+    def initialize: (_SetClient redis) -> void
+
+    def call: (Hash[String, untyped] attributes, Array[Hash[String, String]] groups) -> Array[String]
+
+    private
+
+    def lookup_values: (untyped value) -> Array[String]
+  end
+end
