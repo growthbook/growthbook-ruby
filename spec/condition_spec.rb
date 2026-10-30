@@ -70,6 +70,38 @@ describe 'conditions' do
     end
   end
 
+  context 'with a version prefix or build metadata' do
+    def padded(input)
+      Growthbook::Conditions.padded_version_string(input)
+    end
+
+    it 'strips one leading v and everything from the first +' do
+      plain = padded('1.2.3')
+      expect(padded('v1.2.3')).to eq(plain)
+      expect(padded('vv1.2.3')).to eq('v1-    2-    3-~')
+      expect(padded('1.2.3+build')).to eq(plain)
+      expect(padded('v1.2.3+build+more.1-2')).to eq(plain)
+      expect(padded('1.2.3+')).to eq(plain)
+      expect(padded('+build')).to eq('')
+      expect(padded('v1.2.3-rc.1+build.5')).to eq(padded('1.2.3-rc.1'))
+    end
+
+    it 'treats line breaks as ordinary characters, like JS' do
+      # `^` and `$` match at line breaks in Ruby, so the regex kept "\nx" and stripped a `v` after a line break
+      expect(padded("1.2.3+build\nx")).to eq(padded('1.2.3'))
+      expect(padded("1.2.3+\n")).to eq(padded('1.2.3'))
+      expect(padded("x\nv1.2.3")).to eq("x\nv1-    2-    3-~")
+      expect(padded("1\n.2.3")).to eq("1\n-    2-    3-~")
+    end
+
+    it 'runs in linear time on many + characters' do
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      padded("#{'+' * 50_000}\n")
+      padded("#{'+' * 50_000}\nx")
+      expect(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).to be < 0.5
+    end
+  end
+
   context 'with array or object operands' do
     it 'never matches them, as JS compares by reference' do
       [[], [1], {}, { 'a' => 1 }].each do |value|
