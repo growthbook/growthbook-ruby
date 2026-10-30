@@ -94,6 +94,13 @@ describe 'conditions' do
       expect(padded("1\n.2.3")).to eq("1\n-    2-    3-~")
     end
 
+    it 'keeps a trailing empty part, like JS split' do
+      # "1.2.3-" has four parts, so it isn't padded with `~` like "1.2.3"
+      expect(padded('1.2.3-')).to eq('    1-    2-    3-')
+      expect(padded('1.2.3.')).to eq('    1-    2-    3-')
+      expect(Growthbook::Conditions.eval_condition({ 'v' => '1.2.3-' }, { 'v' => { '$veq' => '1.2.3' } })).to be(false)
+    end
+
     it 'runs in linear time on many + characters' do
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       padded("#{'+' * 50_000}\n")

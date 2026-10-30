@@ -520,7 +520,7 @@ module Growthbook
       version = input.delete_prefix('v')
       build_index = version.index('+')
       version = version[0, build_index] if build_index
-      parts = version.split(/[-.]/)
+      parts = version.split(/[-.]/, -1)
 
       # If it's SemVer without a pre-release, add `~` to the end
       # ["1","0","0"] -> ["1","0","0","~"]
