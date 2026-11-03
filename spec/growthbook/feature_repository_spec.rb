@@ -3,6 +3,7 @@
 require_relative '../spec_helper'
 require 'growthbook'
 require 'json'
+require 'socket'
 
 RSpec.describe Growthbook::FeatureRepository do
   describe '.initialize' do
@@ -513,6 +514,73 @@ RSpec.describe Growthbook::FeatureRepository do
 
       expect(repo.snapshot).to eq(before)
       expect(repo.saved_groups_json).to eq({ 'g' => ['old'] })
+    end
+  end
+
+  describe 'auto refresh after a fork' do
+    # Serves the features endpoint once, then streams a "features" event with a growing counter
+    def start_counting_server(server)
+      Thread.new do
+        loop { Thread.new(server.accept) { |socket| serve_counting(socket) } }
+      rescue IOError
+        nil # the server was closed after the example
+      end
+    end
+
+    def serve_counting(socket)
+      path = socket.gets.to_s.split[1].to_s
+      while (line = socket.gets) && line != "\r\n"; end
+      return socket.write(features_response) if path.include?('/api/features/')
+
+      socket.write("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\n\r\n")
+      1.step { |n| socket.write("event: features\ndata: #{payload(n)}\n\n") && sleep(0.05) }
+    rescue IOError, SystemCallError
+      nil # the client went away
+    ensure
+      socket.close
+    end
+
+    def features_response
+      body = payload(0)
+      "HTTP/1.1 200 OK\r\nx-sse-support: enabled\r\nContent-Length: #{body.bytesize}\r\n\r\n#{body}"
+    end
+
+    def payload(count)
+      { features: { count: { defaultValue: count } } }.to_json
+    end
+
+    def count(repo)
+      repo.features_json['count']['defaultValue']
+    end
+
+    it 'starts a new stream in the child process' do
+      skip 'fork is not available on this platform' unless Process.respond_to?(:fork)
+
+      WebMock.disable! # WebMock buffers a real response to its end, and this stream never ends
+      server = TCPServer.new('127.0.0.1', 0)
+      start_counting_server(server)
+      repo = described_class.new(endpoint: "http://127.0.0.1:#{server.addr[1]}/api/features/sdk-fork", decryption_key: nil)
+      repo.fetch
+      repo.start_auto_refresh
+
+      reader, writer = IO.pipe
+      pid = fork do
+        reader.close
+        first = count(repo)
+        sleep 0.5
+        writer.write(count(repo) > first ? 'updated' : 'stale')
+        writer.close
+        exit!(0) # skip the parent's at_exit hooks (RSpec, SimpleCov) in the child
+      end
+      writer.close
+      result = reader.read
+      Process.wait(pid)
+
+      expect(result).to eq('updated')
+    ensure
+      repo&.stop_auto_refresh
+      server&.close
+      WebMock.enable!
     end
   end
 

@@ -11,10 +11,15 @@ module Growthbook
 
     def saved_groups_json: () -> Hash[String, untyped]
 
-    attr_reader snapshot: [Hash[String, untyped], Hash[String, untyped]]
+    @snapshot: [Hash[String, untyped], Hash[String, untyped]]
+
+    def snapshot: () -> [Hash[String, untyped], Hash[String, untyped]]
 
     @sse_supported: bool
     @sse_client: SSEClient?
+    @sse_pid: Integer?
+    @sse_restart: (^() -> bool)?
+    @at_exit_registered: bool
 
     def sse_supported?: () -> bool
 
@@ -39,6 +44,10 @@ module Growthbook
     def apply_payload: (String json) -> (nil | Hash[String, untyped])
 
     def apply_response: () -> (nil | Hash[String, untyped])
+
+    def restart_after_fork: () -> void
+
+    def register_at_exit: () -> void
 
     def streaming_url: (String? streaming_host) -> String
 

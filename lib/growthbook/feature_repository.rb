@@ -19,21 +19,27 @@ module Growthbook
       @lock = Mutex.new
       @sse_supported = false
       @sse_client = nil
+      @sse_pid = nil
+      @sse_restart = nil
+      @at_exit_registered = false
     end
 
     # Parsed features JSON
     def features_json
-      @snapshot[0]
+      snapshot[0]
     end
 
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     def saved_groups_json
-      @snapshot[1]
+      snapshot[1]
     end
 
     # [features_json, saved_groups_json] from the same update. Prefer this over calling
     # the two readers separately while auto refresh is running.
-    attr_reader :snapshot
+    def snapshot
+      restart_after_fork
+      @snapshot
+    end
 
     # Whether the last fetch said the server can stream updates (`x-sse-support: enabled`)
     def sse_supported?
@@ -53,6 +59,10 @@ module Growthbook
         return false
       end
 
+      @sse_restart = -> { start_auto_refresh(streaming_host: streaming_host, headers: headers, on_update: on_update) }
+      @sse_pid = Process.pid
+      register_at_exit
+
       @sse_client ||= Growthbook::SSEClient.new(
         url: streaming_url(streaming_host),
         headers: headers,
@@ -63,11 +73,15 @@ module Growthbook
     end
 
     def stop_auto_refresh
-      @sse_client&.stop
+      client = @sse_client
       @sse_client = nil
+      @sse_restart = nil
+      # A client copied by fork shares the parent's socket, so it is dropped rather than closed
+      client.stop if !client.nil? && @sse_pid == Process.pid
     end
 
     def auto_refreshing?
+      restart_after_fork
       client = @sse_client
       !client.nil? && client.running?
     end
@@ -110,6 +124,24 @@ module Growthbook
       end
     rescue StandardError
       nil
+    end
+
+    # After a fork (Puma, Unicorn) the stream thread lives on only in the parent, so a
+    # child process starts its own stream the first time it reads features
+    def restart_after_fork
+      return if @sse_pid.nil? || @sse_pid == Process.pid
+
+      @sse_pid = Process.pid
+      @sse_client = nil
+      @sse_restart&.call
+    end
+
+    # Closes the stream when the process exits instead of letting the socket drop
+    def register_at_exit
+      return if @at_exit_registered
+
+      @at_exit_registered = true
+      at_exit { stop_auto_refresh }
     end
 
     # Turns .../api/features/<key> into .../sub/<key>, keeping any path prefix of a proxy
