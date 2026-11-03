@@ -453,4 +453,53 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
   end
+
+  describe 'timeouts' do
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-timeout' }
+
+    it 'defaults to 2 seconds for open and read' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil)
+      expect(repo.open_timeout).to eq(2)
+      expect(repo.read_timeout).to eq(2)
+    end
+
+    it 'accepts custom timeouts' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 5, read_timeout: 10)
+      expect(repo.open_timeout).to eq(5)
+      expect(repo.read_timeout).to eq(10)
+    end
+
+    it 'accepts a sub-second timeout' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0.5, read_timeout: 0.25)
+      expect(repo.open_timeout).to eq(0.5)
+      expect(repo.read_timeout).to eq(0.25)
+    end
+
+    it 'refuses zero rather than clamping it' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
+    it 'refuses a negative timeout' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, read_timeout: -3) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
+    it 'refuses a non-numeric timeout' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, read_timeout: '2') }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
+    it 'falls back to the default when a timeout is nil' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: nil, read_timeout: nil)
+      expect(repo.open_timeout).to eq(2)
+      expect(repo.read_timeout).to eq(2)
+    end
+
+    it 'returns nil when the request times out' do
+      stub_request(:get, endpoint).to_timeout
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil)
+      expect(repo.fetch).to be_nil
+    end
+  end
 end
