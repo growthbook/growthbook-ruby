@@ -387,6 +387,103 @@ RSpec.describe Growthbook::FeatureRepository do
     end
   end
 
+  describe '#start_auto_refresh' do
+    subject(:repo) { described_class.new(endpoint: endpoint, decryption_key: nil) }
+
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-abc123' }
+    let(:stream_url) { 'https://cdn.growthbook.io/sub/sdk-abc123' }
+    let(:updates) { [] }
+    let(:on_update) { ->(features, _saved_groups) { updates << features } }
+
+    # Polls until the block returns true or two seconds pass
+    def wait_until
+      deadline = Time.now + 2
+      sleep 0.01 until yield || Time.now > deadline
+    end
+
+    def features_event
+      "event: features\ndata: {\"features\":{\"banner\":{\"defaultValue\":1}}}\n\n"
+    end
+
+    def stub_features(body, sse: true)
+      headers = sse ? { 'x-sse-support' => 'enabled' } : {}
+      stub_request(:get, endpoint).to_return(status: 200, body: body, headers: headers)
+    end
+
+    after { repo.stop_auto_refresh }
+
+    it 'does not start when the server does not support SSE' do
+      stub_features('{"features":{}}', sse: false)
+      repo.fetch
+
+      expect do
+        expect(repo.start_auto_refresh).to be(false)
+      end.to output(/x-sse-support/).to_stderr
+      expect(repo.auto_refreshing?).to be(false)
+    end
+
+    it 'applies the payload of a "features" event' do
+      stub_features('{"features":{}}')
+      stub_request(:get, stream_url).to_return(status: 200, body: features_event)
+      repo.fetch
+
+      expect(repo.start_auto_refresh(on_update: on_update)).to be(true)
+      wait_until { updates.any? }
+
+      expect(repo.features_json).to eq({ 'banner' => { 'defaultValue' => 1 } })
+      expect(updates.first).to eq(repo.features_json)
+    end
+
+    it 'fetches again on a "features-updated" event' do
+      stub_features('{"features":{}}')
+      repo.fetch
+      stub_features('{"features":{"banner":{"defaultValue":2}}}')
+      stub_request(:get, stream_url).to_return(status: 200, body: "event: features-updated\n\n")
+
+      repo.start_auto_refresh(on_update: on_update)
+      wait_until { updates.any? }
+
+      expect(repo.features_json).to eq({ 'banner' => { 'defaultValue' => 2 } })
+    end
+
+    it 'connects to a custom streaming host' do
+      stub_features('{"features":{}}')
+      stub_request(:get, 'https://stream.example.com/sub/sdk-abc123').to_return(status: 200, body: features_event)
+      repo.fetch
+
+      repo.start_auto_refresh(streaming_host: 'https://stream.example.com/', on_update: on_update)
+      wait_until { updates.any? }
+
+      expect(updates).not_to be_empty
+    end
+
+    context 'when the API sits behind a proxy path' do
+      let(:endpoint) { 'https://proxy.example.com/gb/api/features/sdk-abc123' }
+      let(:stream_url) { 'https://proxy.example.com/gb/sub/sdk-abc123' }
+
+      it 'keeps the path prefix in the stream url' do
+        stub_features('{"features":{}}')
+        stub_request(:get, stream_url).to_return(status: 200, body: features_event)
+        repo.fetch
+
+        repo.start_auto_refresh(on_update: on_update)
+        wait_until { updates.any? }
+
+        expect(updates).not_to be_empty
+      end
+    end
+
+    it 'stops streaming' do
+      stub_features('{"features":{}}')
+      stub_request(:get, stream_url).to_return(status: 200, body: '')
+      repo.fetch
+      repo.start_auto_refresh
+
+      repo.stop_auto_refresh
+      expect(repo.auto_refreshing?).to be(false)
+    end
+  end
+
   describe '#saved_groups_json' do
     subject(:repository) do
       described_class.new(endpoint: endpoint, decryption_key: decryption_key)

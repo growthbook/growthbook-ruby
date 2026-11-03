@@ -9,8 +9,19 @@ module Growthbook
     attr_reader saved_groups_json: Hash[String, untyped]
 
     @sse_supported: bool
+    @sse_client: SSEClient?
 
     def sse_supported?: () -> bool
+
+    def start_auto_refresh: (
+        ?streaming_host: String?,
+        ?headers: Hash[String, String],
+        ?on_update: (^(Hash[String, untyped], Hash[String, untyped]) -> void)?
+      ) -> bool
+
+    def stop_auto_refresh: () -> void
+
+    def auto_refreshing?: () -> bool
 
     def fetch: () -> (nil | Hash[String, untyped])
 
@@ -23,6 +34,13 @@ module Growthbook
     def apply_payload: (String json) -> (nil | Hash[String, untyped])
 
     def apply_response: () -> (nil | Hash[String, untyped])
+
+    def streaming_url: (String? streaming_host) -> String
+
+    def handle_sse_event: (
+        { type: String, data: String } event,
+        (^(Hash[String, untyped], Hash[String, untyped]) -> void)? on_update
+      ) -> void
 
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 
