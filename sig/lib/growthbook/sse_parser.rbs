@@ -1,0 +1,19 @@
+module Growthbook
+  class SSEParser
+    @buffer: String
+    @event_type: String?
+    @data: Array[String]
+
+    def initialize: () -> void
+
+    def feed: (String chunk) { ({ type: String, data: String } event) -> void } -> void
+
+    def finish: () { ({ type: String, data: String } event) -> void } -> void
+
+    private
+
+    def process_line: (String line) -> { type: String, data: String }?
+
+    def dispatch: () -> { type: String, data: String }?
+  end
+end
