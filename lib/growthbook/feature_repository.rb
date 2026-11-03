@@ -23,11 +23,19 @@ module Growthbook
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @sse_supported = false
+    end
+
+    # Whether the last fetch said the server can stream updates (`x-sse-support: enabled`)
+    def sse_supported?
+      @sse_supported
     end
 
     def fetch
       uri = URI(endpoint)
       res = Net::HTTP.get_response(uri)
+
+      @sse_supported = res['x-sse-support'] == 'enabled'
 
       @response = res.is_a?(Net::HTTPSuccess) ? res.body : nil
 

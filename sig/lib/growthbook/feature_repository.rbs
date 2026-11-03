@@ -8,6 +8,10 @@ module Growthbook
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
 
+    @sse_supported: bool
+
+    def sse_supported?: () -> bool
+
     def fetch: () -> (nil | Hash[String, untyped])
 
     def fetch!: () -> (nil | Hash[String, untyped])

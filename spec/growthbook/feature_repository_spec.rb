@@ -453,4 +453,28 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
   end
+
+  describe '#sse_supported?' do
+    subject(:repo) { described_class.new(endpoint: endpoint, decryption_key: nil) }
+
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-abc123' }
+
+    it 'is false before the first fetch' do
+      expect(repo.sse_supported?).to be(false)
+    end
+
+    it 'is true when the server sends x-sse-support: enabled' do
+      stub_request(:get, endpoint).to_return(status: 200, body: '{"features":{}}', headers: { 'x-sse-support' => 'enabled' })
+      repo.fetch
+
+      expect(repo.sse_supported?).to be(true)
+    end
+
+    it 'is false when the header is missing' do
+      stub_request(:get, endpoint).to_return(status: 200, body: '{"features":{}}')
+      repo.fetch
+
+      expect(repo.sse_supported?).to be(false)
+    end
+  end
 end
