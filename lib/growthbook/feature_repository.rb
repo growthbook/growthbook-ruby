@@ -33,11 +33,7 @@ module Growthbook
 
       return nil if response.nil?
 
-      if use_decryption?
-        parsed_decrypted_response
-      else
-        parsed_plain_text_response
-      end
+      apply_response
     rescue StandardError
       nil
     end
@@ -54,6 +50,22 @@ module Growthbook
     private
 
     attr_reader :response
+
+    # Applies a payload pushed by the SSE stream, exactly as if fetch had returned it
+    def apply_payload(json)
+      @response = json
+      apply_response
+    rescue StandardError
+      nil
+    end
+
+    def apply_response
+      if use_decryption?
+        parsed_decrypted_response
+      else
+        parsed_plain_text_response
+      end
+    end
 
     def use_decryption?
       !decryption_key.nil?

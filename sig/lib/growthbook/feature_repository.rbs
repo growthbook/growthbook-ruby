@@ -16,6 +16,10 @@ module Growthbook
 
     attr_reader response: String?
 
+    def apply_payload: (String json) -> (nil | Hash[String, untyped])
+
+    def apply_response: () -> (nil | Hash[String, untyped])
+
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 
     def parsed_decrypted_response: () -> (nil | Hash[String, untyped])
@@ -36,7 +40,7 @@ end
 
 module Net
   class HTTPSuccess
-    
+
   end
 
   class HTTP
