@@ -8,6 +8,9 @@ module Growthbook
     @headers: Hash[String, String]
     @open_timeout: Integer | Float
     @read_timeout: Integer | Float
+    @mutex: Thread::Mutex
+    @thread: Thread?
+    @connection: Net::HTTP?
 
     def initialize: (
         url: String,
@@ -18,6 +21,16 @@ module Growthbook
       ) -> void
 
     def start: () -> void
+
+    def stop: (?timeout: Integer | Float) -> void
+
+    def running?: () -> bool
+
+    private
+
+    def run: () -> void
+
+    def close_connection: () -> void
   end
 end
 
