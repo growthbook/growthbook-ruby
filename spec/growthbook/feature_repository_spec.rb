@@ -453,4 +453,124 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
   end
+
+  describe 'caching' do
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-cache' }
+    let(:json_response) { '{ "status": 200, "features": { "flag": { "defaultValue": true } } }' }
+
+    before do
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: json_response, headers: {})
+    end
+
+    it 'serves a second fetch from cache without another request' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60)
+      first = repo.fetch
+      second = repo.fetch
+
+      expect(second).to eq(first)
+      expect(a_request(:get, endpoint)).to have_been_made.once
+    end
+
+    it 'refetches once the cached entry has expired' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 0)
+      repo.fetch
+      repo.fetch
+
+      expect(a_request(:get, endpoint)).to have_been_made.twice
+    end
+
+    it 'disables caching when given false' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, cache: false)
+
+      repo.fetch
+      repo.fetch
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'refetches past a cached entry when forced' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60)
+      repo.fetch
+
+      repo.fetch(force: true)
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'refetches past an entry another repository wrote' do
+      stub = stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+
+      described_class.new(endpoint: endpoint, decryption_key: nil).fetch(force: true)
+
+      expect(stub).to have_been_requested.twice
+    end
+
+    it 'overwrites the cached entry when forced' do
+      stub_request(:get, endpoint).to_return(status: 200, body: json_response)
+      cache = Growthbook::InMemoryFeatureCache.new
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, cache: cache)
+      repo.fetch
+
+      stub_request(:get, endpoint).to_return(status: 200, body: '{ "features": { "flag": { "defaultValue": false } } }')
+      repo.fetch(force: true)
+
+      expect(cache.get(endpoint)['features']).to eq('flag' => { 'defaultValue' => false })
+    end
+
+    it 'caches both features and saved groups' do
+      cache = Growthbook::InMemoryFeatureCache.new
+      described_class.new(endpoint: endpoint, decryption_key: nil, cache: cache).fetch
+
+      expect(cache.get(endpoint)).to eq(
+        'features'    => { 'flag' => { 'defaultValue' => true } },
+        'savedGroups' => {}
+      )
+    end
+
+    it 'shares the default cache between repositories' do
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+      second = described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+
+      expect(second).to eq('flag' => { 'defaultValue' => true })
+      expect(a_request(:get, endpoint)).to have_been_made.once
+    end
+
+    it 'does not share entries between different decryption keys' do
+      described_class.new(endpoint: endpoint, decryption_key: nil, ttl: 60).fetch
+      described_class.new(endpoint: endpoint, decryption_key: 'BhB1wORFmZLTDjbvstvS8w==', ttl: 60).fetch
+
+      # The second repository has to fetch for itself: the payload the first one
+      # cached was never decrypted
+      expect(a_request(:get, endpoint)).to have_been_made.twice
+    end
+
+    it 'keeps the raw decryption key out of the cache key' do
+      cache = Growthbook::InMemoryFeatureCache.new
+      described_class.new(endpoint: endpoint, decryption_key: 'BhB1wORFmZLTDjbvstvS8w==', cache: cache).fetch
+
+      expect(cache.instance_variable_get(:@store).keys.join).not_to include('BhB1wORFmZLTDjbvstvS8w==')
+    end
+  end
+
+  describe '.default_cache' do
+    it 'is memoized' do
+      cache = described_class.default_cache
+
+      expect(described_class.default_cache).to be(cache)
+    end
+
+    it 'can be replaced' do
+      replacement = Growthbook::InMemoryFeatureCache.new
+      original = described_class.default_cache
+
+      described_class.default_cache = replacement
+      expect(described_class.default_cache).to be(replacement)
+    ensure
+      described_class.default_cache = original
+    end
+  end
 end

@@ -1,20 +1,34 @@
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
-    def initialize: (endpoint: String, decryption_key: String?) -> void
+    DEFAULT_CACHE_MUTEX: Thread::Mutex
+
+    self.@default_cache: FeatureCache?
+
+    def self.default_cache: () -> FeatureCache
+
+    def self.default_cache=: (FeatureCache? cache) -> void
+
+    @ttl: Integer?
+    @cache: FeatureCache
+
+    def initialize: (endpoint: String, decryption_key: String?, ?ttl: Integer?, ?cache: FeatureCache | false | nil) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
+    attr_reader ttl: Integer?
 
-    def fetch: () -> (nil | Hash[String, untyped])
+    def fetch: (?force: bool) -> (nil | Hash[String, untyped])
 
     def fetch!: () -> (nil | Hash[String, untyped])
 
     private
 
     attr_reader response: String?
+
+    def cache_key: () -> String
 
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 

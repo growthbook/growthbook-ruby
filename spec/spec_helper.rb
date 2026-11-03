@@ -16,3 +16,11 @@ SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new(
     SimpleCov::Formatter::ShieldsBadge
   ]
 )
+
+RSpec.configure do |config|
+  # The default feature cache is shared for the whole process, so without this a
+  # payload fetched by one example is served to the next one
+  config.before do
+    Growthbook::FeatureRepository.default_cache.clear
+  end
+end

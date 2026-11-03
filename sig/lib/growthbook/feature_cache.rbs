@@ -1,0 +1,28 @@
+module Growthbook
+  # Extendable cache for storing fetched feature payloads.
+  class FeatureCache
+    def get: (untyped key) -> untyped
+
+    def set: (untyped key, untyped value, Integer? ttl) -> untyped
+
+    def clear: () -> void
+  end
+
+  # Sample in-memory cache with TTL-based expiry (not shared across processes).
+  class InMemoryFeatureCache < FeatureCache
+    @store: Hash[untyped, { value: untyped, expires_at: Float? }]
+    @mutex: Thread::Mutex
+
+    def initialize: () -> void
+
+    def get: (untyped key) -> untyped
+
+    def set: (untyped key, untyped value, Integer? ttl) -> untyped
+
+    def clear: () -> void
+
+    private
+
+    def monotonic_now: () -> Float
+  end
+end
