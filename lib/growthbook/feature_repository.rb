@@ -12,20 +12,28 @@ module Growthbook
     # [String, nil] Optional key for decrypting an encrypted payload
     attr_reader :decryption_key
 
-    # Parsed features JSON
-    attr_reader :features_json
-
-    # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
-    attr_reader :saved_groups_json
-
     def initialize(endpoint:, decryption_key:)
       @endpoint = endpoint
       @decryption_key = decryption_key
-      @features_json = {}
-      @saved_groups_json = {}
+      @snapshot = [{}, {}]
+      @lock = Mutex.new
       @sse_supported = false
       @sse_client = nil
     end
+
+    # Parsed features JSON
+    def features_json
+      @snapshot[0]
+    end
+
+    # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
+    def saved_groups_json
+      @snapshot[1]
+    end
+
+    # [features_json, saved_groups_json] from the same update. Prefer this over calling
+    # the two readers separately while auto refresh is running.
+    attr_reader :snapshot
 
     # Whether the last fetch said the server can stream updates (`x-sse-support: enabled`)
     def sse_supported?
@@ -69,12 +77,14 @@ module Growthbook
       res = Net::HTTP.get_response(uri)
 
       @sse_supported = res['x-sse-support'] == 'enabled'
+      body = res.is_a?(Net::HTTPSuccess) ? res.body : nil
 
-      @response = res.is_a?(Net::HTTPSuccess) ? res.body : nil
+      @lock.synchronize do
+        @response = body
+        return nil if response.nil?
 
-      return nil if response.nil?
-
-      apply_response
+        apply_response
+      end
     rescue StandardError
       nil
     end
@@ -94,8 +104,10 @@ module Growthbook
 
     # Applies a payload pushed by the SSE stream, exactly as if fetch had returned it
     def apply_payload(json)
-      @response = json
-      apply_response
+      @lock.synchronize do
+        @response = json
+        apply_response
+      end
     rescue StandardError
       nil
     end
@@ -119,7 +131,8 @@ module Growthbook
       else return
       end
 
-      on_update&.call(features_json, saved_groups_json)
+      features, saved_groups = snapshot
+      on_update&.call(features, saved_groups)
     end
 
     def apply_response
@@ -138,8 +151,7 @@ module Growthbook
       parsed = parsed_response
       return nil if parsed.nil?
 
-      @saved_groups_json = parsed['savedGroups'] || {}
-      @features_json = parsed['features']
+      publish(parsed['features'], parsed['savedGroups'] || {})
     rescue StandardError
       nil
     end
@@ -151,12 +163,20 @@ module Growthbook
       parsed = parsed_response
       return nil if parsed.nil?
 
-      @saved_groups_json = decrypted_saved_groups(parsed, k)
-
+      saved_groups = decrypted_saved_groups(parsed, k)
       decrypted_str = Growthbook::DecryptionUtil.decrypt(parsed['encryptedFeatures'], key: k)
-      @features_json = JSON.parse(decrypted_str) unless decrypted_str.nil?
+      return nil if decrypted_str.nil?
+
+      publish(JSON.parse(decrypted_str), saved_groups)
     rescue StandardError
       nil
+    end
+
+    # Swaps features and saved groups in a single assignment, so a reader never sees
+    # the features of one payload next to the saved groups of another
+    def publish(features, saved_groups)
+      @snapshot = [features, saved_groups]
+      features
     end
 
     def decrypted_saved_groups(parsed, key)

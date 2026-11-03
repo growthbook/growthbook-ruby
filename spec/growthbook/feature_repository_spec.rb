@@ -484,6 +484,38 @@ RSpec.describe Growthbook::FeatureRepository do
     end
   end
 
+  describe '#snapshot' do
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-snapshot' }
+    let(:encrypted_features) do
+      'Utj/Xwn7YaTXX8vHosRFQg==.yYuNdFoTv1aebOyhC7lTUpNSUW9toE4nSTMATKaT3mGwrzUUMrGg/3uJ0edpxRdoZcAD778+eDBlT9+i/wc+' \
+        'eMzBTK9KkEWSZG/hljlZjRP8zVbfggm/yy1E87xsGl1JnSkQ+iRyMTsrdEvvo2AkoQqFbmEOvOklcYAIZTMaYsgCOi+9BRbI1s6HLpI/kCE4' \
+        'kcuhePY0b20oWrpDL++wDQ=='
+    end
+
+    it 'returns the features and saved groups of the same payload' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil)
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: '{"features":{"f":{"defaultValue":1}},"savedGroups":{"g":["a"]}}')
+      repo.fetch
+
+      expect(repo.snapshot).to eq([{ 'f' => { 'defaultValue' => 1 } }, { 'g' => ['a'] }])
+    end
+
+    it 'keeps the previous pair when the new features fail to decrypt' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: 'BhB1wORFmZLTDjbvstvS8w==')
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: { encryptedFeatures: encrypted_features, savedGroups: { g: ['old'] } }.to_json)
+        .then.to_return(status: 200, body: { encryptedFeatures: 'broken.payload', savedGroups: { g: ['new'] } }.to_json)
+      repo.fetch
+      before = repo.snapshot
+
+      repo.fetch
+
+      expect(repo.snapshot).to eq(before)
+      expect(repo.saved_groups_json).to eq({ 'g' => ['old'] })
+    end
+  end
+
   describe '#saved_groups_json' do
     subject(:repository) do
       described_class.new(endpoint: endpoint, decryption_key: decryption_key)
