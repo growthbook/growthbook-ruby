@@ -474,6 +474,36 @@ RSpec.describe Growthbook::FeatureRepository do
       end
     end
 
+    it 'fetches again after the stream reconnects' do
+      # Reconnect at once instead of after 1-2 s
+      allow(Growthbook::SSEClient).to receive(:new).and_wrap_original do |original, options|
+        original.call(**options, reconnect_delay: 0.01, max_reconnect_delay: 0.05)
+      end
+      stub_features('{"features":{}}')
+      repo.fetch
+      stub_features('{"features":{"banner":{"defaultValue":3}}}')
+      stub_request(:get, stream_url).to_return(status: 200, body: '')
+
+      repo.start_auto_refresh(on_update: on_update)
+      wait_until { updates.any? }
+
+      expect(repo.features_json).to eq({ 'banner' => { 'defaultValue' => 3 } })
+    end
+
+    it 'accepts an endpoint with a trailing slash' do
+      repo = described_class.new(endpoint: "#{endpoint}/", decryption_key: nil)
+
+      expect(repo.send(:streaming_url, nil)).to eq(stream_url)
+    end
+
+    it 'rejects an endpoint it cannot turn into a stream url' do
+      repo = described_class.new(endpoint: 'https://proxy.example.com/api/eval/sdk-abc123', decryption_key: nil)
+      stub_request(:get, repo.endpoint).to_return(status: 200, body: '{"features":{}}', headers: { 'x-sse-support' => 'enabled' })
+      repo.fetch
+
+      expect { repo.start_auto_refresh }.to raise_error(ArgumentError, %r{api/features})
+    end
+
     it 'stops streaming' do
       stub_features('{"features":{}}')
       stub_request(:get, stream_url).to_return(status: 200, body: '')
@@ -662,6 +692,16 @@ RSpec.describe Growthbook::FeatureRepository do
 
     it 'is true when the server sends x-sse-support: enabled' do
       stub_request(:get, endpoint).to_return(status: 200, body: '{"features":{}}', headers: { 'x-sse-support' => 'enabled' })
+      repo.fetch
+
+      expect(repo.sse_supported?).to be(true)
+    end
+
+    it 'stays true when a later fetch gets an error response' do
+      stub_request(:get, endpoint)
+        .to_return(status: 200, body: '{"features":{}}', headers: { 'x-sse-support' => 'enabled' })
+        .then.to_return(status: 502, body: 'Bad Gateway')
+      repo.fetch
       repo.fetch
 
       expect(repo.sse_supported?).to be(true)

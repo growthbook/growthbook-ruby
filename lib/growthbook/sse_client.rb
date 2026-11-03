@@ -19,12 +19,17 @@ module Growthbook
     # Connection failures worth retrying: refused/reset sockets, DNS, timeouts, TLS, closed streams
     NETWORK_ERRORS = [IOError, SystemCallError, SocketError, Timeout::Error, OpenSSL::SSL::SSLError].freeze
 
+    # @param on_reconnect [Proc, nil] Called after a dropped stream is open again, since the
+    #   server does not replay events that were sent while the client was away
     def initialize(
-      url:, on_event:, headers: {}, open_timeout: 30, read_timeout: 60, reconnect_delay: 1, max_reconnect_delay: 60
+      url:, on_event:, on_reconnect: nil, headers: {}, open_timeout: 30, read_timeout: 60,
+      reconnect_delay: 1, max_reconnect_delay: 60
     )
       @uri = URI(url)
       @host = @uri.hostname || raise(ArgumentError, "SSE url has no host: #{url}")
       @on_event = on_event
+      @on_reconnect = on_reconnect
+      @connected = false
       @headers = DEFAULT_HEADERS.merge(headers)
       @open_timeout = open_timeout
       @read_timeout = read_timeout
@@ -106,6 +111,9 @@ module Growthbook
           next unless response.is_a?(Net::HTTPSuccess)
 
           @errors = 0
+          reconnected = @connected
+          @connected = true
+          notify_reconnect if reconnected
           stream(response)
         end
       end
@@ -150,6 +158,12 @@ module Growthbook
       @on_event.call(event)
     rescue StandardError => e
       warn("GrowthBook SSE: event handler failed: #{e.message}")
+    end
+
+    def notify_reconnect
+      @on_reconnect&.call
+    rescue StandardError => e
+      warn("GrowthBook SSE: reconnect handler failed: #{e.message}")
     end
 
     # Doubles with each failure in a row, plus up to 100% random jitter, as in the JS SDK

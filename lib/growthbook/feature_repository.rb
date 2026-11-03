@@ -59,16 +59,7 @@ module Growthbook
         return false
       end
 
-      @sse_restart = -> { start_auto_refresh(streaming_host: streaming_host, headers: headers, on_update: on_update) }
-      @sse_pid = Process.pid
-      register_at_exit
-
-      @sse_client ||= Growthbook::SSEClient.new(
-        url: streaming_url(streaming_host),
-        headers: headers,
-        on_event: ->(event) { handle_sse_event(event, on_update) }
-      )
-      @sse_client.start
+      start_streaming(streaming_host, headers, on_update)
       true
     end
 
@@ -90,7 +81,8 @@ module Growthbook
       uri = URI(endpoint)
       res = Net::HTTP.get_response(uri)
 
-      @sse_supported = res['x-sse-support'] == 'enabled'
+      # Only a successful response speaks for the server; a 5xx from a proxy usually lacks the header
+      @sse_supported = res['x-sse-support'] == 'enabled' if res.is_a?(Net::HTTPSuccess)
       body = res.is_a?(Net::HTTPSuccess) ? res.body : nil
 
       @lock.synchronize do
@@ -126,6 +118,23 @@ module Growthbook
       nil
     end
 
+    # Doesn't re-check sse_supported?, so a forked child restarts the stream its parent ran
+    def start_streaming(streaming_host, headers, on_update)
+      url = streaming_url(streaming_host)
+      @sse_restart = -> { start_streaming(streaming_host, headers, on_update) }
+      @sse_pid = Process.pid
+      register_at_exit
+
+      @sse_client ||= Growthbook::SSEClient.new(
+        url: url,
+        headers: headers,
+        on_event: ->(event) { handle_sse_event(event, on_update) },
+        # Events sent while the stream was down are not replayed, so fetch what was missed
+        on_reconnect: -> { handle_sse_event({ type: 'features-updated', data: '' }, on_update) }
+      )
+      @sse_client.start
+    end
+
     # After a fork (Puma, Unicorn) the stream thread lives on only in the parent, so a
     # child process starts its own stream the first time it reads features
     def restart_after_fork
@@ -147,10 +156,14 @@ module Growthbook
     # Turns .../api/features/<key> into .../sub/<key>, keeping any path prefix of a proxy
     def streaming_url(streaming_host)
       uri = URI(endpoint)
-      client_key = uri.path.split('/').last
+      match = %r{\A(.*)/api/features/([^/]+)/?\z}.match(uri.path)
+      raise ArgumentError, "Can't derive a stream URL from #{endpoint}, expected .../api/features/<key>" if match.nil?
+
+      prefix = match[1].to_s
+      client_key = match[2].to_s
       return "#{streaming_host.chomp('/')}/sub/#{client_key}" unless streaming_host.nil?
 
-      uri.path = uri.path.sub(%r{/api/features/(?=[^/]+\z)}, '/sub/')
+      uri.path = "#{prefix}/sub/#{client_key}"
       uri.query = nil
       uri.to_s
     end

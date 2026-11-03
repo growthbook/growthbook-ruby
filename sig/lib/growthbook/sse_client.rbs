@@ -7,6 +7,8 @@ module Growthbook
     @uri: URI::Generic
     @host: String
     @on_event: ^({ type: String, data: String }) -> void
+    @on_reconnect: (^() -> void)?
+    @connected: bool
     @headers: Hash[String, String]
     @open_timeout: Integer | Float
     @read_timeout: Integer | Float
@@ -22,6 +24,7 @@ module Growthbook
     def initialize: (
         url: String,
         on_event: ^({ type: String, data: String }) -> void,
+        ?on_reconnect: (^() -> void)?,
         ?headers: Hash[String, String],
         ?open_timeout: Integer | Float,
         ?read_timeout: Integer | Float,
@@ -50,6 +53,8 @@ module Growthbook
     def permanent_failure?: (Net::HTTPResponse response) -> bool
 
     def emit: ({ type: String, data: String } event) -> void
+
+    def notify_reconnect: () -> void
 
     def backoff_delay: () -> (Integer | Float)
 

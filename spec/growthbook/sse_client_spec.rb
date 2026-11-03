@@ -47,6 +47,7 @@ RSpec.describe Growthbook::SSEClient do
       described_class.new(
         url: start_server(server, responses),
         on_event: handler,
+        on_reconnect: -> { events << :reconnect },
         reconnect_delay: reconnect_delay,
         max_reconnect_delay: 0.05
       )
@@ -79,6 +80,14 @@ RSpec.describe Growthbook::SSEClient do
 
       client.stop
       expect(client.running?).to be(false)
+    end
+
+    it 'reports a reconnect only after the stream comes back, not on the first connection' do
+      client.start
+      wait_until { events.include?(:reconnect) }
+
+      expect(events.first[:type]).to eq('features')
+      expect(events).to include(:reconnect)
     end
 
     context 'when the server fails before it succeeds' do
