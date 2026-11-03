@@ -1,6 +1,8 @@
 module Growthbook
   class SSEClient
     DEFAULT_HEADERS: Hash[String, String]
+    RETRYABLE_STATUSES: Array[Integer]
+    NETWORK_ERRORS: Array[Class]
 
     @uri: URI::Generic
     @host: String
@@ -11,13 +13,20 @@ module Growthbook
     @mutex: Thread::Mutex
     @thread: Thread?
     @connection: Net::HTTP?
+    @reconnect_delay: Integer | Float
+    @max_reconnect_delay: Integer | Float
+    @wakeup: Thread::ConditionVariable
+    @running: bool
+    @errors: Integer
 
     def initialize: (
         url: String,
         on_event: ^({ type: String, data: String }) -> void,
         ?headers: Hash[String, String],
         ?open_timeout: Integer | Float,
-        ?read_timeout: Integer | Float
+        ?read_timeout: Integer | Float,
+        ?reconnect_delay: Integer | Float,
+        ?max_reconnect_delay: Integer | Float
       ) -> void
 
     def start: () -> void
@@ -31,6 +40,18 @@ module Growthbook
     def run: () -> void
 
     def close_connection: () -> void
+
+    def connect: () -> Symbol
+
+    def stream: (Net::HTTPResponse response) -> void
+
+    def permanent_failure?: (Net::HTTPResponse response) -> bool
+
+    def emit: ({ type: String, data: String } event) -> void
+
+    def backoff_delay: () -> (Integer | Float)
+
+    def wait: (Integer | Float seconds) -> void
   end
 end
 
