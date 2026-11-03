@@ -1,0 +1,23 @@
+module Growthbook
+  class SSEClient
+    DEFAULT_HEADERS: Hash[String, String]
+
+    @uri: URI::Generic
+    @host: String
+    @on_event: ^({ type: String, data: String }) -> void
+    @headers: Hash[String, String]
+    @open_timeout: Integer | Float
+    @read_timeout: Integer | Float
+
+    def initialize: (
+        url: String,
+        on_event: ^({ type: String, data: String }) -> void,
+        ?headers: Hash[String, String],
+        ?open_timeout: Integer | Float,
+        ?read_timeout: Integer | Float
+      ) -> void
+
+    def start: () -> void
+  end
+end
+
