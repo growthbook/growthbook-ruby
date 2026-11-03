@@ -52,16 +52,21 @@ module Growthbook
     #
     # @param timeout [Integer, Float] Seconds to wait before killing the thread
     def stop(timeout: 10)
-      thread = @mutex.synchronize do
+      thread, connection = @mutex.synchronize do
         @running = false
         @wakeup.signal
-        @thread
+        [@thread, @connection]
       end
       return if thread.nil?
 
-      close_connection
-      thread.join(timeout) || thread.kill
-      @mutex.synchronize { @thread = nil }
+      close(connection)
+      # Called from an event handler, the thread is our own: it ends once the handler returns
+      return if thread == Thread.current
+
+      # Without an open connection the thread is waiting (woken above) or still connecting,
+      # which can't be interrupted, so it gets only a moment before being killed
+      thread.join(connection.nil? ? 0.5 : timeout) || thread.kill
+      @mutex.synchronize { @thread = nil if @thread == thread }
     end
 
     def running?
@@ -91,7 +96,8 @@ module Growthbook
       http.max_retries = 0
 
       http.start do |connection|
-        @connection = connection
+        return :retry unless track(connection)
+
         request = Net::HTTP::Get.new(@uri)
         @headers.each { |name, value| request[name] = value }
 
@@ -106,8 +112,20 @@ module Growthbook
       :retry
     rescue *NETWORK_ERRORS
       :retry
+    rescue StandardError => e
+      # e.g. Net::HTTPBadResponse from a misbehaving proxy: keep retrying rather than let the thread die
+      warn("GrowthBook SSE: #{e.class}: #{e.message}")
+      :retry
     ensure
-      @connection = nil
+      @mutex.synchronize { @connection = nil }
+    end
+
+    # Publishes the open connection so stop can close it, unless stop already ran
+    def track(connection)
+      @mutex.synchronize do
+        @connection = connection if @running
+        @running
+      end
     end
 
     def stream(response)
@@ -145,9 +163,9 @@ module Growthbook
       @mutex.synchronize { @wakeup.wait(@mutex, seconds) if @running }
     end
 
-    def close_connection
-      @connection&.finish
-    rescue IOError
+    def close(connection)
+      connection&.finish
+    rescue *NETWORK_ERRORS
       nil # already closed
     end
   end

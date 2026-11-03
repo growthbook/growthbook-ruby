@@ -123,6 +123,32 @@ RSpec.describe Growthbook::SSEClient do
       end
     end
 
+    context 'when the server sends a malformed response' do
+      let(:responses) { [['bad'], [200, features_event]] }
+
+      it 'reports it and reconnects' do
+        expect do
+          client.start
+          wait_until { events.any? }
+        end.to output(/Net::HTTPBadResponse/).to_stderr
+
+        expect(events.first[:type]).to eq('features')
+      end
+    end
+
+    context 'when the handler stops the client' do
+      let(:handler) { ->(_event) { client.stop } }
+
+      it 'stops without an error' do
+        expect do
+          client.start
+          wait_until { !client.running? }
+        end.not_to output.to_stderr
+
+        expect(client.running?).to be(false)
+      end
+    end
+
     context 'when waiting a long time to reconnect' do
       let(:responses) { [[503]] }
       let(:reconnect_delay) { 30 }

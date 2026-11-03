@@ -39,7 +39,9 @@ module Growthbook
 
     def run: () -> void
 
-    def close_connection: () -> void
+    def track: (Net::HTTP connection) -> bool
+
+    def close: (Net::HTTP? connection) -> void
 
     def connect: () -> Symbol
 
