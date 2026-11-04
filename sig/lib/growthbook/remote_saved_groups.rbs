@@ -1,0 +1,34 @@
+module Growthbook
+  # internal use only
+  # Remote saved groups (growthbook/growthbook#7277)
+  module RemoteSavedGroups
+    # Looks up which of the groups a user is in, from the attributes they use
+    interface _Resolver
+      def call: (Hash[String, untyped] attributes, Array[Hash[String, String]] groups) -> untyped
+    end
+
+    # The attribute conditions read a user's remote saved groups from
+    ATTRIBUTE: String
+
+    NO_GROUPS: Array[Hash[String, String]]
+
+    self.@last_scan: [Hash[String, untyped], Array[Hash[String, String]]]?
+
+    self.@warned_missing_ids: bool
+
+    # The payload's remote saved groups, as a resolver gets them
+    def self.groups: (Hash[String, untyped]? saved_groups) -> Array[Hash[String, String]]
+
+    # Asks resolver which of the payload's remote groups the user is in
+    def self.resolve: (Hash[String, untyped] attributes, Hash[String, untyped]? saved_groups, _Resolver resolver) -> Array[String]
+
+    # Whether the payload has remote groups but the user has no remote group ids
+    def self.missing_ids?: (Hash[String, untyped] attributes, Array[String]? remote_group_ids, Hash[String, untyped]? saved_groups) -> bool
+
+    # Logs once when the user has no remote group ids for the payload's remote groups
+    def self.warn_if_missing_ids: (Hash[String, untyped] attributes, Array[String]? remote_group_ids, Hash[String, untyped]? saved_groups) -> void
+
+    # The attributes conditions see, with the remote group ids when set
+    def self.with_ids: (Hash[String, untyped] attributes, Array[String]? remote_group_ids) -> Hash[String, untyped]
+  end
+end
