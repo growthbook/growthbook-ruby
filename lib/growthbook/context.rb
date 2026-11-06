@@ -129,6 +129,13 @@ module Growthbook
       refresh_sticky_buckets
     end
 
+    # Shallow-merge the given attributes into the existing ones (parity with the
+    # TS SDK's updateAttributes): new keys are added, existing keys overwritten,
+    # untouched keys preserved. Unlike attributes=, this does not replace the map.
+    def update_attributes(attrs)
+      self.attributes = attributes.merge(stringify_keys(attrs || {}))
+    end
+
     def forced_variations=(forced_variations)
       @forced_variations = stringify_keys(forced_variations || {})
     end
