@@ -141,5 +141,41 @@ module Growthbook
     def self.in_range?(num, range)
       num >= range[0] && num < range[1]
     end
+
+    # Formats a number like JavaScript's String(number) (ECMAScript Number::toString),
+    # e.g. 2.0 -> "2", 0.000002 -> "0.000002", 1e21 -> "1e+21".
+    #
+    # @param number [Numeric] An Integer is formatted as the double JavaScript would parse
+    # @return [String]
+    def self.js_number_to_s(number)
+      x = number.to_f
+      return 'NaN' if x.nan?
+      return x.positive? ? 'Infinity' : '-Infinity' if x.infinite?
+      return '0' if x.zero?
+      return "-#{js_number_to_s(-x)}" if x.negative?
+
+      # Float#to_s gives the same shortest round-trip digits as JavaScript, but
+      # switches to scientific notation at different thresholds
+      mantissa, exponent = x.to_s.split('e')
+      whole, fraction = mantissa.to_s.split('.')
+      all_digits = "#{whole}#{fraction}"
+      digits = all_digits.sub(/\A0+/, '')
+      # x = 0.digits * 10**point
+      point = whole.to_s.length + exponent.to_i - (all_digits.length - digits.length)
+      digits = digits.sub(/0+\z/, '')
+      format_js_digits(digits, point)
+    end
+
+    # Lays out digits d1..dk with x = 0.d1..dk * 10**point, as ECMAScript Number::toString does
+    def self.format_js_digits(digits, point)
+      k = digits.length
+      return digits + ('0' * (point - k)) if k <= point && point <= 21
+      return "#{digits[0, point]}.#{digits[point..-1]}" if point.positive? && point <= 21
+      return "0.#{'0' * -point}#{digits}" if point > -6 && point <= 0
+
+      e = point - 1
+      fraction = k > 1 ? ".#{digits[1..-1]}" : ''
+      "#{digits[0]}#{fraction}e#{e.negative? ? '-' : '+'}#{e.abs}"
+    end
   end
 end
