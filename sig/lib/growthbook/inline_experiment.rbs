@@ -16,6 +16,8 @@ module Growthbook
     # @return [Float] What percent of users should be included in the experiment (between 0 and 1, inclusive)
     attr_accessor coverage: Float?
 
+    @coverage_given: bool
+
     # @return [Array<Hash>] Array of ranges, one per variation
     attr_accessor ranges: Array[[Float, Float]]?
 

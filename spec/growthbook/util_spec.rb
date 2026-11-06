@@ -56,4 +56,23 @@ describe Growthbook::Util do
       expect(described_class.check_rule('', '!~', '')).to be(false)
     end
   end
+
+  describe '.js_number_to_s' do
+    it 'formats numbers like JavaScript' do
+      {
+        1 => '1', 1.0 => '1', 1.5 => '1.5', 1e21 => '1e+21', 1e-7 => '1e-7', 0.000002 => '0.000002',
+        1.23e-18 => '1.23e-18', 1e23 => '1e+23', -0.0 => '0', -1.5 => '-1.5', 1e20 => '100000000000000000000',
+        123.456 => '123.456', 0.1 => '0.1', Float::NAN => 'NaN', -Float::INFINITY => '-Infinity'
+      }.each { |input, expected| expect(described_class.js_number_to_s(input)).to eq(expected), input.inspect }
+    end
+  end
+
+  describe 'get_hash' do
+    it 'hashes UTF-16 code units like JS' do
+      # An astral character is a surrogate pair, two code units
+      expect(described_class.get_hash(seed: '', value: "\u{1F600}", version: 1)).to eq(0.472)
+      expect(described_class.get_hash(seed: '', value: "\u{1F600}", version: 2)).to eq(0.4971)
+      expect(described_class.get_hash(seed: '', value: 'josé', version: 1)).to eq(0.586)
+    end
+  end
 end
