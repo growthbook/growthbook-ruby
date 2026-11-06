@@ -166,8 +166,6 @@ describe 'test suite' do
 
       # Run the actual test case
       it test_name do
-        skip 'contextual bandits are not implemented' if context.key?('contextualBandits')
-
         gb = Growthbook::Context.new(context)
         result = gb.eval_feature(key)
         expect(result.to_json).to eq(expected)
@@ -200,6 +198,21 @@ describe 'test suite' do
       it test_name do
         result = Growthbook::DecryptionUtil.decrypt(encrypted_payload, key: decryption_key)
         expect(result).to eq(expected_features)
+      end
+    end
+  end
+
+  describe 'contextualBandit' do
+    # Loop through each test case in the JSON file
+    test_cases['contextualBandit'].each do |test_case|
+      # Extract data about the test case
+      test_name, context, key, expected = test_case
+
+      # Run the actual test case
+      it test_name do
+        gb = Growthbook::Context.new(context)
+        result = gb.eval_feature(key)
+        expect(result.to_json).to eq(expected)
       end
     end
   end

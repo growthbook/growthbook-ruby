@@ -18,11 +18,15 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
+    # Parsed contextual bandits JSON, keyed by the ref a feature rule points at
+    attr_reader :contextual_bandits_json
+
     def initialize(endpoint:, decryption_key:)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @contextual_bandits_json = {}
     end
 
     def fetch
@@ -64,6 +68,7 @@ module Growthbook
       return nil if parsed.nil?
 
       @saved_groups_json = parsed['savedGroups'] || {}
+      @contextual_bandits_json = parsed['contextualBandits'] || {}
       @features_json = parsed['features']
     rescue StandardError
       nil
@@ -77,6 +82,7 @@ module Growthbook
       return nil if parsed.nil?
 
       @saved_groups_json = decrypted_saved_groups(parsed, k)
+      @contextual_bandits_json = decrypted_contextual_bandits(parsed, k)
 
       decrypted_str = Growthbook::DecryptionUtil.decrypt(parsed['encryptedFeatures'], key: k)
       @features_json = JSON.parse(decrypted_str) unless decrypted_str.nil?
@@ -91,6 +97,15 @@ module Growthbook
       end
 
       parsed['savedGroups'] || {}
+    end
+
+    def decrypted_contextual_bandits(parsed, key)
+      if parsed['encryptedContextualBandits']
+        decrypted = Growthbook::DecryptionUtil.decrypt(parsed['encryptedContextualBandits'], key: key)
+        return JSON.parse(decrypted) unless decrypted.nil?
+      end
+
+      parsed['contextualBandits'] || {}
     end
 
     def parsed_response

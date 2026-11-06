@@ -75,12 +75,20 @@ module Growthbook
     # @return [Hash, nil] Arbitrary custom fields attached to the rule
     attr_reader custom_fields: Hash[String, untyped]?
 
+    # @return [T[], nil] Variations of a contextual bandit rule
+    attr_reader contextual_variations: Array[untyped]?
+
+    # @return [String, nil] Key of the contextual bandit in the payload
+    attr_reader contextual_bandit_ref: String?
+
     def initialize: (untyped rule) -> void
 
     # @return [Growthbook::InlineExperiment, nil]
     def to_experiment: (String | Symbol feature_key) -> (nil | InlineExperiment)
 
     def experiment?: () -> bool
+
+    def experiment_variations: () -> Array[untyped]?
 
     def force?: () -> bool
 

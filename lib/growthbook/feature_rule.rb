@@ -75,6 +75,14 @@ module Growthbook
     # @return [Hash, nil] Arbitrary custom fields attached to the rule
     attr_reader :custom_fields
 
+    # @return [T[], nil] Variations of a contextual bandit rule. Shipped separately from
+    #   `variations` so that SDKs without bandit support skip the rule instead of bucketing
+    #   users with weights they cannot resolve.
+    attr_reader :contextual_variations
+
+    # @return [String, nil] Key of the contextual bandit in the payload's `contextualBandits`
+    attr_reader :contextual_bandit_ref
+
     def initialize(rule)
       @id = get_option(rule, :id)
       @coverage = get_option(rule, :coverage)
@@ -103,6 +111,8 @@ module Growthbook
       @min_bucket_version = get_option(rule, :min_bucket_version) || get_option(rule, :minBucketVersion) || 0
       @parent_conditions = get_option(rule, :parent_conditions) || get_option(rule, :parentConditions) || []
       @custom_fields = get_option(rule, :custom_fields) || get_option(rule, :customFields)
+      @contextual_variations = get_option(rule, :contextual_variations) || get_option(rule, :contextualVariations)
+      @contextual_bandit_ref = get_option(rule, :contextual_bandit_ref) || get_option(rule, :contextualBanditRef)
 
       return unless @disable_sticky_bucketing
 
@@ -111,11 +121,12 @@ module Growthbook
 
     # @return [Growthbook::InlineExperiment, nil]
     def to_experiment(feature_key)
-      return nil unless @variations
+      variations = experiment_variations
+      return nil unless variations
 
       Growthbook::InlineExperiment.new(
         key: @key || feature_key,
-        variations: @variations,
+        variations: variations,
         condition: @condition,
         coverage: @coverage,
         weights: @weights,
@@ -137,9 +148,16 @@ module Growthbook
     end
 
     def experiment?
-      return false if @variations.nil?
+      variations = experiment_variations
+      return false if variations.nil?
 
-      !@variations&.empty?
+      !variations.empty?
+    end
+
+    # A contextual bandit rule carries its variations under `contextual_variations`, so read
+    # those first: otherwise the rule looks like it has no variations and gets skipped.
+    def experiment_variations
+      @contextual_variations || @variations
     end
 
     def force?
@@ -168,7 +186,9 @@ module Growthbook
         'disableStickyBucketing' => @disable_sticky_bucketing,
         'bucketVersion'          => @bucket_version,
         'minBucketVersion'       => @min_bucket_version,
-        'parentConditions'       => @parent_conditions
+        'parentConditions'       => @parent_conditions,
+        'contextualVariations'   => @contextual_variations,
+        'contextualBanditRef'    => @contextual_bandit_ref
       }.compact
     end
 
