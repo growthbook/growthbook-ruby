@@ -203,14 +203,16 @@ module Growthbook
           end
         end
 
-        # Targeting condition
-        next if rule.condition && !condition_passes?(rule.condition)
-
         # If there are filters for who is included (e.g. namespaces)
         next if rule.filters && filtered_out?(rule.filters || [])
 
-        # If this is a percentage rollout, skip if not included
+        # Force rule
         if rule.force?
+          # Targeting condition. Experiment rules check it in _run after the
+          # sticky bucket lookup, so sticky users keep their variation (like JS)
+          next if rule.condition && !condition_passes?(rule.condition)
+
+          # If this is a percentage rollout, skip if not included
           seed = rule.seed || key
           hash_attribute = rule.hash_attribute || 'id'
           included_in_rollout = included_in_rollout?(
