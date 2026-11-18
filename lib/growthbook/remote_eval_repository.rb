@@ -48,6 +48,9 @@ module Growthbook
     # [Numeric] Seconds to wait for the response to be read
     attr_reader :read_timeout
 
+    # [Numeric] Seconds to wait for the request body to be written
+    attr_reader :write_timeout
+
     # Parsed features JSON of the last successful evaluation
     attr_reader :features_json
 
@@ -68,6 +71,7 @@ module Growthbook
       cache_ttl: DEFAULT_CACHE_TTL,
       open_timeout: DEFAULT_TIMEOUT,
       read_timeout: DEFAULT_TIMEOUT,
+      write_timeout: DEFAULT_TIMEOUT,
       allow_insecure_http: false
     )
       raise ArgumentError, 'api_host must be provided for remote evaluation' if api_host.nil? || api_host.to_s.empty?
@@ -81,6 +85,7 @@ module Growthbook
       @cache_ttl = cache_ttl
       @open_timeout = normalize_timeout(:open_timeout, open_timeout)
       @read_timeout = normalize_timeout(:read_timeout, read_timeout)
+      @write_timeout = normalize_timeout(:write_timeout, write_timeout)
       @features_json = {}
       @saved_groups_json = {}
       @flight = {}
@@ -237,7 +242,10 @@ module Growthbook
         uri.port,
         use_ssl: uri.scheme == 'https',
         open_timeout: @open_timeout,
-        read_timeout: @read_timeout
+        read_timeout: @read_timeout,
+        # This request has a body, so the write phase is the one most likely to stall against a
+        # proxy that accepts the connection and never drains the socket
+        write_timeout: @write_timeout
       ) { |http| http.request(request) }
 
       return nil unless res.is_a?(Net::HTTPSuccess)

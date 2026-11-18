@@ -13,6 +13,7 @@ module Growthbook
       ?cache_ttl: Integer,
       ?open_timeout: Numeric?,
       ?read_timeout: Numeric?,
+      ?write_timeout: Numeric?,
       ?allow_insecure_http: bool
     ) -> void
 
@@ -24,6 +25,7 @@ module Growthbook
     attr_reader cache_ttl: Integer
     attr_reader open_timeout: Numeric
     attr_reader read_timeout: Numeric
+    attr_reader write_timeout: Numeric
     attr_reader features_json: Hash[String, untyped]
     attr_reader saved_groups_json: Hash[String, untyped]
 

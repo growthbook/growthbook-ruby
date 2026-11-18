@@ -107,6 +107,15 @@ RSpec.describe Growthbook::RemoteEvalRepository do
       expect(repo.read_timeout).to eq(2)
     end
 
+    it 'defaults the write timeout to 2 seconds' do
+      expect(repository.write_timeout).to eq(2)
+    end
+
+    it 'validates the write timeout like the others' do
+      expect { described_class.new(api_host: api_host, client_key: 'sdk-abc123', write_timeout: 0) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
     it 'accepts a sub-second timeout' do
       repo = described_class.new(api_host: api_host, client_key: 'sdk-abc123', open_timeout: 0.5)
 
