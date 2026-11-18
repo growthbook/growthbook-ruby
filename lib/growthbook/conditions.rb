@@ -1,30 +1,57 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'set'
 
 module Growthbook
   # internal use only
   # Utils for condition evaluation
-  class Conditions
+  class Conditions # rubocop:disable Metrics/ClassLength
+    # Keys a condition can have that aren't attributes, besides $not, which is
+    # also an operator on a value
+    CONDITION_OPERATORS = %w[$or $nor $and $savedGroup].freeze
+
+    # Keys that pass when what they hold fails
+    NEGATING_KEYS = %w[$not $nor].freeze
+
+    # Saved groups for one evaluation, and the group ids already being resolved, to stop cycles
+    class EvalContext
+      # @return [Hash] Saved groups payload, keyed by group id
+      attr_reader :saved_groups
+
+      # @return [Set<String>] Ids of the saved groups being resolved
+      attr_reader :visited
+
+      def initialize(saved_groups, visited = Set.new)
+        @saved_groups = saved_groups || {}
+        @visited = visited
+      end
+
+      # A copy that also holds id, so sibling groups don't see each other's ids
+      def visiting(id)
+        EvalContext.new(@saved_groups, @visited.dup.add(id))
+      end
+    end
+
     # Evaluate a targeting conditions hash against an attributes hash
     # Both attributes and conditions only have string keys (no symbols)
     def self.eval_condition(attributes, condition, saved_groups = {})
-      condition.each do |key, value|
-        case key
-        when '$or'
-          return false unless eval_or(attributes, value, saved_groups)
-        when '$nor'
-          return false if eval_or(attributes, value, saved_groups)
-        when '$and'
-          return false unless eval_and(attributes, value, saved_groups)
-        when '$not'
-          return false if eval_condition(attributes, value, saved_groups)
-        else
-          return false unless eval_condition_value(value, get_path(attributes, key), saved_groups)
-        end
-      end
+      eval_condition_result(attributes, condition, EvalContext.new(saved_groups)) == true
+    end
 
-      true
+    # Partially evaluate a condition when only some attributes are known, e.g. on
+    # a server. Attributes missing from `attributes` are unknown. Returns true or
+    # false once the result can't depend on them, otherwise the condition minus
+    # every branch that is already decided.
+    def self.prune_condition(attributes, condition, saved_groups = {})
+      prune_with_context(attributes, condition, EvalContext.new(saved_groups))
+    end
+
+    # Prune the saved group a reference points to. Returns its result once decided
+    # (nil for a group type this SDK doesn't know), otherwise its condition minus
+    # every branch that is already decided. A malformed condition group stays as written.
+    def self.prune_saved_group(attributes, reference, saved_groups)
+      eval_saved_group(attributes, reference, EvalContext.new(saved_groups), prune: true, keep_malformed: true)
     end
 
     # Helper function to ensure conditions only have string keys (no symbols)
@@ -33,25 +60,172 @@ module Growthbook
       when Array
         return condition.map { |v| parse_condition(v) }
       when Hash
-        return condition.to_h { |k, v| [k.to_s, parse_condition(v)] }
+        # Not to_h with a block, which Ruby 2.5 ignores
+        return condition.each_with_object({}) { |(k, v), h| h[k.to_s] = parse_condition(v) }
       end
       condition
     end
 
-    def self.eval_or(attributes, conditions, saved_groups = {})
-      return true if conditions.length <= 0
+    # Evaluates a condition to true or false, or nil when the result depends on an
+    # operator or saved group type this SDK doesn't support
+    def self.eval_condition_result(attributes, condition, ctx)
+      # @type var result: bool?
+      result = true
+      condition.each do |key, value|
+        r = case key
+            when '$or' then eval_or(attributes, value, ctx)
+            when '$nor' then negate(eval_or(attributes, value, ctx))
+            when '$and' then eval_and(attributes, value, ctx)
+            when '$not' then negate(eval_condition_result(attributes, value, ctx))
+            when '$savedGroup' then eval_saved_group(attributes, value, ctx)
+            else eval_condition_value(value, get_path(attributes, key), ctx)
+        end
+        # One failing entry decides it, wherever an unsupported one is
+        return false if r == false
 
-      conditions.each do |condition|
-        return true if eval_condition(attributes, condition, saved_groups)
+        result = nil if r.nil?
       end
-      false
+      result
     end
 
-    def self.eval_and(attributes, conditions, saved_groups = {})
+    # $not of an undecided result stays undecided
+    def self.negate(result)
+      result.nil? ? nil : !result
+    end
+
+    def self.eval_or(attributes, conditions, ctx)
+      return true if conditions.length <= 0
+
+      # @type var result: bool?
+      result = false
       conditions.each do |condition|
-        return false unless eval_condition(attributes, condition, saved_groups)
+        r = eval_condition_result(attributes, condition, ctx)
+        return true if r == true
+
+        result = nil if r.nil?
       end
-      true
+      result
+    end
+
+    def self.eval_and(attributes, conditions, ctx)
+      # @type var result: bool?
+      result = true
+      conditions.each do |condition|
+        r = eval_condition_result(attributes, condition, ctx)
+        return false if r == false
+
+        result = nil if r.nil?
+      end
+      result
+    end
+
+    # Resolves a `$savedGroup` reference. Anything unrecognized matches nobody.
+    # With prune, an unknown attribute leaves a list group undecided (nil), and a
+    # condition group is pruned rather than evaluated. With keep_malformed, a
+    # condition group that raises while pruning is returned as written.
+    def self.eval_saved_group(attributes, reference, ctx, prune: false, keep_malformed: false)
+      return false unless reference.is_a?(Hash)
+
+      id = reference['id']
+      attribute_key = reference['attributeKey']
+      return false if !id.is_a?(String) || ctx.visited.include?(id)
+      # Only an absent override falls back to the entry's attribute. Falling back
+      # for any other non-string, nil included, would check a different population.
+      return false if reference.key?('attributeKey') && !attribute_key.is_a?(String)
+
+      entry = ctx.saved_groups[id]
+      # Absent, or a v1 bare array
+      return false unless entry.is_a?(Hash)
+
+      case entry['type']
+      when 'list'
+        # The override wins over the entry's own attribute
+        key = attribute_key || entry['attributeKey']
+        return false unless key.is_a?(String)
+        return false unless entry['values'].is_a?(Array)
+        return nil if prune && !known?(attributes, key)
+
+        in?(get_path(attributes, key), entry['values'])
+      when 'condition'
+        # A condition group has no single attribute, so any override is ignored
+        return false unless entry['condition'].is_a?(Hash)
+
+        group_ctx = ctx.visiting(id)
+        return eval_condition_result(attributes, entry['condition'], group_ctx) unless prune
+
+        # Inside a condition being pruned, the error reaches that condition's prune_with_context
+        keep_malformed ? prune_with_context(attributes, entry['condition'], group_ctx) : prune_entries(attributes, entry['condition'], group_ctx)
+      end
+      # Any other type was added after this SDK was built. The client SDK may support it.
+    end
+
+    def self.prune_with_context(attributes, condition, ctx)
+      prune_entries(attributes, condition, ctx)
+    rescue StandardError
+      # One that raises, such as a malformed one, stays as written. Evaluating it
+      # fails as a whole, so no part of it can be decided.
+      condition
+    end
+
+    def self.prune_entries(attributes, condition, ctx)
+      out = {}
+      condition.each do |key, value|
+        r = case key
+            when '$or', '$nor', '$and' then prune_list(attributes, value, ctx, or_list: key != '$and')
+            when '$not' then prune_entries(attributes, value, ctx)
+            when '$savedGroup'
+              # Keep an undecided reference as is rather than inlining the group
+              decided = eval_saved_group(attributes, value, ctx, prune: true)
+              decided?(decided) ? decided : nil
+            else
+              # nil when the attribute is unknown, or the value uses an operator
+              # this SDK doesn't support, which the client's SDK may
+              known?(attributes, key) ? eval_condition_value(value, get_path(attributes, key), ctx) : nil
+        end
+        # $not and $nor pass when what they hold fails
+        r = !r if NEGATING_KEYS.include?(key) && decided?(r)
+
+        # One failing entry fails the whole condition, and a passing one is dropped
+        return false if r == false
+
+        # nil is an undecided leaf, which stays as written
+        if r.nil?
+          out[key] = value
+        elsif r != true
+          out[key] = r
+        end
+      end
+      out.empty? ? true : out
+    end
+
+    # Prune an $or (or an $and) list. Returns the conditions still undecided, or
+    # the list's result once there are none.
+    def self.prune_list(attributes, conditions, ctx, or_list:)
+      raise TypeError, 'expected an array of conditions' unless conditions.is_a?(Array)
+
+      out = []
+      conditions.each do |condition|
+        r = prune_entries(attributes, condition, ctx)
+        # One passing condition decides an $or, and one failing condition an $and
+        return true if or_list && r == true
+        return false if !or_list && r == false
+
+        out << r unless decided?(r)
+      end
+      return out unless out.empty?
+
+      # Every condition failed an $or, or passed an $and. Like eval_or, an empty $or passes.
+      or_list ? conditions.empty? : true
+    end
+
+    # True or false, rather than nil or a pruned condition
+    def self.decided?(result)
+      result.is_a?(TrueClass) || result.is_a?(FalseClass)
+    end
+
+    # A nested path is unknown, since the server may only have part of the object
+    def self.known?(attributes, path)
+      !path.include?('.') && attributes.is_a?(Hash) && attributes.key?(path)
     end
 
     def self.operator_object?(obj)
@@ -79,52 +253,86 @@ module Growthbook
       current = attributes
 
       parts.each do |value|
-        return nil unless current.is_a?(Hash) && current&.key?(value)
-
-        current = current[value]
+        if current.is_a?(Hash) && current.key?(value)
+          current = current[value]
+        elsif current.is_a?(Array) && value.match?(/\A(0|[1-9][0-9]*)\z/) && value.to_i < current.length
+          # Like JS, a segment can index into an array ("tags.0")
+          current = current[value.to_i]
+        elsif current.is_a?(Array) && value == 'length'
+          current = current.length
+        else
+          return nil
+        end
       end
 
       current
     end
 
-    def self.eval_condition_value(condition_value, attribute_value, saved_groups = {}, insensitive: false)
+    def self.eval_condition_value(condition_value, attribute_value, ctx, insensitive: false)
       if condition_value.is_a?(Hash) && operator_object?(condition_value)
+        # @type var result: bool?
+        result = true
         condition_value.each do |key, value|
-          return false unless eval_operator_condition(key, attribute_value, value, saved_groups)
+          r = eval_operator_condition(key, attribute_value, value, ctx)
+          return false if r == false
+
+          result = nil if r.nil?
         end
-        return true
+        return result
       end
       return condition_value.casecmp?(attribute_value) if insensitive && condition_value.is_a?(String) && attribute_value.is_a?(String)
 
-      condition_value.to_json == attribute_value.to_json
+      # null matches only null, like JS ===; js_json would also write NaN and infinity as "null"
+      return attribute_value.nil? if condition_value.nil?
+
+      # Numbers compare by value, like JS ===, so 1.0 equals 1
+      return number?(attribute_value) && condition_value == attribute_value if number?(condition_value)
+
+      js_json(condition_value) == js_json(attribute_value)
     end
 
-    def self.elem_match(condition, attribute_value, saved_groups = {})
+    # Serializes like JavaScript's JSON.stringify, which writes 1.0 as "1" and -0.0 as "0"
+    def self.js_json(value)
+      case value
+      when Hash then "{#{value.map { |k, v| "#{k.to_s.to_json}:#{js_json(v)}" }.join(',')}}"
+      when Array then "[#{value.map { |v| js_json(v) }.join(',')}]"
+      when Integer, Float then value.to_f.finite? ? Util.js_number_to_s(value) : 'null'
+      else value.to_json
+      end
+    end
+
+    def self.elem_match(condition, attribute_value, ctx)
       return false unless attribute_value.is_a? Array
 
+      # Operators test each element itself. A condition, including one that only
+      # uses $or, $and, $nor, or $savedGroup, tests each element's fields.
+      on_value = operator_object?(condition) && condition.keys.none? { |k| CONDITION_OPERATORS.include?(k) }
+      # @type var result: bool?
+      result = false
       attribute_value.each do |item|
-        if operator_object?(condition)
-          return true if eval_condition_value(condition, item, saved_groups)
-        elsif eval_condition(item, condition, saved_groups)
-          return true
-        end
+        next if item.nil?
+
+        r = on_value ? eval_condition_value(condition, item, ctx) : eval_condition_result(item, condition, ctx)
+        return true if r == true
+
+        result = nil if r.nil?
       end
-      false
+      result
     end
 
-    def self.compare(val1, val2)
-      if val1.is_a?(Numeric) || val2.is_a?(Numeric)
-        val1 = val1.is_a?(Numeric) ? val1 : val1.to_f
-        val2 = val2.is_a?(Numeric) ? val2 : val2.to_f
-      end
-
-      return 1 if val1 > val2
-      return -1 if val1 < val2
-
-      0
+    # Only two numbers or two strings can be ordered; anything else is a type mismatch
+    def self.orderable?(val1, val2)
+      (number?(val1) && number?(val2)) || (val1.is_a?(String) && val2.is_a?(String))
     end
 
+    def self.number?(value)
+      value.is_a?(Integer) || value.is_a?(Float)
+    end
+
+    # On a type mismatch $vne matches and every other version operator fails
     def self.eval_version_operator(operator, attribute_value, condition_value)
+      return operator == '$vne' unless orderable?(attribute_value, condition_value)
+
       a = padded_version_string(attribute_value)
       b = padded_version_string(condition_value)
       case operator
@@ -139,31 +347,72 @@ module Growthbook
     end
 
     def self.eval_compare_operator(operator, attribute_value, condition_value)
-      result = compare(attribute_value, condition_value)
       case operator
-      when '$eq' then result.zero?
-      when '$ne' then result != 0
-      when '$lt' then result.negative?
-      when '$lte' then result <= 0
-      when '$gt' then result.positive?
-      when '$gte' then result >= 0
-      else false
-      end
-    rescue StandardError
-      # Values weren't comparable (e.g. booleans); fall back to direct equality
-      return attribute_value == condition_value if operator == '$eq'
-      return attribute_value != condition_value if operator == '$ne'
+      when '$eq' then strict_equal?(attribute_value, condition_value)
+      when '$ne' then !strict_equal?(attribute_value, condition_value)
+      else
+        return false unless orderable?(attribute_value, condition_value)
 
-      false
+        attribute_value, condition_value = utf16_units(attribute_value, condition_value)
+        case operator
+        when '$lt' then attribute_value < condition_value
+        when '$lte' then attribute_value <= condition_value
+        when '$gt' then attribute_value > condition_value
+        when '$gte' then attribute_value >= condition_value
+        else false
+        end
+      end
     end
 
-    def self.eval_operator_condition(operator, attribute_value, condition_value, saved_groups = {})
+    # JS orders strings by UTF-16 code units, so a character above U+FFFF (a
+    # surrogate pair) sorts below U+E000..U+FFFF. Big-endian UTF-16 bytes
+    # compare in that order.
+    def self.utf16_units(val1, val2)
+      return [val1, val2] unless val1.is_a?(String) && val2.is_a?(String)
+      return [val1, val2] if val1.ascii_only? && val2.ascii_only?
+
+      [val1.encode('UTF-16BE').b, val2.encode('UTF-16BE').b]
+    end
+
+    # Like JS ===: values of different types are never equal (no "5" == 5 or
+    # 0 == nil), numbers compare by value (1 equals 1.0), and arrays and objects
+    # compare by reference, so two parsed from JSON are never equal
+    def self.strict_equal?(val1, val2)
+      return false if val1.is_a?(Array) || val1.is_a?(Hash) || val2.is_a?(Array) || val2.is_a?(Hash)
+
+      get_type(val1) == get_type(val2) && val1 == val2
+    end
+
+    # Gets the values of a saved group for $inGroup/$notInGroup: a bare array, or
+    # the values of a typed list entry. nil when it has no values to check.
+    def self.saved_group_values(saved_groups, id)
+      # An unknown id has always behaved like an empty list. A malformed entry
+      # has not, and must not: $notInGroup would pass everyone.
+      return [] unless saved_groups.key?(id)
+
+      entry = saved_groups[id]
+      return entry if entry.is_a?(Array)
+      # These operators take their attribute from the condition they sit on
+      return entry['values'].is_a?(Array) ? entry['values'] : nil if entry.is_a?(Hash) && entry['type'] == 'list'
+
+      # A condition group, a malformed entry, or an unknown type
+      nil
+    end
+
+    # A saved group type added after this SDK was built
+    def self.new_group_type?(entry)
+      entry.is_a?(Hash) && !%w[list condition].include?(entry['type'])
+    end
+
+    def self.eval_operator_condition(operator, attribute_value, condition_value, ctx)
       case operator
       when '$veq', '$vne', '$vgt', '$vgte', '$vlt', '$vlte'
         eval_version_operator(operator, attribute_value, condition_value)
       when '$eq', '$ne', '$lt', '$lte', '$gt', '$gte'
         eval_compare_operator(operator, attribute_value, condition_value)
       when '$regex'
+        return false unless attribute_value.is_a?(String)
+
         silence_warnings do
           re = Regexp.new(condition_value)
           !!attribute_value.match(re)
@@ -171,6 +420,8 @@ module Growthbook
           false
         end
       when '$regexi'
+        return false unless attribute_value.is_a?(String)
+
         silence_warnings do
           re = Regexp.new(condition_value, Regexp::IGNORECASE)
           !!attribute_value.match(re)
@@ -193,28 +444,29 @@ module Growthbook
         return false unless condition_value.is_a?(Array)
 
         !in?(attribute_value, condition_value, insensitive: true)
-      when '$inGroup'
-        return false unless condition_value.is_a?(String)
-        return false unless saved_groups.key?(condition_value)
+      when '$inGroup', '$notInGroup'
+        entry = condition_value.is_a?(String) ? ctx.saved_groups[condition_value] : nil
+        return nil if new_group_type?(entry)
 
-        in?(attribute_value, saved_groups[condition_value] || [])
-      when '$notInGroup'
-        return false unless condition_value.is_a?(String)
-        return true unless saved_groups.key?(condition_value)
+        # No values means matching nobody. An empty list would pass everyone.
+        values = condition_value.is_a?(String) ? saved_group_values(ctx.saved_groups, condition_value) : nil
+        return false if values.nil?
 
-        !in?(attribute_value, saved_groups[condition_value] || [])
+        operator == '$inGroup' ? in?(attribute_value, values) : !in?(attribute_value, values)
       when '$elemMatch'
-        elem_match(condition_value, attribute_value, saved_groups)
+        elem_match(condition_value, attribute_value, ctx)
       when '$size'
         return false unless attribute_value.is_a? Array
 
-        eval_condition_value(condition_value, attribute_value.length, saved_groups)
+        eval_condition_value(condition_value, attribute_value.length, ctx)
       when '$all'
-        in_all?(condition_value, attribute_value, saved_groups, false)
+        return false unless condition_value.is_a?(Array)
+
+        in_all?(condition_value, attribute_value, ctx, false)
       when '$alli'
         return false unless condition_value.is_a?(Array)
 
-        in_all?(condition_value, attribute_value, saved_groups, true)
+        in_all?(condition_value, attribute_value, ctx, true)
       when '$exists'
         exists = !attribute_value.nil?
         if condition_value
@@ -225,23 +477,42 @@ module Growthbook
       when '$type'
         condition_value == get_type(attribute_value)
       when '$not'
-        !eval_condition_value(condition_value, attribute_value, saved_groups)
+        negate(eval_condition_value(condition_value, attribute_value, ctx))
       else
-        false
+        # Keys this SDK knows, but on a condition rather than on a value, where
+        # they never match. Any other operator is unsupported.
+        CONDITION_OPERATORS.include?(operator) ? false : nil
       end
     end
 
-    def self.in_all?(condition_values, attribute_value, saved_groups, insensitive)
+    def self.in_all?(condition_values, attribute_value, ctx, insensitive)
       return false unless attribute_value.is_a? Array
 
+      # @type var result: bool?
+      result = true
       condition_values.each do |cond|
-        passed = attribute_value.any? { |attr| eval_condition_value(cond, attr, saved_groups, insensitive: insensitive) }
-        return false unless passed
+        # @type var passed: bool?
+        passed = false
+        attribute_value.each do |attr|
+          r = eval_condition_value(cond, attr, ctx, insensitive: insensitive)
+          if r == true
+            passed = true
+            break
+          end
+          passed = nil if r.nil?
+        end
+        return false if passed == false
+
+        result = nil if passed.nil?
       end
-      true
+      result
     end
 
     def self.padded_version_string(input)
+      # Format numbers like JS does (2.0 -> "2", 0.000002 -> "0.000002"); treat empty input as version 0
+      input = Util.js_number_to_s(input) if number?(input)
+      input = '0' if input.empty?
+
       # Remove build info and leading `v` if any
       # Split version into parts (both core version numbers and pre-release tags)
       # "v1.2.3-rc.1+build123" -> ["1","2","3","rc","1"]
@@ -258,20 +529,19 @@ module Growthbook
       end.join('-')
     end
 
+    # Like JS Array#includes: 1 matches 1.0, and an array or object never
+    # matches (JS compares them by reference). An array attribute matches if any
+    # of its items does. Array#include? compares with ==, which matches JS for
+    # everything but arrays and objects.
     def self.in?(actual, expected, insensitive: false)
       expected ||= []
 
-      if insensitive
-        fold = ->(val) { val.is_a?(String) ? val.downcase : val }
-        folded_expected = expected.map { |exp| fold.call(exp) }
-        return actual.any? { |el| folded_expected.include?(fold.call(el)) } if actual.is_a?(Array)
+      fold = ->(val) { insensitive && val.is_a?(String) ? val.downcase : val }
+      folded_expected = insensitive ? expected.map { |exp| fold.call(exp) } : expected
+      includes = ->(val) { !val.is_a?(Array) && !val.is_a?(Hash) && folded_expected.include?(fold.call(val)) }
+      return actual.any? { |el| includes.call(el) } if actual.is_a?(Array)
 
-        return folded_expected.include?(fold.call(actual))
-      end
-
-      return expected.include?(actual) unless actual.is_a?(Array)
-
-      (actual & expected).any?
+      includes.call(actual)
     end
 
     # Sets $VERBOSE for the duration of the block and back to its original

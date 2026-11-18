@@ -94,6 +94,25 @@ describe Growthbook::Context do
     end
   end
 
+  describe 'malformed conditions' do
+    it 'skips a rule whose condition raises instead of raising' do
+      gb = described_class.new(
+        attributes: { id: '1' },
+        features: {
+          feature: {
+            defaultValue: 'default',
+            rules: [
+              { condition: { '$not' => nil }, force: 'malformed' },
+              { condition: { 'id' => '1' }, force: 'next rule' }
+            ]
+          }
+        }
+      )
+
+      expect(gb.feature_value(:feature)).to eq('next rule')
+    end
+  end
+
   describe 'feature usage callback' do
     let(:on_feature_usage) { double }
 
@@ -299,6 +318,52 @@ describe Growthbook::Context do
         expect(context.features['banner_text'].to_json['defaultValue']).to eq('Welcome to Acme Donuts!')
         expect(context.features['banner_text'].rules.first.force).to eq('Bienvenue au Beignets Acme !')
         expect(context.features['banner_text'].rules.last.force).to eq('¡Bienvenidos y bienvenidas a Donas Acme!')
+      end
+    end
+  end
+
+  describe 'hash attribute values' do
+    let(:experiment) { Growthbook::InlineExperiment.new(key: 'my-test', variations: [0, 1], fallback_attribute: 'deviceId') }
+
+    [true, false, 0, 0.0, '', nil, [], ['1'], {}, { 'a' => 1 }, Float::INFINITY].each do |id|
+      it "treats #{id.inspect} as missing and uses the fallback attribute" do
+        attributes = { 'id' => id, 'deviceId' => 'd1' }
+
+        # Without sticky bucketing, experiments ignore the fallback attribute
+        result = described_class.new(attributes: attributes).run(experiment)
+        expect([result.in_experiment?, result.hash_used?]).to eq([false, false])
+
+        gb = described_class.new(attributes: attributes, sticky_bucket_service: Growthbook::InMemoryStickyBucketService.new)
+        result = gb.run(experiment)
+        expect([result.in_experiment?, result.hash_attribute, result.hash_value]).to eq([true, 'deviceId', 'd1'])
+
+        # Rollouts always use the rule's fallback attribute
+        features = { 'f' => { 'defaultValue' => 'off', 'rules' => [{ 'force' => 'on', 'coverage' => 1, 'fallbackAttribute' => 'deviceId' }] } }
+        expect(described_class.new(attributes: attributes, features: features).eval_feature('f').source).to eq('force')
+        expect(described_class.new(attributes: { 'id' => id }, features: features).eval_feature('f').source).to eq('defaultValue')
+      end
+    end
+
+    it 'hashes numbers like JS String()' do
+      bucket = ->(id) { described_class.new(attributes: { 'id' => id }).run(Growthbook::InlineExperiment.new(key: 'k', variations: [0, 1])).bucket }
+      expect(bucket.call(1.0)).to eq(bucket.call('1'))
+      expect(bucket.call(1)).to eq(bucket.call('1'))
+      expect(bucket.call(1.5)).to eq(bucket.call('1.5'))
+    end
+
+    it 'filters out users without a hash value' do
+      experiment = Growthbook::InlineExperiment.new(
+        key: 'k', variations: [0, 1], filters: [{ 'attribute' => 'company', 'seed' => 's', 'ranges' => [[0, 1]] }]
+      )
+      expect(described_class.new(attributes: { 'id' => '1' }).run(experiment).in_experiment?).to be(false)
+    end
+  end
+
+  describe 'feature on and off' do
+    { [] => true, {} => true, 'off' => true, '0' => true, 0 => false, 0.0 => false, '' => false, false => false, nil => false }.each do |value, on|
+      it "is #{on ? 'on' : 'off'} for #{value.inspect}, like JS truthiness" do
+        result = described_class.new(features: { 'f' => { 'defaultValue' => value } }).eval_feature('f')
+        expect([result.on, result.off]).to eq([on, !on])
       end
     end
   end

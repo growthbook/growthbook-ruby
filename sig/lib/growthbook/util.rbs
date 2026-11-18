@@ -21,5 +21,10 @@ module Growthbook
     def self.get_query_string_override: (String? id, String url, Integer num_variations) -> (nil | Integer)
 
     def self.in_range?: (Float num, Array[Float] range) -> bool
+
+    # Formats a number like JavaScript's String(number)
+    def self.js_number_to_s: (Numeric number) -> String
+
+    def self.format_js_digits: (String digits, Integer point) -> String
   end
 end
