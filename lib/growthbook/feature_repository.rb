@@ -28,13 +28,17 @@ module Growthbook
     # [Numeric] Seconds to wait for the response to be read
     attr_reader :read_timeout
 
-    def initialize(endpoint:, decryption_key:, open_timeout: DEFAULT_TIMEOUT, read_timeout: DEFAULT_TIMEOUT)
+    # [Numeric] Seconds to wait for the request to be written
+    attr_reader :write_timeout
+
+    def initialize(endpoint:, decryption_key:, open_timeout: DEFAULT_TIMEOUT, read_timeout: DEFAULT_TIMEOUT, write_timeout: DEFAULT_TIMEOUT)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
       @open_timeout = normalize_timeout(:open_timeout, open_timeout)
       @read_timeout = normalize_timeout(:read_timeout, read_timeout)
+      @write_timeout = normalize_timeout(:write_timeout, write_timeout)
     end
 
     def fetch
@@ -45,6 +49,9 @@ module Growthbook
       http.use_ssl = uri.scheme == 'https'
       http.open_timeout = @open_timeout
       http.read_timeout = @read_timeout
+      # Left at Ruby's own 60s otherwise, so a configured timeout would not cover a connection
+      # that accepts but never drains the socket
+      http.write_timeout = @write_timeout
       res = http.get(uri.request_uri)
 
       @response = res.is_a?(Net::HTTPSuccess) ? res.body : nil

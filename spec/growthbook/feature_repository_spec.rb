@@ -469,6 +469,23 @@ RSpec.describe Growthbook::FeatureRepository do
       expect(repo.read_timeout).to eq(10)
     end
 
+    it 'defaults the write timeout to 2 seconds' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil)
+
+      expect(repo.write_timeout).to eq(2)
+    end
+
+    it 'accepts a custom write timeout' do
+      repo = described_class.new(endpoint: endpoint, decryption_key: nil, write_timeout: 5)
+
+      expect(repo.write_timeout).to eq(5)
+    end
+
+    it 'validates the write timeout like the others' do
+      expect { described_class.new(endpoint: endpoint, decryption_key: nil, write_timeout: 0) }
+        .to raise_error(ArgumentError, /positive number of seconds/)
+    end
+
     it 'accepts a sub-second timeout' do
       repo = described_class.new(endpoint: endpoint, decryption_key: nil, open_timeout: 0.5, read_timeout: 0.25)
       expect(repo.open_timeout).to eq(0.5)

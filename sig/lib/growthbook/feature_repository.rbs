@@ -5,8 +5,9 @@ module Growthbook
 
     @open_timeout: Numeric
     @read_timeout: Numeric
+    @write_timeout: Numeric
 
-    def initialize: (endpoint: String, decryption_key: String?, ?open_timeout: Numeric?, ?read_timeout: Numeric?) -> void
+    def initialize: (endpoint: String, decryption_key: String?, ?open_timeout: Numeric?, ?read_timeout: Numeric?, ?write_timeout: Numeric?) -> void
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
@@ -14,6 +15,7 @@ module Growthbook
     attr_reader saved_groups_json: Hash[String, untyped]
     attr_reader open_timeout: Numeric
     attr_reader read_timeout: Numeric
+    attr_reader write_timeout: Numeric
 
     def fetch: () -> (nil | Hash[String, untyped])
 
@@ -54,6 +56,7 @@ module Net
     def use_ssl=: (bool) -> bool
     def open_timeout=: (Numeric) -> Numeric
     def read_timeout=: (Numeric) -> Numeric
+    def write_timeout=: (Numeric) -> Numeric
     def get: (String) -> untyped
   end
 end
