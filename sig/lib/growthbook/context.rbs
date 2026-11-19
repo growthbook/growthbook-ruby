@@ -1,6 +1,8 @@
 module Growthbook
   # Context object passed into the GrowthBook constructor.
   class Context
+    TRACKED_EXPERIMENTS_LIMIT: Integer
+
     # @return [true, false] Switch to globally disable all experiments. Default true.
     attr_accessor enabled: bool
 
@@ -28,7 +30,7 @@ module Growthbook
 
     @tracked_feature_usage: Hash[String, String]
 
-    @tracked_experiments: Set[String]
+    @tracked_experiments: Hash[Array[untyped], bool]
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader attributes: Hash[untyped, untyped]
@@ -135,6 +137,8 @@ module Growthbook
     def log_feature_evaluated: (String key, FeatureResult feature_result) -> void
 
     def log_experiment_viewed: (InlineExperiment experiment, InlineExperimentResult result) -> void
+
+    def experiment_tracked?: (Array[untyped] dedupe_key) -> bool
 
     def dedupe_value: (untyped value) -> String
 

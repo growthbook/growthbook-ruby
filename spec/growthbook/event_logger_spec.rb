@@ -83,6 +83,24 @@ describe 'Growthbook::Context event logger' do
       expect(events).to be_empty
     end
 
+    it 'is sent again for a different user with the same value' do
+      gb.eval_feature('by_country')
+      gb.attributes = { 'id' => 'user-456', 'country' => 'UA' }
+      gb.eval_feature('by_country')
+
+      expect(events.map { |_, properties, user_context| [properties['value'], user_context[:attributes]['id']] }).to eq(
+        [%w[ua user-123], %w[ua user-456]]
+      )
+    end
+
+    it 'is not sent again when the same attributes are set again' do
+      gb.eval_feature('by_country')
+      gb.attributes = { id: 'user-123', country: 'UA' }
+      gb.eval_feature('by_country')
+
+      expect(events.length).to eq(1)
+    end
+
     it 'dedupes values that cannot be serialized to JSON' do
       context_options[:features] = { 'ratio' => { 'defaultValue' => Float::NAN } }
 
@@ -126,6 +144,32 @@ describe 'Growthbook::Context event logger' do
       gb.run(experiment)
 
       expect(events.map { |_, properties, _| properties['hashValue'] }).to eq(%w[user-123 user-456])
+    end
+
+    it 'does not confuse assignments whose key parts run together' do
+      # 'user-1' + '2-exp' and 'user-12' + '-exp' would build the same key if concatenated
+      always_first = { variations: %w[a b], weights: [1.0, 0.0] }
+      context_options[:attributes] = { 'id' => 'user-1' }
+      gb.run(Growthbook::InlineExperiment.new(always_first.merge(key: '2-exp')))
+      gb.attributes = { 'id' => 'user-12' }
+      gb.run(Growthbook::InlineExperiment.new(always_first.merge(key: '-exp')))
+
+      expect(events.map { |_, properties, _| properties['experimentId'] }).to eq(%w[2-exp -exp])
+    end
+
+    it 'forgets the least recently seen assignment once the limit is reached' do
+      stub_const('Growthbook::Context::TRACKED_EXPERIMENTS_LIMIT', 2)
+      run_as = lambda do |id|
+        gb.attributes = { 'id' => id }
+        gb.run(experiment)
+      end
+
+      %w[user-1 user-2 user-1 user-3].each(&run_as)
+      expect(events.map { |_, properties, _| properties['hashValue'] }).to eq(%w[user-1 user-2 user-3])
+
+      # user-1 was seen more recently than user-2, so user-2 was evicted and is reported again
+      %w[user-1 user-2].each(&run_as)
+      expect(events.map { |_, properties, _| properties['hashValue'] }).to eq(%w[user-1 user-2 user-3 user-2])
     end
 
     it 'is sent alongside Feature Evaluated for an experiment rule' do

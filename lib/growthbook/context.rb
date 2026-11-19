@@ -5,7 +5,16 @@ require 'set'
 
 module Growthbook
   # Context object passed into the GrowthBook constructor.
+  #
+  # A Context is not thread-safe: evaluation updates impressions, sticky buckets and the event
+  # dedupe history without locking. Create one per request (or per thread) rather than sharing a
+  # single instance between threads, e.g. under Puma or Sidekiq. Sharing one can send duplicate
+  # Feature Evaluated and Experiment Viewed events and mix up results between users.
   class Context # rubocop:disable Metrics/ClassLength
+    # How many unit/experiment/variation assignments are remembered to dedupe Experiment Viewed.
+    # The least recently seen is forgotten first, so a long-lived context can't grow without bound.
+    TRACKED_EXPERIMENTS_LIMIT = 10_000
+
     # @return [true, false] Switch to globally disable all experiments. Default true.
     attr_accessor :enabled
 
@@ -76,7 +85,7 @@ module Growthbook
       @saved_groups = {}
       @remote_group_ids = nil
       @tracked_feature_usage = {}
-      @tracked_experiments = Set.new
+      @tracked_experiments = {}
 
       features = {}
       attributes = {}
@@ -144,7 +153,11 @@ module Growthbook
     end
 
     def attributes=(attrs)
-      @attributes = stringify_keys(attrs || {})
+      attributes = stringify_keys(attrs || {})
+      # Feature usage is deduped per user, so different attributes start a fresh history, like the
+      # Kotlin SDK. Experiment Viewed needs no reset: its dedupe key includes the hash value.
+      @tracked_feature_usage = {} unless attributes == @attributes
+      @attributes = attributes
       @condition_attributes = RemoteSavedGroups.with_ids(@attributes, @remote_group_ids)
 
       refresh_sticky_buckets
@@ -556,12 +569,14 @@ module Growthbook
       invoke_callback { @event_logger.call(Growthbook::EVENT_FEATURE_EVALUATED, properties, tracking_user_context) }
     end
 
-    # Sent once per unit, experiment and variation, keyed like the TS SDK's getExperimentDedupeKey
+    # Sent once per unit, experiment and variation, with the same parts as the TS SDK's
+    # getExperimentDedupeKey. They are kept apart rather than concatenated, so different
+    # assignments can't produce the same key.
     def log_experiment_viewed(experiment, result)
       return unless @event_logger.respond_to?(:call)
 
-      dedupe_key = "#{result.hash_attribute}#{result.hash_value}#{experiment.key}#{result.variation_id}"
-      return unless @tracked_experiments.add?(dedupe_key)
+      dedupe_key = [result.hash_attribute, result.hash_value, experiment.key, result.variation_id]
+      return if experiment_tracked?(dedupe_key)
 
       properties = {
         'experimentId'  => experiment.key,
@@ -570,6 +585,17 @@ module Growthbook
         'hashValue'     => result.hash_value
       }
       invoke_callback { @event_logger.call(Growthbook::EVENT_EXPERIMENT_VIEWED, properties, tracking_user_context) }
+    end
+
+    # Remembers the key and reports whether it was already there. A hit moves the key to the end
+    # (Hash keeps insertion order), so the least recently seen key is the one evicted.
+    def experiment_tracked?(dedupe_key)
+      tracked = !@tracked_experiments.delete(dedupe_key).nil?
+      @tracked_experiments[dedupe_key] = true
+      return true if tracked
+
+      @tracked_experiments.shift if @tracked_experiments.size > TRACKED_EXPERIMENTS_LIMIT
+      false
     end
 
     # Compared serialized, like the TS SDK's JSON.stringify. NaN and Infinity can't be JSON, so they
