@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'set'
 
 module Growthbook
@@ -19,6 +20,11 @@ module Growthbook
 
     # @return [Growthbook::FeatureUsageCallback] An object that responds to `on_feature_usage(String, Growthbook::FeatureResult)`
     attr_accessor :on_feature_usage
+
+    # @return [#call, nil] Receives every event as `call(event_name, properties, user_context)`, where
+    #   user_context is `{ attributes:, url: }`: the SDK's own Feature Evaluated and Experiment Viewed
+    #   events, and any sent with #log_event
+    attr_accessor :event_logger
 
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader :attributes
@@ -69,6 +75,8 @@ module Growthbook
       @sticky_bucket_assignment_docs = {}
       @saved_groups = {}
       @remote_group_ids = nil
+      @tracked_feature_usage = {}
+      @tracked_experiments = Set.new
 
       features = {}
       attributes = {}
@@ -99,6 +107,8 @@ module Growthbook
           @listener = value
         when :on_feature_usage
           @on_feature_usage = value
+        when :event_logger
+          @event_logger = value
         when :sticky_bucket_service
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
@@ -225,6 +235,23 @@ module Growthbook
     def feature_value(key, fallback = nil)
       value = eval_feature(key).value
       value.nil? ? fallback : value
+    end
+
+    # Send a custom event to the event logger, along with the current attributes and url
+    #
+    # @param event_name [String] The name of the event
+    # @param properties [Hash] Any properties of the event
+    def log_event(event_name, properties = {})
+      unless @event_logger.respond_to?(:call)
+        warn('No event logger configured')
+        return
+      end
+
+      begin
+        @event_logger.call(event_name, properties || {}, tracking_user_context)
+      rescue StandardError => e
+        warn("GrowthBook event logger raised: #{e.class}: #{e.message}")
+      end
     end
 
     private
@@ -504,10 +531,57 @@ module Growthbook
     end
 
     def track_feature_usage(key, feature_result)
-      return unless on_feature_usage.respond_to?(:on_feature_usage)
       return if feature_result.source == 'override'
 
-      invoke_callback { on_feature_usage.on_feature_usage(key, feature_result) }
+      invoke_callback { on_feature_usage.on_feature_usage(key, feature_result) } if on_feature_usage.respond_to?(:on_feature_usage)
+      log_feature_evaluated(key, feature_result)
+    end
+
+    # Sent once per feature, and again only when its value changes, like the TS SDK
+    def log_feature_evaluated(key, feature_result)
+      return unless @event_logger.respond_to?(:call)
+
+      value = dedupe_value(feature_result.value)
+      return if @tracked_feature_usage[key] == value
+
+      @tracked_feature_usage[key] = value
+
+      properties = {
+        'feature'     => key,
+        'source'      => feature_result.source,
+        'value'       => feature_result.value,
+        'ruleId'      => feature_result.source == 'defaultValue' ? '$default' : feature_result.rule_id.to_s,
+        'variationId' => feature_result.experiment_result ? feature_result.experiment_result.key : ''
+      }
+      invoke_callback { @event_logger.call(Growthbook::EVENT_FEATURE_EVALUATED, properties, tracking_user_context) }
+    end
+
+    # Sent once per unit, experiment and variation, keyed like the TS SDK's getExperimentDedupeKey
+    def log_experiment_viewed(experiment, result)
+      return unless @event_logger.respond_to?(:call)
+
+      dedupe_key = "#{result.hash_attribute}#{result.hash_value}#{experiment.key}#{result.variation_id}"
+      return unless @tracked_experiments.add?(dedupe_key)
+
+      properties = {
+        'experimentId'  => experiment.key,
+        'variationId'   => result.key,
+        'hashAttribute' => result.hash_attribute,
+        'hashValue'     => result.hash_value
+      }
+      invoke_callback { @event_logger.call(Growthbook::EVENT_EXPERIMENT_VIEWED, properties, tracking_user_context) }
+    end
+
+    # Compared serialized, like the TS SDK's JSON.stringify. NaN and Infinity can't be JSON, so they
+    # fall back to inspect rather than raising out of evaluation.
+    def dedupe_value(value)
+      value.to_json
+    rescue StandardError
+      value.inspect
+    end
+
+    def tracking_user_context
+      { attributes: @attributes.dup, url: @url }
     end
 
     # Callbacks are the host app's code, often an analytics client, and a failure there must not
@@ -574,6 +648,8 @@ module Growthbook
     end
 
     def track_experiment(experiment, result)
+      log_experiment_viewed(experiment, result)
+
       return if listener.nil?
 
       invoke_callback { @listener.on_experiment_viewed(experiment, result) } if @listener.respond_to?(:on_experiment_viewed)
