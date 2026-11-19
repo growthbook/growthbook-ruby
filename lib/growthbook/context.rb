@@ -507,7 +507,15 @@ module Growthbook
       return unless on_feature_usage.respond_to?(:on_feature_usage)
       return if feature_result.source == 'override'
 
-      on_feature_usage.on_feature_usage(key, feature_result)
+      invoke_callback { on_feature_usage.on_feature_usage(key, feature_result) }
+    end
+
+    # Callbacks are the host app's code, often an analytics client, and a failure there must not
+    # break evaluation. Like the TS SDK's safeCall, the error is ignored.
+    def invoke_callback
+      yield
+    rescue StandardError
+      nil
     end
 
     def get_feature(key)
@@ -568,7 +576,7 @@ module Growthbook
     def track_experiment(experiment, result)
       return if listener.nil?
 
-      @listener.on_experiment_viewed(experiment, result) if @listener.respond_to?(:on_experiment_viewed)
+      invoke_callback { @listener.on_experiment_viewed(experiment, result) } if @listener.respond_to?(:on_experiment_viewed)
       @impressions[experiment.key] = result unless experiment.key.nil?
     end
 

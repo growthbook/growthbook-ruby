@@ -113,5 +113,7 @@ module Growthbook
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
 
     def track_feature_usage: (String, FeatureResult) -> void
+
+    def invoke_callback: () { () -> untyped } -> untyped
   end
 end
