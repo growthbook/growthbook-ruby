@@ -22,6 +22,12 @@ describe 'Growthbook::Context lifecycle' do
       expect(gb.client_key).to eq('sdk-test')
     end
 
+    it 'accepts the camelCase option name' do
+      context_options[:clientKey] = 'sdk-test'
+
+      expect(gb.client_key).to eq('sdk-test')
+    end
+
     it 'is nil when not set' do
       expect(gb.client_key).to be_nil
     end
@@ -80,16 +86,26 @@ describe 'Growthbook::Context lifecycle' do
       expect(events.map(&:first)).to eq(['Feature Evaluated', 'Experiment Viewed'] * 2)
     end
 
-    it 'keeps evaluating features' do
+    it 'keeps evaluating features, and still reports them to the event logger' do
       gb.destroy
 
       expect(gb.on?('flag')).to be(true)
+      expect(events.map(&:first)).to eq(['Feature Evaluated'])
     end
   end
 
   describe '#on_destroy' do
     it 'requires a block' do
       expect { gb.on_destroy }.to raise_error(ArgumentError)
+    end
+
+    it 'warns and ignores a block registered after destroy' do
+      calls = []
+      gb.destroy
+
+      expect { gb.on_destroy { calls << :late } }.to output(/Cannot register on_destroy callback/).to_stderr
+      gb.destroy
+      expect(calls).to be_empty
     end
   end
 

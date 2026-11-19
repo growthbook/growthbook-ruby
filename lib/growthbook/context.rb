@@ -123,7 +123,7 @@ module Growthbook
           @on_feature_usage = value
         when :event_logger
           @event_logger = value
-        when :client_key
+        when :client_key, :clientKey
           @client_key = value
         when :sticky_bucket_service
           @sticky_bucket_service = value
@@ -279,9 +279,15 @@ module Growthbook
       end
     end
 
-    # Register a block to run when the context is destroyed, e.g. to flush queued events
+    # Register a block to run when the context is destroyed, e.g. to flush queued events.
+    # On a context that is already destroyed the block would never run, so it is ignored with a warning.
     def on_destroy(&block)
       raise ArgumentError, 'on_destroy requires a block' unless block
+
+      if @destroyed
+        warn('Cannot register on_destroy callback on destroyed GrowthBook context')
+        return
+      end
 
       @destroy_callbacks << block
       nil
@@ -293,7 +299,10 @@ module Growthbook
     end
 
     # Run the #on_destroy callbacks, then release the impressions and the event dedupe history.
-    # Features can still be evaluated afterwards, but #log_event is ignored.
+    #
+    # Features can still be evaluated afterwards, as in the TS SDK. That evaluation still sends
+    # Feature Evaluated and Experiment Viewed to the event logger and starts a new dedupe history.
+    # Only #log_event and #on_destroy are ignored, so stop using the context once it is destroyed.
     def destroy
       @destroyed = true
 
