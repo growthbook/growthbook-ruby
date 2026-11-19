@@ -35,6 +35,9 @@ module Growthbook
     #   events, and any sent with #log_event
     attr_accessor :event_logger
 
+    # @return [String, nil] The SDK client key, used by plugins (e.g. to send events to GrowthBook)
+    attr_reader :client_key
+
     # @return [Hash] Map of user attributes that are used to assign variations
     attr_reader :attributes
 
@@ -86,6 +89,8 @@ module Growthbook
       @remote_group_ids = nil
       @tracked_feature_usage = {}
       @tracked_experiments = {}
+      @destroy_callbacks = []
+      @destroyed = false
 
       features = {}
       attributes = {}
@@ -118,6 +123,8 @@ module Growthbook
           @on_feature_usage = value
         when :event_logger
           @event_logger = value
+        when :client_key
+          @client_key = value
         when :sticky_bucket_service
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
@@ -255,6 +262,11 @@ module Growthbook
     # @param event_name [String] The name of the event
     # @param properties [Hash] Any properties of the event
     def log_event(event_name, properties = {})
+      if @destroyed
+        warn('Cannot log event to destroyed GrowthBook context')
+        return
+      end
+
       unless @event_logger.respond_to?(:call)
         warn('No event logger configured')
         return
@@ -265,6 +277,39 @@ module Growthbook
       rescue StandardError => e
         warn("GrowthBook event logger raised: #{e.class}: #{e.message}")
       end
+    end
+
+    # Register a block to run when the context is destroyed, e.g. to flush queued events
+    def on_destroy(&block)
+      raise ArgumentError, 'on_destroy requires a block' unless block
+
+      @destroy_callbacks << block
+      nil
+    end
+
+    # @return [true, false] Whether #destroy has been called
+    def destroyed?
+      @destroyed
+    end
+
+    # Run the #on_destroy callbacks, then release the impressions and the event dedupe history.
+    # Features can still be evaluated afterwards, but #log_event is ignored.
+    def destroy
+      @destroyed = true
+
+      # Callbacks run first, so they can still read the data cleared below
+      callbacks = @destroy_callbacks
+      @destroy_callbacks = []
+      callbacks.each do |callback|
+        callback.call
+      rescue StandardError => e
+        warn("GrowthBook on_destroy callback raised: #{e.class}: #{e.message}")
+      end
+
+      @impressions = {}
+      @tracked_feature_usage = {}
+      @tracked_experiments = {}
+      nil
     end
 
     private
