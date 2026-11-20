@@ -98,6 +98,11 @@ module Growthbook
 
     def log_event: (String event_name, ?Hash[untyped, untyped]? properties) -> void
 
+    # A plugin is called once with the context, at the end of #initialize
+    interface _Plugin
+      def call: (Context context) -> untyped
+    end
+
     def on_destroy: () { () -> untyped } -> nil
 
     def destroyed?: () -> bool
@@ -106,6 +111,8 @@ module Growthbook
 
 
     private
+
+    def apply_plugins: (Array[_Plugin] plugins) -> void
 
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
 

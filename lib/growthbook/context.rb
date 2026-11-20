@@ -95,6 +95,7 @@ module Growthbook
       features = {}
       attributes = {}
       remote_group_ids = nil
+      plugins = []
 
       options.transform_keys(&:to_sym).each do |key, value|
         case key
@@ -125,6 +126,8 @@ module Growthbook
           @event_logger = value
         when :client_key, :clientKey
           @client_key = value
+        when :plugins
+          plugins = value || []
         when :sticky_bucket_service
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
@@ -142,6 +145,7 @@ module Growthbook
       self.attributes = attributes
       self.remote_group_ids = remote_group_ids
       self.features = features
+      apply_plugins(plugins)
     end
 
     def features=(features)
@@ -322,6 +326,16 @@ module Growthbook
     end
 
     private
+
+    # Plugins run last, once the context is fully set up. Like in the TS SDK, an error raised by a
+    # plugin is not rescued: a broken plugin should fail loudly when the context is created.
+    def apply_plugins(plugins)
+      plugins.each do |plugin|
+        raise ArgumentError, "GrowthBook plugin must respond to #call, got #{plugin.class}" unless plugin.respond_to?(:call)
+
+        plugin.call(self)
+      end
+    end
 
     def _eval_prereqs(parent_conditions, stack)
       parent_conditions.each do |parent_condition|
