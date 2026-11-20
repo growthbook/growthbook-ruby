@@ -112,7 +112,7 @@ module Growthbook
 
     private
 
-    def apply_plugins: (Array[_Plugin] plugins) -> void
+    def apply_plugins: (untyped plugins) -> void
 
     def _run: (InlineExperiment exp, ?::String | Symbol feature_id) -> InlineExperimentResult
 

@@ -327,13 +327,21 @@ module Growthbook
 
     private
 
-    # Plugins run last, once the context is fully set up. Like in the TS SDK, an error raised by a
-    # plugin is not rescued: a broken plugin should fail loudly when the context is created.
+    # Plugins run last, once the context is fully set up. The whole list is checked before any
+    # plugin runs. Like in the TS SDK, an error raised by a plugin propagates, so a broken plugin
+    # fails loudly when the context is created; the context is destroyed first, so the plugins
+    # that already ran can release what they started (threads, queues) in their on_destroy.
     def apply_plugins(plugins)
-      plugins.each do |plugin|
-        raise ArgumentError, "GrowthBook plugin must respond to #call, got #{plugin.class}" unless plugin.respond_to?(:call)
+      raise ArgumentError, "GrowthBook plugins must be an Array, got #{plugins.class}" unless plugins.is_a?(Array)
 
-        plugin.call(self)
+      invalid = plugins.reject { |plugin| plugin.respond_to?(:call) }
+      raise ArgumentError, "GrowthBook plugin must respond to #call, got #{invalid.first.class}" unless invalid.empty?
+
+      begin
+        plugins.each { |plugin| plugin.call(self) }
+      rescue Exception # rubocop:disable Lint/RescueException
+        destroy
+        raise
       end
     end
 
