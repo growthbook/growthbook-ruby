@@ -57,14 +57,19 @@ GROWTHBOOK_TRACKING = Growthbook::Plugins::Tracking.new
 # per request
 gb = Growthbook::Context.new(
   client_key: ENV.fetch('GROWTHBOOK_CLIENT_KEY'),
-  attributes: { id: current_user_id },
+  attributes: { id: current_user_id.to_s },
   features: features,
   plugins: [GROWTHBOOK_TRACKING]
 )
 ```
 
-Events are queued and sent in batches from a background thread, deduplicated across contexts, and
-flushed when a context is destroyed and at exit. The plugin is thread-safe and fork-safe.
+Identity attributes (`id`, `user_id`, `device_id`, `anonymous_id`, `page_id`, `session_id`) are
+only sent when they are Strings, as in the other GrowthBook SDKs. Convert numeric ids with `to_s`,
+or events reach GrowthBook without a user.
+
+Events are queued and sent in batches from a background thread over one kept-alive connection,
+deduplicated across contexts, and flushed at exit. The plugin is thread-safe and fork-safe. Don't
+create a new plugin per context: each one has its own queue and thread.
 
 | Option | Default | |
 | --- | --- | --- |

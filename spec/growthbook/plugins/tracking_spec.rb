@@ -246,14 +246,58 @@ describe Growthbook::Plugins::Tracking do
       expect(requests.length).to eq(1)
     end
 
-    it 'sends right away when the context is destroyed' do
+    it 'leaves the batch to the worker when a context is destroyed' do
       gb = context
       gb.on?('flag')
 
       gb.destroy
-      wait_for_request
+      sleep(0.05)
 
-      expect(requests.length).to eq(1)
+      expect(requests).to be_empty
+      expect(sent_events.length).to eq(1)
+    end
+
+    it 'reuses one connection for several batches' do
+      allow(Net::HTTP).to receive(:new).and_call_original
+      gb = context
+
+      gb.log_event('One')
+      tracker.flush
+      gb.log_event('Two')
+      tracker.flush
+
+      expect(requests.length).to eq(2)
+      expect(Net::HTTP).to have_received(:new).once
+    end
+
+    it 'opens a new connection after a failed request' do
+      stub_request(:post, endpoint).to_raise(Errno::ECONNRESET).then.to_return(status: 200)
+      allow(Net::HTTP).to receive(:new).and_call_original
+      gb = context
+
+      gb.log_event('One')
+      expect { tracker.flush }.to output(/Errno::ECONNRESET/).to_stderr
+      gb.log_event('Two')
+      tracker.flush
+
+      expect(Net::HTTP).to have_received(:new).twice
+    end
+
+    it 'stops an idle worker and starts a new one with the next event' do
+      stub_const('Growthbook::Plugins::Tracking::WORKER_IDLE_TIMEOUT', 0.05)
+      tracker_options[:queue_flush_interval] = 0.01
+      gb = context
+
+      gb.log_event('One')
+      wait_for_request
+      tracker.instance_variable_get(:@worker)&.join(2)
+      expect(tracker.instance_variable_get(:@worker)).to be_nil
+
+      gb.log_event('Two')
+      deadline = Time.now + 2
+      sleep(0.01) while requests.length < 2 && Time.now < deadline
+
+      expect(requests.length).to eq(2)
     end
 
     it 'sends queued events with flush' do
@@ -294,6 +338,23 @@ describe Growthbook::Plugins::Tracking do
       gb.on?('flag')
 
       expect(sent_events).to be_empty
+    end
+  end
+
+  describe 'instances' do
+    it 'warns when too many are created, as when one is made per context' do
+      count = described_class.instance_variable_get(:@instance_count)
+      stub_const('Growthbook::Plugins::Tracking::INSTANCE_WARNING_THRESHOLD', count + 1)
+
+      expect { described_class.new }.to output(/create one per process/).to_stderr
+    end
+
+    it 'are all flushed by shutdown_all, which runs at exit' do
+      context.log_event('Queued')
+
+      described_class.shutdown_all
+
+      expect(requests.length).to eq(1)
     end
   end
 

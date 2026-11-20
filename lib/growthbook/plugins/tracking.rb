@@ -15,9 +15,11 @@ module Growthbook
     #   TRACKING = Growthbook::Plugins::Tracking.new
     #   gb = Growthbook::Context.new(client_key: 'sdk-abc123', features: features, plugins: [TRACKING])
     #
-    # The instance owns a queue and a background thread that sends the queued events in batches,
-    # so a Context per request doesn't start a thread per request. It is thread-safe, survives
-    # a fork (the child starts its own queue and thread) and flushes the queue at exit.
+    # The instance owns a queue and a background thread that sends the queued events in batches
+    # over one kept-alive connection, so a Context per request doesn't start a thread or a
+    # connection per request. It is thread-safe, survives a fork (the child starts its own queue
+    # and thread) and flushes the queue at exit. The thread stops after WORKER_IDLE_TIMEOUT
+    # seconds without events and starts again with the next one.
     #
     # Every attribute of the user is sent to the ingestor (see #initialize for the identity
     # fields). Use event_filter, or leave attributes out of the Context, to keep data you must
@@ -41,6 +43,39 @@ module Growthbook
       TOP_LEVEL_ATTRIBUTES = (IDENTITY_ATTRIBUTES + OPTIONAL_FIELDS.values).freeze
 
       DEDUPED_EVENTS = [Growthbook::EVENT_FEATURE_EVALUATED, Growthbook::EVENT_EXPERIMENT_VIEWED].freeze
+
+      # Seconds without events after which the background thread stops
+      WORKER_IDLE_TIMEOUT = 30
+
+      # Creating this many instances means one is made per context instead of once per process
+      INSTANCE_WARNING_THRESHOLD = 100
+
+      # Instances are held weakly, so one that is no longer used can be garbage-collected; a
+      # single at_exit hook flushes the rest
+      @instances = ObjectSpace::WeakMap.new
+      @instance_count = 0
+      @registry_mutex = Mutex.new
+
+      class << self
+        # @private Called by #initialize
+        def register(instance)
+          @registry_mutex.synchronize do
+            @instances[instance] = true
+            @instance_count += 1
+            warn("#{INSTANCE_WARNING_THRESHOLD} GrowthBook tracking plugins created: create one per process and pass it to every Context") if @instance_count == INSTANCE_WARNING_THRESHOLD
+          end
+        end
+
+        # Shut down every instance that is still alive. Runs at exit.
+        def shutdown_all
+          instances = @registry_mutex.synchronize { @instances.keys }
+          instances.each(&:shutdown)
+        end
+      end
+
+      # Registered when the gem is loaded, so it runs after the at_exit hooks the app registers
+      # later, and events they track are still sent
+      at_exit { shutdown_all }
 
       # @param ingestor_host [String] Where events are sent, as "#{ingestor_host}/track"
       # @param queue_flush_interval [Numeric] Seconds to collect events before sending them as one batch
@@ -74,6 +109,8 @@ module Growthbook
         @ingestor_host = (ingestor_host || DEFAULT_INGESTOR_HOST).to_s.chomp('/')
         raise ArgumentError, "ingestor_host must be an http(s) URL, got #{@ingestor_host.inspect}" unless @ingestor_host.match?(%r{\Ahttps?://[^/]})
 
+        @ingestor_uri = URI(@ingestor_host)
+
         @queue_flush_interval = queue_flush_interval
         @enable = enable
         @enable_feature_usage_events = enable_feature_usage_events
@@ -87,7 +124,7 @@ module Growthbook
         @dedupe_cache = {}
         @stopped = false
         reset_queue
-        at_exit { shutdown }
+        Tracking.register(self)
       end
 
       # Plugin entry point: send the events of this context to the ingestor
@@ -97,10 +134,11 @@ module Growthbook
         client_key = context.client_key.to_s
         raise ArgumentError, 'client_key must be specified to use event logging' if client_key.empty?
 
+        # Unlike TS, nothing is sent on Context#destroy: with a context per request that would
+        # send a request per request. The queue is shared, so the batch goes out on schedule.
         context.event_logger = lambda do |event_name, properties, user_context|
           track(client_key, event_name, properties, user_context)
         end
-        context.on_destroy { flush_soon }
         nil
       end
 
@@ -156,6 +194,8 @@ module Growthbook
         end
         worker&.join(timeout)
         flush
+        @send_mutex.synchronize { close_connection }
+        nil
       end
 
       private
@@ -166,8 +206,10 @@ module Growthbook
         @wakeup = ConditionVariable.new
         @queue = []
         @worker = nil
-        @flush_now = false
         @dropping = false
+        @send_mutex = Mutex.new
+        # Dropped, not closed: after a fork the socket still belongs to the parent
+        @http = nil
       end
 
       # A forked child gets a copy of the queue and of a mutex that a parent thread may hold, but
@@ -269,42 +311,62 @@ module Growthbook
 
       def run_worker
         loop do
-          @mutex.synchronize do
-            @wakeup.wait(@mutex) while @queue.empty? && !@stopped
-            @wakeup.wait(@mutex, @queue_flush_interval) unless @stopped || @flush_now
-            @flush_now = false
+          idle = @mutex.synchronize do
+            @wakeup.wait(@mutex, WORKER_IDLE_TIMEOUT) if @queue.empty? && !@stopped
+            if @queue.empty?
+              # Nothing to send: stop, and let the next event start a new thread
+              @worker = nil
+              true
+            else
+              @wakeup.wait(@mutex, @queue_flush_interval) unless @stopped
+              false
+            end
           end
+          break if idle
+
           flush
-          break if @mutex.synchronize { @stopped && @queue.empty? }
         end
       rescue StandardError => e
+        @mutex.synchronize { @worker = nil }
         warn("GrowthBook tracking worker stopped: #{e.class}")
       end
 
-      # Ask the worker to send the queue without waiting for the rest of the batch window
-      def flush_soon
-        @mutex.synchronize do
-          unless @queue.empty?
-            @flush_now = true
-            @wakeup.signal
-          end
+      def send_events(client_key, events)
+        path = "#{@ingestor_uri.path}/track?client_key=#{URI.encode_www_form_component(client_key)}"
+        request = Net::HTTP::Post.new(path, 'Accept' => 'application/json', 'Content-Type' => 'text/plain')
+        request.body = "[#{events.join(',')}]"
+
+        # One connection, kept alive between batches; the worker, #flush and #shutdown take turns
+        @send_mutex.synchronize do
+          response = connection.request(request)
+          warn("GrowthBook tracking failed: HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+        rescue StandardError => e
+          close_connection
+          # Only the class: the message can contain the request body, and so user data
+          warn("GrowthBook tracking failed: #{e.class}")
         end
       end
 
-      def send_events(client_key, events)
-        uri = URI("#{@ingestor_host}/track?client_key=#{URI.encode_www_form_component(client_key)}")
-        http = Net::HTTP.new(uri.host.to_s, uri.port)
-        http.use_ssl = uri.scheme == 'https'
+      # Called with @send_mutex held
+      def connection
+        http = @http
+        return http if http&.started?
+
+        http = Net::HTTP.new(@ingestor_uri.host.to_s, @ingestor_uri.port)
+        http.use_ssl = @ingestor_uri.scheme == 'https'
         http.open_timeout = @http_timeout
         http.read_timeout = @http_timeout
+        http.start
+        @http = http
+      end
 
-        request = Net::HTTP::Post.new(uri.request_uri, 'Accept' => 'application/json', 'Content-Type' => 'text/plain')
-        request.body = "[#{events.join(',')}]"
-        response = http.request(request)
-        warn("GrowthBook tracking failed: HTTP #{response.code}") unless response.is_a?(Net::HTTPSuccess)
-      rescue StandardError => e
-        # Only the class: the message can contain the request body, and so user data
-        warn("GrowthBook tracking failed: #{e.class}")
+      # Called with @send_mutex held
+      def close_connection
+        http = @http
+        @http = nil
+        http.finish if http&.started?
+      rescue IOError, SystemCallError
+        nil
       end
     end
   end
