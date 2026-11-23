@@ -276,4 +276,30 @@ describe 'test suite' do
       end
     end
   end
+
+  describe 'savedGroupReferencesRemote' do
+    remote = test_cases['savedGroupReferencesRemote']
+
+    describe 'evalCondition' do
+      remote['evalCondition'].each do |test_case|
+        test_name, condition, attributes, expected, saved_groups = test_case
+
+        it test_name do
+          result = Growthbook::Conditions.eval_condition(attributes, condition, saved_groups || {})
+          expect(result).to eq(expected)
+        end
+      end
+    end
+
+    describe 'feature' do
+      remote['feature'].each do |test_case|
+        test_name, context, key, expected = test_case
+
+        it test_name do
+          gb = Growthbook::Context.new(context)
+          expect(gb.eval_feature(key).to_json).to eq(expected)
+        end
+      end
+    end
+  end
 end

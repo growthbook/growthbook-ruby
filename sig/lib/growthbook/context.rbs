@@ -31,6 +31,11 @@ module Growthbook
 
     attr_reader saved_groups: Hash[String, untyped]
 
+    # The remote saved groups the user is in, resolved by the app. nil means unresolved.
+    attr_reader remote_group_ids: Array[String]?
+
+    @condition_attributes: Hash[String, untyped]
+
     attr_reader sticky_bucket_service: Growthbook::StickyBucketService
 
     attr_reader sticky_bucket_identifier_attributes: Array[String]
@@ -46,6 +51,13 @@ module Growthbook
     def features=: (Hash[String | Symbol, untyped] features) -> void
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
+
+    def remote_group_ids=: (Array[String]? ids) -> Hash[String, untyped]
+
+    def saved_groups=: (Hash[String, untyped]? saved_groups) -> Hash[String, untyped]
+
+    # Looks up the user's remote saved groups with resolver and sets them as remote_group_ids
+    def add_remote_saved_groups: (RemoteSavedGroups::_Resolver resolver) -> Context
 
     def forced_variations=: (Hash[String | Symbol, Integer] forced_variations) -> Hash[String, Integer]
 
