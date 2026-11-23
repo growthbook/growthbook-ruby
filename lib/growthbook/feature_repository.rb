@@ -1,11 +1,31 @@
 # frozen_string_literal: true
 
+require 'digest'
 require 'net/http'
 require 'uri'
 
 module Growthbook
   # Optional class for fetching features from the GrowthBook API
   class FeatureRepository
+    DEFAULT_CACHE_MUTEX = Mutex.new
+    private_constant :DEFAULT_CACHE_MUTEX
+
+    class << self
+      # Cache shared by every repository that was not given one explicitly.
+      #
+      # Repositories are usually built per request, so a per-instance cache
+      # would be empty on every fetch and the TTL would never take effect.
+      def default_cache
+        DEFAULT_CACHE_MUTEX.synchronize { @default_cache ||= Growthbook::InMemoryFeatureCache.new }
+      end
+
+      # Mainly useful in tests, where a shared cache otherwise leaks payloads
+      # between examples
+      def default_cache=(cache)
+        DEFAULT_CACHE_MUTEX.synchronize { @default_cache = cache }
+      end
+    end
+
     # [String] The SDK endpoint
     attr_reader :endpoint
 
@@ -18,14 +38,30 @@ module Growthbook
     # Parsed saved groups JSON (used by the $inGroup/$notInGroup operators)
     attr_reader :saved_groups_json
 
-    def initialize(endpoint:, decryption_key:)
+    # [Integer, nil] Seconds a fetched payload stays cached (nil = never expires)
+    attr_reader :ttl
+
+    def initialize(endpoint:, decryption_key:, ttl: 60, cache: nil)
       @endpoint = endpoint
       @decryption_key = decryption_key
       @features_json = {}
       @saved_groups_json = {}
+      @ttl = ttl
+      # false disables caching outright; nil means "no preference", which is the shared default
+      @cache = cache == false ? Growthbook::FeatureCache.new : cache || self.class.default_cache
     end
 
-    def fetch
+    # @param force [true, false] Skip the cached entry and refetch, overwriting it. The supported
+    #   way to get a fresh payload, including past an entry another repository wrote to the
+    #   shared cache - a repository's own ttl governs what it writes, not what it reads.
+    def fetch(force: false)
+      cached = force ? nil : @cache.get(cache_key)
+      unless cached.nil?
+        @features_json = cached['features']
+        @saved_groups_json = cached['savedGroups']
+        return @features_json
+      end
+
       uri = URI(endpoint)
       res = Net::HTTP.get_response(uri)
 
@@ -33,11 +69,9 @@ module Growthbook
 
       return nil if response.nil?
 
-      if use_decryption?
-        parsed_decrypted_response
-      else
-        parsed_plain_text_response
-      end
+      result = use_decryption? ? parsed_decrypted_response : parsed_plain_text_response
+      @cache.set(cache_key, { 'features' => @features_json, 'savedGroups' => @saved_groups_json }, @ttl) unless result.nil?
+      result
     rescue StandardError
       nil
     end
@@ -45,7 +79,9 @@ module Growthbook
     def fetch!
       fetch
 
-      raise FeatureFetchError if response.nil?
+      # A cache hit populates features_json without an HTTP response, so only
+      # treat a missing response as a fetch error when we also have no features
+      raise FeatureFetchError if response.nil? && (features_json.nil? || features_json.empty?)
       raise FeatureParseError if features_json.nil? || features_json.empty?
 
       features_json
@@ -54,6 +90,18 @@ module Growthbook
     private
 
     attr_reader :response
+
+    # The decryption key is part of the key because the cache is shared: two
+    # repositories on the same endpoint with different keys store different
+    # payloads, and keying on the endpoint alone would let one serve the other's
+    # entry - including handing an undecrypted, empty payload to the repository
+    # that does have a key. Digested so the key itself is never part of a cache
+    # key that might be inspected or logged.
+    def cache_key
+      return endpoint if decryption_key.nil?
+
+      "#{endpoint}||#{Digest::SHA256.hexdigest(decryption_key)}"
+    end
 
     def use_decryption?
       !decryption_key.nil?
