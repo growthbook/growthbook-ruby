@@ -950,12 +950,12 @@ also an operator on a value</p>
       <pre class="lines">
 
 
-222
-223
-224</pre>
+232
+233
+234</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 222</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 232</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_decided?'>decided?</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>TrueClass</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>FalseClass</span><span class='rparen'>)</span>
@@ -980,16 +980,6 @@ also an operator on a value</p>
       <pre class="lines">
 
 
-304
-305
-306
-307
-308
-309
-310
-311
-312
-313
 314
 315
 316
@@ -997,10 +987,20 @@ also an operator on a value</p>
 318
 319
 320
-321</pre>
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 304</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 314</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_elem_match'>elem_match</span><span class='lparen'>(</span><span class='id identifier rubyid_condition'>condition</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Array</span>
@@ -1086,26 +1086,26 @@ also an operator on a value</p>
       <pre class="lines">
 
 
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
 359
 360
 361
 362
 363
 364
-365</pre>
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 349</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 359</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_eval_compare_operator'>eval_compare_operator</span><span class='lparen'>(</span><span class='id identifier rubyid_operator'>operator</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_condition_value'>condition_value</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_operator'>operator</span>
@@ -1256,16 +1256,6 @@ operator or saved group type this SDK doesn't support</p>
       <pre class="lines">
 
 
-271
-272
-273
-274
-275
-276
-277
-278
-279
-280
 281
 282
 283
@@ -1277,10 +1267,20 @@ operator or saved group type this SDK doesn't support</p>
 289
 290
 291
-292</pre>
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 271</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_eval_condition_value'>eval_condition_value</span><span class='lparen'>(</span><span class='id identifier rubyid_condition_value'>condition_value</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='comma'>,</span> <span class='label'>insensitive:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_condition_value'>condition_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_operator_object?'>operator_object?</span><span class='lparen'>(</span><span class='id identifier rubyid_condition_value'>condition_value</span><span class='rparen'>)</span>
@@ -1324,16 +1324,6 @@ operator or saved group type this SDK doesn't support</p>
       <pre class="lines">
 
 
-407
-408
-409
-410
-411
-412
-413
-414
-415
-416
 417
 418
 419
@@ -1403,10 +1393,20 @@ operator or saved group type this SDK doesn't support</p>
 483
 484
 485
-486</pre>
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 407</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 417</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_eval_operator_condition'>eval_operator_condition</span><span class='lparen'>(</span><span class='id identifier rubyid_operator'>operator</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_condition_value'>condition_value</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_operator'>operator</span>
@@ -1555,9 +1555,10 @@ operator or saved group type this SDK doesn't support</p>
 </h3><div class="docstring">
   <div class="discussion">
     <p>Resolves a <code>$savedGroup</code> reference. Anything unrecognized matches nobody.
-With prune, an unknown attribute leaves a list group undecided (nil), and a
-condition group is pruned rather than evaluated. With keep_malformed, a
-condition group that raises while pruning is returned as written.</p>
+With prune, an unknown attribute leaves a list group undecided (nil), unknown
+remote group ids leave a remote group undecided, and a condition group is
+pruned rather than evaluated. With keep_malformed, a condition group that
+raises while pruning is returned as written.</p>
 
   </div>
 </div>
@@ -1570,7 +1571,6 @@ condition group that raises while pruning is returned as written.</p>
       <pre class="lines">
 
 
-126
 127
 128
 129
@@ -1604,10 +1604,20 @@ condition group that raises while pruning is returned as written.</p>
 157
 158
 159
-160</pre>
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 126</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 127</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_eval_saved_group'>eval_saved_group</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_reference'>reference</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='comma'>,</span> <span class='label'>prune:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>keep_malformed:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_reference'>reference</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -1632,6 +1642,15 @@ condition group that raises while pruning is returned as written.</p>
     <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_prune'>prune</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_known?'>known?</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
 
     <span class='id identifier rubyid_in?'>in?</span><span class='lparen'>(</span><span class='id identifier rubyid_get_path'>get_path</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>values</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>remote</span><span class='tstring_end'>&#39;</span></span>
+    <span class='comment'># The ids live outside the payload: the user&#39;s groups arrive resolved, in
+</span>    <span class='comment'># the __gb_remoteGroupIds attribute. Another attribute needs a derived
+</span>    <span class='comment'># group, which isn&#39;t supported yet.
+</span>    <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_reference'>reference</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>attributeKey</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attribute_key'>attribute_key</span> <span class='op'>!=</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>attributeKey</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+    <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_prune'>prune</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_known?'>known?</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RemoteSavedGroups.html#ATTRIBUTE-constant" title="Growthbook::RemoteSavedGroups::ATTRIBUTE (constant)">ATTRIBUTE</a></span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_group_ids'>group_ids</span> <span class='op'>=</span> <span class='id identifier rubyid_get_path'>get_path</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RemoteSavedGroups.html#ATTRIBUTE-constant" title="Growthbook::RemoteSavedGroups::ATTRIBUTE (constant)">ATTRIBUTE</a></span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_group_ids'>group_ids</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_group_ids'>group_ids</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>condition</span><span class='tstring_end'>&#39;</span></span>
     <span class='comment'># A condition group has no single attribute, so any override is ignored
 </span>    <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>condition</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -1673,24 +1692,24 @@ condition group that raises while pruning is returned as written.</p>
       <pre class="lines">
 
 
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
 343
 344
 345
 346
-347</pre>
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 333</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 343</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_eval_version_operator'>eval_version_operator</span><span class='lparen'>(</span><span class='id identifier rubyid_operator'>operator</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_condition_value'>condition_value</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_operator'>operator</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>$vne</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_orderable?'>orderable?</span><span class='lparen'>(</span><span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_condition_value'>condition_value</span><span class='rparen'>)</span>
@@ -1727,16 +1746,6 @@ condition group that raises while pruning is returned as written.</p>
       <pre class="lines">
 
 
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
 259
 260
 261
@@ -1747,10 +1756,20 @@ condition group that raises while pruning is returned as written.</p>
 266
 267
 268
-269</pre>
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 249</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 259</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_path'>get_path</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
@@ -1793,19 +1812,19 @@ condition group that raises while pruning is returned as written.</p>
       <pre class="lines">
 
 
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247</pre>
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 238</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 248</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_type'>get_type</span><span class='lparen'>(</span><span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>string</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>String</span>
@@ -1862,19 +1881,19 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-536
-537
-538
-539
-540
-541
-542
-543
-544
-545</pre>
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 536</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 546</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_in?'>in?</span><span class='lparen'>(</span><span class='id identifier rubyid_actual'>actual</span><span class='comma'>,</span> <span class='id identifier rubyid_expected'>expected</span><span class='comma'>,</span> <span class='label'>insensitive:</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_expected'>expected</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -1928,16 +1947,6 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-488
-489
-490
-491
-492
-493
-494
-495
-496
-497
 498
 499
 500
@@ -1949,10 +1958,20 @@ everything but arrays and objects.</p>
 506
 507
 508
-509</pre>
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 488</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 498</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_in_all?'>in_all?</span><span class='lparen'>(</span><span class='id identifier rubyid_condition_values'>condition_values</span><span class='comma'>,</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='comma'>,</span> <span class='id identifier rubyid_insensitive'>insensitive</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attribute_value'>attribute_value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Array</span>
@@ -2005,17 +2024,17 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-295
-296
-297
-298
-299
-300
-301
-302</pre>
+305
+306
+307
+308
+309
+310
+311
+312</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 295</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 305</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_js_json'>js_json</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_value'>value</span>
@@ -2067,12 +2086,12 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-227
-228
-229</pre>
+237
+238
+239</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 227</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 237</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_known?'>known?</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='op'>!</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -2158,12 +2177,12 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-403
-404
-405</pre>
+413
+414
+415</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 403</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 413</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_new_group_type?'>new_group_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='qwords_beg'>%w[</span><span class='tstring_content'>list</span><span class='words_sep'> </span><span class='tstring_content'>condition</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -2210,12 +2229,12 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-328
-329
-330</pre>
+338
+339
+340</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 328</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 338</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_number?'>number?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Integer</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Float</span><span class='rparen'>)</span>
@@ -2262,15 +2281,15 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-231
-232
-233
-234
-235
-236</pre>
+241
+242
+243
+244
+245
+246</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 231</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 241</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_operator_object?'>operator_object?</span><span class='lparen'>(</span><span class='id identifier rubyid_obj'>obj</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_obj'>obj</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid__value'>_value</span><span class='op'>|</span>
@@ -2320,12 +2339,12 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-324
-325
-326</pre>
+334
+335
+336</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 324</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 334</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_orderable?'>orderable?</span><span class='lparen'>(</span><span class='id identifier rubyid_val1'>val1</span><span class='comma'>,</span> <span class='id identifier rubyid_val2'>val2</span><span class='rparen'>)</span>
   <span class='lparen'>(</span><span class='id identifier rubyid_number?'>number?</span><span class='lparen'>(</span><span class='id identifier rubyid_val1'>val1</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_number?'>number?</span><span class='lparen'>(</span><span class='id identifier rubyid_val2'>val2</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lparen'>(</span><span class='id identifier rubyid_val1'>val1</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_val2'>val2</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -2350,16 +2369,6 @@ everything but arrays and objects.</p>
       <pre class="lines">
 
 
-511
-512
-513
-514
-515
-516
-517
-518
-519
-520
 521
 522
 523
@@ -2369,10 +2378,20 @@ everything but arrays and objects.</p>
 527
 528
 529
-530</pre>
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 511</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 521</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_padded_version_string'>padded_version_string</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
   <span class='comment'># Format numbers like JS does (2.0 -&gt; &quot;2&quot;, 0.000002 -&gt; &quot;0.000002&quot;); treat empty input as version 0
@@ -2509,16 +2528,6 @@ every branch that is already decided.</p>
       <pre class="lines">
 
 
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
 180
 181
 182
@@ -2538,10 +2547,20 @@ every branch that is already decided.</p>
 196
 197
 198
-199</pre>
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 170</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 180</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_prune_entries'>prune_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_condition'>condition</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_out'>out</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -2616,26 +2635,26 @@ the list's result once there are none.</p>
       <pre class="lines">
 
 
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
 213
 214
 215
 216
 217
 218
-219</pre>
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 203</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 213</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_prune_list'>prune_list</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_conditions'>conditions</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='comma'>,</span> <span class='label'>or_list:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>expected an array of conditions</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_conditions'>conditions</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span>
@@ -2715,16 +2734,16 @@ every branch that is already decided. A malformed condition group stays as writt
       <pre class="lines">
 
 
-162
-163
-164
-165
-166
-167
-168</pre>
+172
+173
+174
+175
+176
+177
+178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 172</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_prune_with_context'>prune_with_context</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_condition'>condition</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_prune_entries'>prune_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_condition'>condition</span><span class='comma'>,</span> <span class='id identifier rubyid_ctx'>ctx</span><span class='rparen'>)</span>
@@ -2763,22 +2782,22 @@ the values of a typed list entry. nil when it has no values to check.</p>
       <pre class="lines">
 
 
-388
-389
-390
-391
-392
-393
-394
-395
-396
-397
 398
 399
-400</pre>
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 388</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 398</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_saved_group_values'>saved_group_values</span><span class='lparen'>(</span><span class='id identifier rubyid_saved_groups'>saved_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
   <span class='comment'># An unknown id has always behaved like an empty list. A malformed entry
@@ -2823,16 +2842,16 @@ value afterwards. Used for testing invalid regexes.</p>
       <pre class="lines">
 
 
-549
-550
-551
-552
-553
-554
-555</pre>
+559
+560
+561
+562
+563
+564
+565</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 549</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 559</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_silence_warnings'>silence_warnings</span>
   <span class='id identifier rubyid_old_verbose'>old_verbose</span> <span class='op'>=</span> <span class='gvar'>$VERBOSE</span>
@@ -2885,14 +2904,14 @@ compare by reference, so two parsed from JSON are never equal</p>
       <pre class="lines">
 
 
-380
-381
-382
-383
-384</pre>
+390
+391
+392
+393
+394</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 380</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 390</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_strict_equal?'>strict_equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_val1'>val1</span><span class='comma'>,</span> <span class='id identifier rubyid_val2'>val2</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_val1'>val1</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_val1'>val1</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_val2'>val2</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_val2'>val2</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -2930,15 +2949,15 @@ compare in that order.</p>
       <pre class="lines">
 
 
-370
-371
-372
-373
-374
-375</pre>
+380
+381
+382
+383
+384
+385</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 370</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/conditions.rb', line 380</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_utf16_units'>utf16_units</span><span class='lparen'>(</span><span class='id identifier rubyid_val1'>val1</span><span class='comma'>,</span> <span class='id identifier rubyid_val2'>val2</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='id identifier rubyid_val1'>val1</span><span class='comma'>,</span> <span class='id identifier rubyid_val2'>val2</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_val1'>val1</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_val2'>val2</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span>
@@ -2956,7 +2975,7 @@ compare in that order.</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Nov  2 22:31:12 2026 by
+  Generated on Mon Nov 23 18:52:27 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-3.2.11).
 </div>

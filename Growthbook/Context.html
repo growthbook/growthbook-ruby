@@ -348,7 +348,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#saved_groups-instance_method" title="#saved_groups (instance method)">#<strong>saved_groups</strong>  &#x21d2; Hash[String, Array] </a>
+      <a href="#remote_group_ids-instance_method" title="#remote_group_ids (instance method)">#<strong>remote_group_ids</strong>  &#x21d2; Array&lt;String&gt;<sup>?</sup> </a>
     
 
     
@@ -357,7 +357,30 @@
   
   
     
-      <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The remote saved groups the user is in, resolved by the app.</p></div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#saved_groups-instance_method" title="#saved_groups (instance method)">#<strong>saved_groups</strong>  &#x21d2; Hash[String, Array] </a>
+    
+
+    
+  </span>
+  
+  
+  
     
     
   
@@ -548,6 +571,28 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#add_remote_saved_groups-instance_method" title="#add_remote_saved_groups (instance method)">#<strong>add_remote_saved_groups</strong>(resolver)  &#x21d2; Growthbook::Context </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Looks up the user's remote saved groups with resolver and sets them as #remote_group_ids.</p></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#eval_feature-instance_method" title="#eval_feature (instance method)">#<strong>eval_feature</strong>(key)  &#x21d2; Object </a>
     
 
@@ -710,11 +755,6 @@
       <pre class="lines">
 
 
-56
-57
-58
-59
-60
 61
 62
 63
@@ -763,10 +803,20 @@
 106
 107
 108
-109</pre>
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='ivar'>@features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -778,9 +828,11 @@
   <span class='ivar'>@impressions</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='ivar'>@sticky_bucket_assignment_docs</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='ivar'>@saved_groups</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@remote_group_ids</span> <span class='op'>=</span> <span class='kw'>nil</span>
 
   <span class='id identifier rubyid_features'>features</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span> <span class='op'>=</span> <span class='kw'>nil</span>
 
   <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_transform_keys'>transform_keys</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
     <span class='kw'>case</span> <span class='id identifier rubyid_key'>key</span>
@@ -813,6 +865,8 @@
       <span class='ivar'>@sticky_bucket_identifier_attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
     <span class='kw'>when</span> <span class='symbol'>:saved_groups</span><span class='comma'>,</span> <span class='symbol'>:savedGroups</span>
       <span class='ivar'>@saved_groups</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>when</span> <span class='symbol'>:remote_group_ids</span><span class='comma'>,</span> <span class='symbol'>:remoteGroupIds</span>
+      <span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
     <span class='kw'>else</span>
       <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown context option: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='kw'>end</span>
@@ -820,6 +874,7 @@
 
   <span class='ivar'>@using_derived_sticky_bucket_attributes</span> <span class='op'>=</span> <span class='op'>!</span><span class='ivar'>@sticky_bucket_identifier_attributes</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span> <span class='op'>=</span> <span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_features'>features</span> <span class='op'>=</span> <span class='id identifier rubyid_features'>features</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1346,11 +1401,72 @@
 </div>
     
       
-      <span id=""></span>
+      <span id="remote_group_ids=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="remote_group_ids-instance_method">
+  
+    #<strong>remote_group_ids</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The remote saved groups the user is in, resolved by the app.
+nil means unresolved, which is not the same as no groups: rules using remote
+groups then fail, &quot;not in group&quot; included. See #add_remote_saved_groups.</p>
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The remote saved groups the user is in, resolved by the app.
+nil means unresolved, which is not the same as no groups: rules using remote
+groups then fail, &quot;not in group&quot; included. See #add_remote_saved_groups.</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span>
+  <span class='ivar'>@remote_group_ids</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="saved_groups=-instance_method"></span>
       <div class="method_details ">
   <h3 class="signature " id="saved_groups-instance_method">
   
-    #<strong>saved_groups</strong>  &#x21d2; <tt>Hash[String, Array]</tt>  <span class="extras">(readonly)</span>
+    #<strong>saved_groups</strong>  &#x21d2; <tt>Hash[String, Array]</tt> 
   
 
   
@@ -1444,12 +1560,12 @@
       <pre class="lines">
 
 
-48
-49
-50</pre>
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 53</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_assignment_docs'>sticky_bucket_assignment_docs</span>
   <span class='ivar'>@sticky_bucket_assignment_docs</span>
@@ -1501,12 +1617,12 @@
       <pre class="lines">
 
 
-54
-55
-56</pre>
+59
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_attributes'>sticky_bucket_attributes</span>
   <span class='ivar'>@sticky_bucket_attributes</span>
@@ -1558,12 +1674,12 @@
       <pre class="lines">
 
 
-45
-46
-47</pre>
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_identifier_attributes'>sticky_bucket_identifier_attributes</span>
   <span class='ivar'>@sticky_bucket_identifier_attributes</span>
@@ -1615,12 +1731,12 @@
       <pre class="lines">
 
 
-42
-43
-44</pre>
+47
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 47</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sticky_bucket_service'>sticky_bucket_service</span>
   <span class='ivar'>@sticky_bucket_service</span>
@@ -1729,12 +1845,12 @@
       <pre class="lines">
 
 
-51
-52
-53</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_using_derived_sticky_bucket_attributes'>using_derived_sticky_bucket_attributes</span>
   <span class='ivar'>@using_derived_sticky_bucket_attributes</span>
@@ -1752,7 +1868,128 @@
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="eval_feature-instance_method">
+  <h3 class="signature first" id="add_remote_saved_groups-instance_method">
+  
+    #<strong>add_remote_saved_groups</strong>(resolver)  &#x21d2; <tt><span class='object_link'><a href="" title="Growthbook::Context (class)">Growthbook::Context</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Looks up the user's remote saved groups with resolver and sets them as
+#remote_group_ids. Leaves the context unchanged when the payload has no
+remote groups or the resolver raises.</p>
+<p>Requires a saved group references v2 payload for the group metadata. With
+inline/v1 payloads, resolve membership in the app and set #remote_group_ids
+directly instead.</p>
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>resolver</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Called with the attributes the payload's remote groups
+use (keyed by attributeKey) and the groups (hashes with 'id', 'attributeKey'
+and, for a derived group, 'valuesFrom'). Returns the ids of the groups the
+user is in. See Growthbook::RedisResolver.</p></div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Growthbook::Context (class)">Growthbook::Context</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>self</p></div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 175</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_remote_saved_groups'>add_remote_saved_groups</span><span class='lparen'>(</span><span class='id identifier rubyid_resolver'>resolver</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_saved_groups'>saved_groups</span> <span class='op'>=</span> <span class='ivar'>@saved_groups</span>
+  <span class='comment'># No remote entries doesn&#39;t mean no remote rules: payloads for SDKs without
+</span>  <span class='comment'># remote support check __gb_remoteGroupIds directly. Leaving it unset makes
+</span>  <span class='comment'># those rules fail closed; [] would let every &quot;not in group&quot; rule match.
+</span>  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_groups'><span class='object_link'><a href="RemoteSavedGroups.html#groups-class_method" title="Growthbook::RemoteSavedGroups.groups (method)">groups</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_saved_groups'>saved_groups</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_ids'>ids</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resolve'><span class='object_link'><a href="RemoteSavedGroups.html#resolve-class_method" title="Growthbook::RemoteSavedGroups.resolve (method)">resolve</a></span></span><span class='lparen'>(</span><span class='ivar'>@attributes</span><span class='comma'>,</span> <span class='id identifier rubyid_saved_groups'>saved_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='rparen'>)</span>
+  <span class='comment'># A new payload set during the lookup can add groups the result doesn&#39;t
+</span>  <span class='comment'># cover, and a missing group would pass &quot;not in group&quot; rules. Look up once
+</span>  <span class='comment'># more for the new payload.
+</span>  <span class='kw'>unless</span> <span class='ivar'>@saved_groups</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_saved_groups'>saved_groups</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_groups'><span class='object_link'><a href="RemoteSavedGroups.html#groups-class_method" title="Growthbook::RemoteSavedGroups.groups (method)">groups</a></span></span><span class='lparen'>(</span><span class='ivar'>@saved_groups</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+    <span class='id identifier rubyid_ids'>ids</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_resolve'><span class='object_link'><a href="RemoteSavedGroups.html#resolve-class_method" title="Growthbook::RemoteSavedGroups.resolve (method)">resolve</a></span></span><span class='lparen'>(</span><span class='ivar'>@attributes</span><span class='comma'>,</span> <span class='ivar'>@saved_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_remote_group_ids'>remote_group_ids</span> <span class='op'>=</span> <span class='id identifier rubyid_ids'>ids</span>
+  <span class='kw'>self</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='comment'># The class only: messages can hold attribute values, such as a Redis key
+</span>  <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>GrowthBook: could not resolve remote saved groups (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="eval_feature-instance_method">
   
     #<strong>eval_feature</strong>(key)  &#x21d2; <tt>Object</tt> 
   
@@ -1766,14 +2003,16 @@
       <pre class="lines">
 
 
-140
-141
-142</pre>
+207
+208
+209
+210</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 140</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_warn_if_missing_ids'><span class='object_link'><a href="RemoteSavedGroups.html#warn_if_missing_ids-class_method" title="Growthbook::RemoteSavedGroups.warn_if_missing_ids (method)">warn_if_missing_ids</a></span></span><span class='lparen'>(</span><span class='ivar'>@attributes</span><span class='comma'>,</span> <span class='ivar'>@remote_group_ids</span><span class='comma'>,</span> <span class='ivar'>@saved_groups</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__eval_feature'>_eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1796,13 +2035,13 @@
       <pre class="lines">
 
 
-156
-157
-158
-159</pre>
+225
+226
+227
+228</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 156</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 225</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_feature_value'>feature_value</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_fallback'>fallback</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
@@ -1850,12 +2089,12 @@
       <pre class="lines">
 
 
-152
-153
-154</pre>
+221
+222
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 152</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_off?'>off?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_off'>off</span>
@@ -1902,12 +2141,12 @@
       <pre class="lines">
 
 
-148
-149
-150</pre>
+217
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 148</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 217</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on?'>on?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_eval_feature'>eval_feature</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_on'>on</span>
@@ -1932,14 +2171,16 @@
       <pre class="lines">
 
 
-144
-145
-146</pre>
+212
+213
+214
+215</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/growthbook/context.rb', line 212</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="RemoteSavedGroups.html" title="Growthbook::RemoteSavedGroups (module)">RemoteSavedGroups</a></span></span><span class='period'>.</span><span class='id identifier rubyid_warn_if_missing_ids'><span class='object_link'><a href="RemoteSavedGroups.html#warn_if_missing_ids-class_method" title="Growthbook::RemoteSavedGroups.warn_if_missing_ids (method)">warn_if_missing_ids</a></span></span><span class='lparen'>(</span><span class='ivar'>@attributes</span><span class='comma'>,</span> <span class='ivar'>@remote_group_ids</span><span class='comma'>,</span> <span class='ivar'>@saved_groups</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__run'>_run</span><span class='lparen'>(</span><span class='id identifier rubyid_exp'>exp</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1952,7 +2193,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Nov  2 22:31:11 2026 by
+  Generated on Mon Nov 23 18:52:27 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-3.2.11).
 </div>
