@@ -219,6 +219,47 @@ RSpec.describe 'remote saved groups' do
 
     let(:groups) { Growthbook::RemoteSavedGroups.groups(saved_groups) }
 
+    # Records each pipeline, like the redis gem's `pipelined`
+    def pipelined_redis
+      Class.new(redis) do
+        attr_reader :pipelines
+
+        def pipelined
+          @pipelines = (@pipelines || 0) + 1
+          queued = []
+          pipe = Object.new
+          pipe.define_singleton_method(:smembers) { |key| queued << key }
+          yield pipe
+          queued.map { |key| smembers(key) }
+        end
+      end
+    end
+
+    it 'sends the lookups in one pipeline when the client has one' do
+      client = pipelined_redis.new('gb:member:account_id:a2' => ['grp_vip'], 'gb:member:account_id:p1' => ['grp_vip'])
+      ids = described_class.new(client).call({ 'account_id' => %w[a1 a2], 'parent_id' => 'p1' }, groups)
+      expect(ids).to eq(%w[grp_vip grp_vip:parent_id])
+      expect(client.pipelines).to eq(1)
+      expect(client.keys).to eq(%w[gb:member:account_id:a1 gb:member:account_id:a2 gb:member:account_id:p1])
+    end
+
+    it 'looks up one key at a time when the client cannot pipeline them' do
+      client = Class.new(redis) do
+        def pipelined
+          raise ArgumentError, 'cannot pipeline'
+        end
+      end.new('gb:member:account_id:a2' => ['grp_vip'])
+      ids = described_class.new(client).call({ 'account_id' => %w[a1 a2] }, [groups[0]])
+      expect(ids).to eq(['grp_vip'])
+      expect(client.keys).to eq(%w[gb:member:account_id:a1 gb:member:account_id:a2])
+    end
+
+    it 'opens no pipeline when there is nothing to look up' do
+      client = pipelined_redis.new
+      expect(described_class.new(client).call({}, groups)).to eq([])
+      expect(client.pipelines).to be_nil
+    end
+
     it 'looks up each attribute value in its group' do
       client = redis.new('gb:member:account_id:a1' => %w[grp_vip grp_other])
       expect(described_class.new(client).call({ 'account_id' => 'a1' }, groups)).to eq(['grp_vip'])

@@ -5,7 +5,8 @@ require 'growthbook/util'
 module Growthbook
   # A resolver for Context#add_remote_saved_groups, for remote saved groups loaded
   # into Redis by GrowthBook's loader: one `SMEMBERS gb:member:<attribute>:<value>`
-  # per attribute value. Takes any client with `smembers(key)`, such as the redis
+  # per attribute value, sent in one pipeline when the client has `pipelined`.
+  # Takes any client with `smembers(key)`, such as the redis
   # gem's `Redis`; the SDK doesn't depend on one. Not loaded by `require 'growthbook'`:
   #
   #   require 'growthbook/redis_resolver'
@@ -34,16 +35,31 @@ module Growthbook
           checks << [group['id'], "gb:member:#{source['attributeKey']}:#{value}", source['id']]
         end
       end
-      members = checks.map { |check| check[1] }.uniq.each_with_object({}) do |key, out|
-        out[key] = @redis.smembers(key).map(&:to_s)
-      end
+      keys = checks.map { |check| check[1] }.uniq
+      members = keys.zip(smembers(keys)).to_h
       # Checking for the expected id, not any id in the set, also keeps keys that
       # collide when attributes or values contain ":" (`a:b` + `c` and `a` + `b:c`)
       # from mixing up groups.
-      checks.select { |_id, key, match_id| members[key].include?(match_id) }.map(&:first).uniq
+      checks.select { |_id, key, match_id| members[key].map(&:to_s).include?(match_id) }.map(&:first).uniq
     end
 
     private
+
+    # One pipeline when the client can pipeline these keys, so the lookups cost
+    # one round trip; otherwise one call per key
+    def smembers(keys)
+      return [] if keys.empty?
+
+      if @redis.respond_to?(:pipelined)
+        begin
+          return @redis.pipelined { |pipe| keys.each { |key| pipe.smembers(key) } }
+        rescue StandardError
+          # Redis::Distributed can't pipeline, and redis 4.x cluster mode can't
+          # pipeline keys on different nodes
+        end
+      end
+      keys.map { |key| @redis.smembers(key) }
+    end
 
     # Each item of an array is looked up. Numbers use JS `String(value)`, the same
     # form the loader stores them in.
