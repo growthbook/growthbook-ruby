@@ -60,7 +60,8 @@ module Growthbook
         # @private Called by #initialize
         def register(instance)
           @registry_mutex.synchronize do
-            @instances[instance] = true
+            # The value is the instance too: before Ruby 2.7 a WeakMap value can't be true or nil
+            @instances[instance] = instance
             @instance_count += 1
             warn("#{INSTANCE_WARNING_THRESHOLD} GrowthBook tracking plugins created: create one per process and pass it to every Context") if @instance_count == INSTANCE_WARNING_THRESHOLD
           end

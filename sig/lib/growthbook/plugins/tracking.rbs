@@ -22,7 +22,7 @@ module Growthbook
 
       INSTANCE_WARNING_THRESHOLD: Integer
 
-      self.@instances: ObjectSpace::WeakMap[Tracking, bool]
+      self.@instances: ObjectSpace::WeakMap[Tracking, Tracking]
 
       self.@instance_count: Integer
 
