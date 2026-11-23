@@ -1,5 +1,8 @@
 # The GrowthBook SDK
 module Growthbook
+  # The released version of this gem
+  VERSION: String
+
   # Partially evaluate a targeting condition when only some attributes are known
   def self.prune_condition: (Hash[untyped, untyped]? attributes, Hash[untyped, untyped] condition, ?Hash[String, untyped]? saved_groups) -> (bool | Hash[String, untyped])
 

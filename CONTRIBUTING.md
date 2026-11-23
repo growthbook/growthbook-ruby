@@ -55,8 +55,11 @@ You may find the following tools helpful:
 
 ## Releasing
 
-1. Bump version in `Gemfile.lock` and `growthbook.gemspec`
-2. Merge to the `main` branch
-3. Create a new GitHub release with the new version as the tag (e.g. `v0.2.0`)
-4. Run `gem build growthbook`
-5. Run `gem push growthbook-{VERSION}.gem`
+Releases are made by [release-please](https://github.com/googleapis/release-please) from
+[Conventional Commits](https://www.conventionalcommits.org/) on `main`:
+
+1. Merge PRs with conventional titles (`feat:`, `fix:`, `feat!:` …). Release-please keeps a
+   "chore: release X.Y.Z" PR open that bumps `lib/growthbook/version.rb`, `Gemfile.lock` and
+   `CHANGELOG.md`.
+2. Merge the release PR. Release-please tags `vX.Y.Z`, creates the GitHub release, and the
+   workflow runs the tests and publishes the gem to RubyGems.
