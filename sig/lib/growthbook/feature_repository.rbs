@@ -5,8 +5,33 @@ module Growthbook
 
     attr_reader endpoint: String
     attr_reader decryption_key: String?
-    attr_reader features_json: Hash[String, untyped]
-    attr_reader saved_groups_json: Hash[String, untyped]
+    @lock: Thread::Mutex
+
+    def features_json: () -> Hash[String, untyped]
+
+    def saved_groups_json: () -> Hash[String, untyped]
+
+    @snapshot: [Hash[String, untyped], Hash[String, untyped]]
+
+    def snapshot: () -> [Hash[String, untyped], Hash[String, untyped]]
+
+    @sse_supported: bool
+    @sse_client: SSEClient?
+    @sse_pid: Integer?
+    @sse_restart: (^() -> void)?
+    @at_exit_registered: bool
+
+    def sse_supported?: () -> bool
+
+    def start_auto_refresh: (
+        ?streaming_host: String?,
+        ?headers: Hash[String, String],
+        ?on_update: (^(Hash[String, untyped], Hash[String, untyped]) -> void)?
+      ) -> bool
+
+    def stop_auto_refresh: () -> void
+
+    def auto_refreshing?: () -> bool
 
     def fetch: () -> (nil | Hash[String, untyped])
 
@@ -16,6 +41,27 @@ module Growthbook
 
     attr_reader response: String?
 
+    def apply_payload: (String json) -> (nil | Hash[String, untyped])
+
+    def apply_response: () -> (nil | Hash[String, untyped])
+
+    def start_streaming: (
+        String? streaming_host,
+        Hash[String, String] headers,
+        (^(Hash[String, untyped], Hash[String, untyped]) -> void)? on_update
+      ) -> void
+
+    def restart_after_fork: () -> void
+
+    def register_at_exit: () -> void
+
+    def streaming_url: (String? streaming_host) -> String
+
+    def handle_sse_event: (
+        { type: String, data: String } event,
+        (^(Hash[String, untyped], Hash[String, untyped]) -> void)? on_update
+      ) -> void
+
     def parsed_plain_text_response: () -> (nil | Hash[String, untyped])
 
     def parsed_decrypted_response: () -> (nil | Hash[String, untyped])
@@ -23,6 +69,8 @@ module Growthbook
     def decrypted_saved_groups: (Hash[String, untyped] parsed, String key) -> Hash[String, untyped]
 
     def parsed_response: () -> (nil | Hash[String, untyped])
+
+    def publish: (Hash[String, untyped] features, Hash[String, untyped] saved_groups) -> Hash[String, untyped]
 
     def use_decryption?: -> bool
 
@@ -36,7 +84,7 @@ end
 
 module Net
   class HTTPSuccess
-    
+
   end
 
   class HTTP
