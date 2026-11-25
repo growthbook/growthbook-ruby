@@ -93,6 +93,27 @@ RSpec.describe 'contextual bandit evaluation' do
       expect(result.variation_weights).to eq([0.5, 0.5])
     end
 
+    it 'matches a leaf on the remote saved groups the user is in' do
+      remote_bandits = {
+        'cb-bandit' => {
+          'banditVersion' => 7,
+          'contexts'      => [{ 'leafId' => 2, 'condition' => { '$savedGroup' => { 'id' => 'grp_vip' } }, 'weights' => [0, 1] }]
+        }
+      }
+      gb = Growthbook::Context.new(
+        features: features,
+        attributes: { id: '1', account_id: 'a1' },
+        saved_groups: { 'grp_vip' => { 'type' => 'remote', 'attributeKey' => 'account_id' } },
+        remote_group_ids: ['grp_vip'],
+        contextual_bandits: remote_bandits
+      )
+
+      result = gb.eval_feature('bandit-feature').experiment_result
+
+      expect(result.leaf_id).to eq(2)
+      expect(result.variation_weights).to eq([0, 1])
+    end
+
     it 'derives sticky bucket attributes from a bandit rule too' do
       bandit_rule = features['bandit-feature']['rules'].first.merge('hashAttribute' => 'device_id')
       gb = Growthbook::Context.new(

@@ -485,7 +485,7 @@ module Growthbook
       return if definition.nil?
 
       leaf = begin
-        definition.contexts.find { |context| Growthbook::Conditions.eval_condition(@attributes, context.condition || {}, @saved_groups) }
+        definition.contexts.find { |context| Growthbook::Conditions.eval_condition(@condition_attributes, context.condition || {}, @saved_groups) }
       rescue StandardError
         # Any throw while selecting a leaf abandons the selection entirely and falls back, rather
         # than carrying on with the remaining leaves - matching the reference implementation
