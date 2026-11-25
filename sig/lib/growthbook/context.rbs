@@ -52,6 +52,8 @@ module Growthbook
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
 
+    def update_attributes: (Hash[String | Symbol, untyped]? attrs) -> untyped
+
     def remote_group_ids=: (Array[String]? ids) -> Hash[String, untyped]
 
     def saved_groups=: (Hash[String, untyped]? saved_groups) -> Hash[String, untyped]

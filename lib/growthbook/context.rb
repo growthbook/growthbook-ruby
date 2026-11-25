@@ -140,6 +140,13 @@ module Growthbook
       refresh_sticky_buckets
     end
 
+    # Shallow-merge the given attributes into the existing ones (parity with the
+    # TS SDK's updateAttributes): new keys are added, existing keys overwritten,
+    # untouched keys preserved. Unlike attributes=, this does not replace the map.
+    def update_attributes(attrs)
+      self.attributes = attributes.merge(stringify_keys(attrs || {}))
+    end
+
     # Sets the remote saved groups the user is in. A remote saved group keeps its
     # members outside the payload, so the app resolves the user's groups and passes
     # their ids here, or uses #add_remote_saved_groups. Conditions read them as the
