@@ -97,7 +97,7 @@ module Growthbook
       remote_group_ids = nil
       plugins = []
 
-      options.transform_keys(&:to_sym).each do |key, value|
+      options.transform_keys(&:to_sym).each do |key, value| # rubocop:disable Metrics/BlockLength
         case key
         when :enabled
           @enabled = value
