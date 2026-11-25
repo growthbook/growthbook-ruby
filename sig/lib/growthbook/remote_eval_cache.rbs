@@ -1,0 +1,29 @@
+module Growthbook
+  # Extendable class used to cache remote evaluation responses
+  class RemoteEvalCache
+    def get: (String key) -> Hash[String, untyped]?
+
+    def set: (String key, untyped value, Integer ttl) -> untyped
+  end
+
+  # Thread-safe in-memory cache with a TTL and a least-recently-used bound
+  class InMemoryRemoteEvalCache < RemoteEvalCache
+    DEFAULT_MAX_SIZE: Integer
+
+    @max_size: Integer
+    @entries: Hash[String, { value: untyped, expires_at: Float? }]
+    @mutex: Thread::Mutex
+
+    def initialize: (?max_size: Integer) -> void
+
+    def get: (String key) -> untyped
+
+    def set: (String key, untyped value, Integer ttl) -> untyped
+
+    private
+
+    def evict_oldest: () -> void
+
+    def monotonic_now: () -> Float
+  end
+end
