@@ -52,6 +52,7 @@ end
 
 require 'growthbook/conditions'
 require 'growthbook/context'
+require 'growthbook/contextual_bandit'
 require 'growthbook/decryption_util'
 require 'growthbook/feature'
 require 'growthbook/feature_repository'

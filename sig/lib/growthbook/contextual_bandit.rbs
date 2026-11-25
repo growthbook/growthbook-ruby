@@ -1,0 +1,39 @@
+module Growthbook
+  # How a contextual bandit routed one evaluation
+  class ContextualBandit
+    FALLBACK_LEAF_ID: Integer
+
+    attr_reader leaf_id: Integer?
+    attr_reader variation_weights: Array[Float]?
+    attr_reader bandit_version: Integer?
+
+    def initialize: (Integer? leaf_id, Array[Float]? variation_weights, ?Integer? bandit_version) -> void
+
+    def to_json: (*untyped) -> Hash[String, untyped]
+  end
+
+  # One leaf of a contextual bandit
+  class ContextualBanditContext
+    attr_reader leaf_id: Integer?
+    attr_reader condition: Hash[String, untyped]?
+    attr_reader weights: Array[Float]?
+
+    def initialize: (untyped context) -> void
+
+    private
+
+    def get_option: (Hash[untyped, untyped] hash, String | Symbol key) -> untyped
+  end
+
+  # A contextual bandit shipped in the feature payload
+  class ContextualBanditDefinition
+    attr_reader bandit_version: Integer?
+    attr_reader contexts: Array[Growthbook::ContextualBanditContext]
+
+    def initialize: (untyped definition) -> void
+
+    private
+
+    def get_option: (Hash[untyped, untyped] hash, String | Symbol key) -> untyped
+  end
+end

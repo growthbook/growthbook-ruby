@@ -38,6 +38,10 @@ module Growthbook
     # @return [Hash[String, Array]] Saved groups, used by the $inGroup/$notInGroup operators
     attr_reader :saved_groups
 
+    # @return [Hash[String, Growthbook::ContextualBanditDefinition]] Contextual bandits that
+    #   feature rules resolve their contextualBanditRef against
+    attr_reader :contextual_bandits
+
     # @return [Array<String>, nil] The remote saved groups the user is in, resolved by the app.
     #   nil means unresolved, which is not the same as no groups: rules using remote
     #   groups then fail, "not in group" included. See #add_remote_saved_groups.
@@ -68,6 +72,7 @@ module Growthbook
       @impressions = {}
       @sticky_bucket_assignment_docs = {}
       @saved_groups = {}
+      @contextual_bandits = {}
       @remote_group_ids = nil
 
       features = {}
@@ -105,6 +110,8 @@ module Growthbook
           @sticky_bucket_identifier_attributes = value
         when :saved_groups, :savedGroups
           @saved_groups = value || {}
+        when :contextual_bandits, :contextualBandits
+          self.contextual_bandits = value
         when :remote_group_ids, :remoteGroupIds
           remote_group_ids = value
         else
@@ -138,6 +145,21 @@ module Growthbook
       @condition_attributes = RemoteSavedGroups.with_ids(@attributes, @remote_group_ids)
 
       refresh_sticky_buckets
+    end
+
+    # Replace the contextual bandit definitions that feature rules resolve their
+    # contextualBanditRef against. These are read-only inputs computed by the GrowthBook
+    # backend and normally arrive with the feature payload.
+    def contextual_bandits=(contextual_bandits)
+      @contextual_bandits = {}
+
+      return if contextual_bandits.nil?
+
+      contextual_bandits.each do |ref, definition|
+        definition = Growthbook::ContextualBanditDefinition.new(definition) unless definition.is_a?(Growthbook::ContextualBanditDefinition)
+
+        @contextual_bandits[ref.to_s] = definition
+      end
     end
 
     # Sets the remote saved groups the user is in. A remote saved group keeps its
@@ -300,7 +322,7 @@ module Growthbook
         exp = rule.to_experiment(key)
         next if exp.nil?
 
-        result = _run(exp, key)
+        result = _run_experiment_rule(rule, exp, key)
 
         next unless result.in_experiment && !result.passthrough
 
@@ -440,6 +462,49 @@ module Growthbook
       result
     end
 
+    def _run_experiment_rule(rule, exp, key)
+      apply_contextual_bandit(exp, rule.contextual_bandit_ref) if rule.contextual_bandit_ref
+
+      result = _run(exp, key)
+
+      # The weights stay applied, but the routing metadata describes an exposure, so drop it
+      # when the user was not really bucketed in (forced, QA mode, filtered out, ...)
+      exp.contextual_bandit = nil unless result.hash_used && result.in_experiment
+
+      result
+    end
+
+    # Apply a contextual bandit's backend-computed weights to an experiment before bucketing.
+    #
+    # The first leaf whose condition matches the user wins and its weights replace the
+    # experiment's own. A missing definition leaves the experiment untouched (aggregate weights,
+    # no metadata); a definition with no matching leaf records the fallback leaf against the
+    # experiment's own or equal weights.
+    def apply_contextual_bandit(exp, contextual_bandit_ref)
+      definition = @contextual_bandits[contextual_bandit_ref.to_s]
+      return if definition.nil?
+
+      leaf = begin
+        definition.contexts.find { |context| Growthbook::Conditions.eval_condition(@condition_attributes, context.condition || {}, @saved_groups) }
+      rescue StandardError
+        # Any throw while selecting a leaf abandons the selection entirely and falls back, rather
+        # than carrying on with the remaining leaves - matching the reference implementation
+        nil
+      end
+
+      if leaf && !leaf.weights.nil?
+        exp.weights = leaf.weights
+        exp.contextual_bandit = Growthbook::ContextualBandit.new(leaf.leaf_id, leaf.weights, definition.bandit_version)
+        return
+      end
+
+      exp.contextual_bandit = Growthbook::ContextualBandit.new(
+        Growthbook::ContextualBandit::FALLBACK_LEAF_ID,
+        exp.weights || Growthbook::Util.get_equal_weights(exp.variations.length),
+        definition.bandit_version
+      )
+    end
+
     def stringify_keys(hash)
       new_hash = {}
       hash.each do |key, value|
@@ -486,7 +551,9 @@ module Growthbook
           feature_id: feature_id,
           bucket: bucket,
           name: meta['name'],
-          sticky_bucket_used: sticky_bucket_used
+          sticky_bucket_used: sticky_bucket_used,
+          # Only a real exposure carries the bandit's routing metadata
+          contextual_bandit: hash_used && in_experiment ? experiment.contextual_bandit : nil
         }
       )
 
@@ -624,7 +691,9 @@ module Growthbook
       attributes = Set.new
       @features.each do |_key, feature|
         feature.rules.each do |rule|
-          if rule.variations
+          # experiment_variations, not variations: a contextual bandit rule keeps its variations
+          # under contextualVariations, and its hash attributes are needed here all the same
+          if rule.experiment_variations
             attributes.add(rule.hash_attribute || 'id')
             attributes.add(rule.fallback_attribute) if rule.fallback_attribute
           end

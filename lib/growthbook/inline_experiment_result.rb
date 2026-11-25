@@ -39,6 +39,9 @@ module Growthbook
     # @return [Boolean]  When true, sticky bucketing was used to assign a variation
     attr_accessor :sticky_bucket_used
 
+    # @return [Growthbook::ContextualBandit, nil] How a contextual bandit routed this assignment
+    attr_reader :contextual_bandit
+
     def initialize(options = {})
       @key = options[:key]
       @in_experiment = options[:in_experiment]
@@ -52,6 +55,22 @@ module Growthbook
       @name = options[:name]
       @passthrough = options[:passthrough]
       @sticky_bucket_used = options[:sticky_bucket_used]
+      @contextual_bandit = options[:contextual_bandit]
+    end
+
+    # @return [Integer, nil] The contextual bandit leaf that routed this assignment
+    def leaf_id
+      @contextual_bandit&.leaf_id
+    end
+
+    # @return [Float[], nil] The weights the contextual bandit bucketed with
+    def variation_weights
+      @contextual_bandit&.variation_weights
+    end
+
+    # @return [Integer, nil] Version of the weights the contextual bandit supplied
+    def bandit_version
+      @contextual_bandit&.bandit_version
     end
 
     # If the variation was randomly assigned based on user attribute hashes
@@ -83,7 +102,10 @@ module Growthbook
         'bucket'           => @bucket,
         'name'             => @name,
         'passthrough'      => @passthrough,
-        'stickyBucketUsed' => @sticky_bucket_used
+        'stickyBucketUsed' => @sticky_bucket_used,
+        'leafId'           => leaf_id,
+        'variationWeights' => variation_weights,
+        'banditVersion'    => bandit_version
       }.compact
     end
   end

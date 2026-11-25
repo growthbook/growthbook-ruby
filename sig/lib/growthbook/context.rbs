@@ -31,6 +31,8 @@ module Growthbook
 
     attr_reader saved_groups: Hash[String, untyped]
 
+    attr_reader contextual_bandits: Hash[String, Growthbook::ContextualBanditDefinition]
+
     # The remote saved groups the user is in, resolved by the app. nil means unresolved.
     attr_reader remote_group_ids: Array[String]?
 
@@ -51,6 +53,8 @@ module Growthbook
     def features=: (Hash[String | Symbol, untyped] features) -> void
 
     def attributes=: (Hash[String | Symbol, untyped] attrs) -> untyped
+
+    def contextual_bandits=: (Hash[untyped, untyped]? contextual_bandits) -> void
 
     def remote_group_ids=: (Array[String]? ids) -> Hash[String, untyped]
 
@@ -113,5 +117,7 @@ module Growthbook
     def decrypted_features_from_options: (Hash[Symbol, untyped] options) -> Hash[String, untyped]?
 
     def track_feature_usage: (String, FeatureResult) -> void
+
+    def apply_contextual_bandit: (InlineExperiment exp, String contextual_bandit_ref) -> void
   end
 end

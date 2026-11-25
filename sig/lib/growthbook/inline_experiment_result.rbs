@@ -37,6 +37,15 @@ module Growthbook
     # @return [Boolean]  When true, sticky bucketing was used to assign a variation
     attr_accessor sticky_bucket_used: bool?
 
+    # @return [Growthbook::ContextualBandit, nil] How a contextual bandit routed this assignment
+    attr_reader contextual_bandit: Growthbook::ContextualBandit?
+
+    def leaf_id: () -> Integer?
+
+    def variation_weights: () -> Array[Float]?
+
+    def bandit_version: () -> Integer?
+
     def initialize: (?::Hash[untyped, untyped] options) -> void
 
     # If the variation was randomly assigned based on user attribute hashes
