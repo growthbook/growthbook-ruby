@@ -95,8 +95,9 @@ module Growthbook
       features = {}
       attributes = {}
       remote_group_ids = nil
+      plugins = []
 
-      options.transform_keys(&:to_sym).each do |key, value|
+      options.transform_keys(&:to_sym).each do |key, value| # rubocop:disable Metrics/BlockLength
         case key
         when :enabled
           @enabled = value
@@ -125,6 +126,8 @@ module Growthbook
           @event_logger = value
         when :client_key, :clientKey
           @client_key = value
+        when :plugins
+          plugins = value || []
         when :sticky_bucket_service
           @sticky_bucket_service = value
         when :sticky_bucket_identifier_attributes
@@ -142,6 +145,7 @@ module Growthbook
       self.attributes = attributes
       self.remote_group_ids = remote_group_ids
       self.features = features
+      apply_plugins(plugins)
     end
 
     def features=(features)
@@ -322,6 +326,24 @@ module Growthbook
     end
 
     private
+
+    # Plugins run last, once the context is fully set up. The whole list is checked before any
+    # plugin runs. Like in the TS SDK, an error raised by a plugin propagates, so a broken plugin
+    # fails loudly when the context is created; the context is destroyed first, so the plugins
+    # that already ran can release what they started (threads, queues) in their on_destroy.
+    def apply_plugins(plugins)
+      raise ArgumentError, "GrowthBook plugins must be an Array, got #{plugins.class}" unless plugins.is_a?(Array)
+
+      invalid = plugins.reject { |plugin| plugin.respond_to?(:call) }
+      raise ArgumentError, "GrowthBook plugin must respond to #call, got #{invalid.first.class}" unless invalid.empty?
+
+      begin
+        plugins.each { |plugin| plugin.call(self) }
+      rescue Exception # rubocop:disable Lint/RescueException
+        destroy
+        raise
+      end
+    end
 
     def _eval_prereqs(parent_conditions, stack)
       parent_conditions.each do |parent_condition|
