@@ -2,6 +2,12 @@
 
 # The GrowthBook SDK
 module Growthbook
+  # Name of the event sent to the event logger when a feature is evaluated
+  EVENT_FEATURE_EVALUATED = 'Feature Evaluated'
+
+  # Name of the event sent to the event logger when a user is put in an experiment
+  EVENT_EXPERIMENT_VIEWED = 'Experiment Viewed'
+
   # Partially evaluate a targeting condition when only some attributes are known,
   # e.g. on a server. Attributes missing from `attributes` are unknown.
   #
@@ -64,5 +70,6 @@ require 'growthbook/payload_reducer'
 require 'growthbook/remote_saved_groups'
 require 'growthbook/tracking_callback'
 require 'growthbook/util'
+require 'growthbook/version'
 require 'growthbook/feature_usage_callback'
 require 'growthbook/sticky_bucket_service'

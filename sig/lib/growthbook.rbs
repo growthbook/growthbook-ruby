@@ -1,5 +1,14 @@
 # The GrowthBook SDK
 module Growthbook
+  # The released version of this gem
+  VERSION: String
+
+  # Name of the event sent to the event logger when a feature is evaluated
+  EVENT_FEATURE_EVALUATED: String
+
+  # Name of the event sent to the event logger when a user is put in an experiment
+  EVENT_EXPERIMENT_VIEWED: String
+
   # Partially evaluate a targeting condition when only some attributes are known
   def self.prune_condition: (Hash[untyped, untyped]? attributes, Hash[untyped, untyped] condition, ?Hash[String, untyped]? saved_groups) -> (bool | Hash[String, untyped])
 

@@ -253,6 +253,37 @@ describe Growthbook::Context do
     end
   end
 
+  describe 'callbacks that raise' do
+    let(:features) do
+      {
+        'flag'       => { 'defaultValue' => true },
+        'experiment' => { 'defaultValue' => 0, 'rules' => [{ 'variations' => [1, 2] }] }
+      }
+    end
+
+    it 'still returns the feature result when the feature usage callback raises' do
+      on_feature_usage = double
+      allow(on_feature_usage).to receive(:on_feature_usage).and_raise(StandardError, 'analytics down')
+
+      gb = described_class.new(features: features, on_feature_usage: on_feature_usage)
+
+      expect(gb.eval_feature('flag').value).to be(true)
+      expect(on_feature_usage).to have_received(:on_feature_usage)
+    end
+
+    it 'still returns the experiment result and records the impression when the listener raises' do
+      listener = double
+      allow(listener).to receive(:on_experiment_viewed).and_raise(StandardError, 'analytics down')
+
+      gb = described_class.new(attributes: { 'id' => 'user-123' }, features: features, listener: listener)
+
+      expect(gb.eval_feature('experiment').source).to eq('experiment')
+      expect(gb.run(Growthbook::InlineExperiment.new(key: 'inline', variations: [0, 1])).in_experiment).to be(true)
+      expect(listener).to have_received(:on_experiment_viewed).twice
+      expect(gb.impressions.keys).to contain_exactly('experiment', 'inline')
+    end
+  end
+
   describe 'encrypted features' do
     context 'when provided an encryption key' do
       # uses "Valid feature" test

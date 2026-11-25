@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'lib/growthbook/version'
+
 Gem::Specification.new do |s|
   s.name          = 'growthbook'
-  s.version       = '2.0.0'
+  s.version       = Growthbook::VERSION
   s.summary       = 'GrowthBook SDK for Ruby'
   s.description   = 'Official GrowthBook SDK for Ruby'
   s.authors       = ['GrowthBook']
