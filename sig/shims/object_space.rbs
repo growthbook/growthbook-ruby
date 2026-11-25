@@ -1,0 +1,10 @@
+# The RBS bundled with steep 1.6 has no signature for ObjectSpace::WeakMap; only what the SDK uses
+module ObjectSpace
+  class WeakMap[K, V]
+    def initialize: () -> void
+
+    def []=: (K key, V value) -> V
+
+    def keys: () -> Array[K]
+  end
+end

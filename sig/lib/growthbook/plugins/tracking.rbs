@@ -1,0 +1,98 @@
+module Growthbook
+  module Plugins
+    # Sends the SDK's events to the GrowthBook ingestor. One instance per process.
+    class Tracking
+      type event_data = { event_name: String, properties: Hash[untyped, untyped], attributes: Hash[untyped, untyped], url: String }
+
+      interface _EventFilter
+        def call: (event_data data) -> untyped
+      end
+
+      DEFAULT_INGESTOR_HOST: String
+
+      IDENTITY_ATTRIBUTES: Array[String]
+
+      OPTIONAL_FIELDS: Hash[String, String]
+
+      TOP_LEVEL_ATTRIBUTES: Array[String]
+
+      DEDUPED_EVENTS: Array[String]
+
+      WORKER_IDLE_TIMEOUT: Integer
+
+      INSTANCE_WARNING_THRESHOLD: Integer
+
+      self.@instances: ObjectSpace::WeakMap[Tracking, Tracking]
+
+      self.@instance_count: Integer
+
+      self.@registry_mutex: Thread::Mutex
+
+      def self.register: (Tracking instance) -> void
+
+      def self.shutdown_all: () -> void
+
+      @ingestor_host: String
+      @ingestor_uri: URI::Generic
+      @send_mutex: Thread::Mutex
+      @http: Net::HTTP?
+      @queue_flush_interval: Float | Integer
+      @enable: bool
+      @enable_feature_usage_events: bool
+      @debug: bool
+      @dedupe_cache_size: Integer
+      @dedupe_key_attributes: Array[String]
+      @event_filter: _EventFilter?
+      @max_queue_size: Integer
+      @http_timeout: Float | Integer
+      @dedupe_cache: Hash[String, bool]
+      @stopped: bool
+      @pid: Integer
+      @mutex: Thread::Mutex
+      @wakeup: Thread::ConditionVariable
+      @queue: Array[[String, String]]
+      @worker: Thread?
+      @dropping: bool
+
+      def initialize: (?ingestor_host: String?, ?queue_flush_interval: Float | Integer, ?enable: bool, ?enable_feature_usage_events: bool, ?debug: bool, ?dedupe_cache_size: Integer, ?dedupe_key_attributes: Array[String | Symbol]?, ?event_filter: _EventFilter?, ?max_queue_size: Integer, ?http_timeout: Float | Integer) -> void
+
+      def call: (Context context) -> nil
+
+      def track: (String client_key, String event_name, Hash[untyped, untyped]? properties, Context::tracking_user_context user_context) -> nil
+
+      def flush: () -> nil
+
+      def shutdown: (?timeout: Float | Integer) -> nil
+
+      private
+
+      def reset_queue: () -> void
+
+      def reset_after_fork: () -> void
+
+      def duplicate?: (String client_key, event_data data) -> bool
+
+      def dedupe_key: (String client_key, event_data data) -> String
+
+      def event_payload: (event_data data) -> Hash[String, untyped]
+
+      def first_present: (Hash[untyped, untyped] attributes, Array[String] names) -> untyped
+
+      def string_or_nil: (untyped value) -> String?
+
+      def serialize: (Hash[String, untyped] payload) -> String?
+
+      def enqueue: (String client_key, String body) -> void
+
+      def start_worker: () -> void
+
+      def run_worker: () -> void
+
+      def connection: () -> Net::HTTP
+
+      def close_connection: () -> void
+
+      def send_events: (String client_key, Array[String] events) -> void
+    end
+  end
+end
