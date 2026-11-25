@@ -38,6 +38,11 @@ module Growthbook
     # @return [Hash[String, Array]] Saved groups, used by the $inGroup/$notInGroup operators
     attr_reader :saved_groups
 
+    # @return [Array<String>, nil] The remote saved groups the user is in, resolved by the app.
+    #   nil means unresolved, which is not the same as no groups: rules using remote
+    #   groups then fail, "not in group" included. See #add_remote_saved_groups.
+    attr_reader :remote_group_ids
+
     # @return [Growthbook::StickyBucketService] Sticky bucket service for sticky bucketing
     attr_reader :sticky_bucket_service
 
@@ -70,9 +75,11 @@ module Growthbook
       @impressions = {}
       @sticky_bucket_assignment_docs = {}
       @saved_groups = {}
+      @remote_group_ids = nil
 
       features = {}
       attributes = {}
+      remote_group_ids = nil
 
       options.transform_keys(&:to_sym).each do |key, value|
         case key
@@ -107,6 +114,8 @@ module Growthbook
           @saved_groups = value || {}
         when :remote_eval_repository
           @remote_eval_repository = value
+        when :remote_group_ids, :remoteGroupIds
+          remote_group_ids = value
         else
           warn("Unknown context option: #{key}")
         end
@@ -114,6 +123,7 @@ module Growthbook
 
       @using_derived_sticky_bucket_attributes = !@sticky_bucket_identifier_attributes
       self.attributes = attributes
+      self.remote_group_ids = remote_group_ids
       self.features = features
 
       validate_remote_eval(decryption_key)
@@ -139,6 +149,7 @@ module Growthbook
 
     def attributes=(attrs)
       @attributes = stringify_keys(attrs || {})
+      @condition_attributes = RemoteSavedGroups.with_ids(@attributes, @remote_group_ids)
 
       refresh_sticky_buckets
       refresh_for_remote_eval
@@ -150,8 +161,60 @@ module Growthbook
       refresh_for_remote_eval
     end
 
+    # Sets the remote saved groups the user is in. A remote saved group keeps its
+    # members outside the payload, so the app resolves the user's groups and passes
+    # their ids here, or uses #add_remote_saved_groups. Conditions read them as the
+    # `__gb_remoteGroupIds` attribute, over any value the attributes set for it.
+    #
+    # Pass nil while the groups are unresolved: rules that use remote groups then
+    # fail, including "not in group". Don't pass [] for that: it means "in no
+    # group", so "not in group" rules match.
+    #
+    # @param ids [Array<String>, nil]
+    def remote_group_ids=(ids)
+      @remote_group_ids = ids&.map(&:to_s)
+      @condition_attributes = RemoteSavedGroups.with_ids(@attributes, @remote_group_ids)
+    end
+
     def saved_groups=(saved_groups)
       @saved_groups = saved_groups || {}
+    end
+
+    # Looks up the user's remote saved groups with resolver and sets them as
+    # #remote_group_ids. Leaves the context unchanged when the payload has no
+    # remote groups or the resolver raises.
+    #
+    # Requires a saved group references v2 payload for the group metadata. With
+    # inline/v1 payloads, resolve membership in the app and set #remote_group_ids
+    # directly instead.
+    #
+    # @param resolver [#call] Called with the attributes the payload's remote groups
+    #   use (keyed by attributeKey) and the groups (hashes with 'id', 'attributeKey'
+    #   and, for a derived group, 'valuesFrom'). Returns the ids of the groups the
+    #   user is in. See Growthbook::RedisResolver.
+    # @return [Growthbook::Context] self
+    def add_remote_saved_groups(resolver)
+      saved_groups = @saved_groups
+      # No remote entries doesn't mean no remote rules: payloads for SDKs without
+      # remote support check __gb_remoteGroupIds directly. Leaving it unset makes
+      # those rules fail closed; [] would let every "not in group" rule match.
+      return self if RemoteSavedGroups.groups(saved_groups).empty?
+
+      ids = RemoteSavedGroups.resolve(@attributes, saved_groups, resolver)
+      # A new payload set during the lookup can add groups the result doesn't
+      # cover, and a missing group would pass "not in group" rules. Look up once
+      # more for the new payload.
+      unless @saved_groups.equal?(saved_groups)
+        return self if RemoteSavedGroups.groups(@saved_groups).empty?
+
+        ids = RemoteSavedGroups.resolve(@attributes, @saved_groups, resolver)
+      end
+      self.remote_group_ids = ids
+      self
+    rescue StandardError => e
+      # The class only: messages can hold attribute values, such as a Redis key
+      warn("GrowthBook: could not resolve remote saved groups (#{e.class})")
+      self
     end
 
     def forced_variations=(forced_variations)
@@ -202,10 +265,12 @@ module Growthbook
     end
 
     def eval_feature(key)
+      RemoteSavedGroups.warn_if_missing_ids(@attributes, @remote_group_ids, @saved_groups)
       _eval_feature(key, Set.new)
     end
 
     def run(exp)
+      RemoteSavedGroups.warn_if_missing_ids(@attributes, @remote_group_ids, @saved_groups)
       _run(exp)
     end
 
@@ -489,7 +554,7 @@ module Growthbook
     def condition_passes?(condition)
       return false if condition.nil?
 
-      Growthbook::Conditions.eval_condition(@attributes, condition, @saved_groups)
+      Growthbook::Conditions.eval_condition(@condition_attributes, condition, @saved_groups)
     rescue StandardError
       false
     end
