@@ -387,6 +387,61 @@ RSpec.describe Growthbook::FeatureRepository do
     end
   end
 
+  describe '#fetch! success detection' do
+    subject(:repository) do
+      described_class.new(endpoint: endpoint, decryption_key: decryption_key)
+    end
+
+    let(:endpoint) { 'https://cdn.growthbook.io/api/features/sdk-repeat' }
+    let(:decryption_key) { nil }
+
+    context 'when the payload has no features defined yet' do
+      before do
+        stub_request(:get, endpoint)
+          .to_return(status: 200, body: '{"status": 200, "features": {}}', headers: {})
+      end
+
+      it 'returns an empty hash' do
+        expect(repository.fetch!).to eq({})
+      end
+    end
+
+    context 'when a later encrypted payload cannot be parsed' do
+      let(:decryption_key) { 'BhB1wORFmZLTDjbvstvS8w==' }
+      let(:good_body) do
+        iv = 'a' * 16
+        cipher = OpenSSL::Cipher.new('aes-128-cbc').encrypt
+        cipher.key = Base64.decode64(decryption_key)
+        cipher.iv = iv
+        data = cipher.update('{"flag": {"defaultValue": true}}') + cipher.final
+        JSON.generate('encryptedFeatures' => "#{Base64.strict_encode64(iv)}.#{Base64.strict_encode64(data)}")
+      end
+
+      before do
+        stub_request(:get, endpoint)
+          .to_return({ status: 200, body: good_body }, { status: 200, body: 'not json' })
+        repository.fetch!
+      end
+
+      it 'raises a FeatureParseError instead of returning the previous features' do
+        expect { repository.fetch! }.to raise_error Growthbook::FeatureRepository::FeatureParseError
+      end
+    end
+
+    context 'when a later request fails at the network level' do
+      before do
+        stub_request(:get, endpoint)
+          .to_return(status: 200, body: '{"features": {"flag": {"defaultValue": true}}}')
+          .then.to_raise(SocketError)
+        repository.fetch!
+      end
+
+      it 'raises a FeatureFetchError' do
+        expect { repository.fetch! }.to raise_error Growthbook::FeatureRepository::FeatureFetchError
+      end
+    end
+  end
+
   describe '#saved_groups_json' do
     subject(:repository) do
       described_class.new(endpoint: endpoint, decryption_key: decryption_key)
