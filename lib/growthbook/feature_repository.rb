@@ -26,6 +26,8 @@ module Growthbook
     end
 
     def fetch
+      # Don't let fetch! mistake an earlier response for this request's
+      @response = nil
       uri = URI(endpoint)
       res = Net::HTTP.get_response(uri)
 
@@ -43,12 +45,13 @@ module Growthbook
     end
 
     def fetch!
-      fetch
+      # nil unless this response was parsed; an empty features hash is valid
+      features = fetch
 
       raise FeatureFetchError if response.nil?
-      raise FeatureParseError if features_json.nil? || features_json.empty?
+      raise FeatureParseError if features.nil?
 
-      features_json
+      features
     end
 
     private
